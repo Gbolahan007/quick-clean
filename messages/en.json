@@ -1,0 +1,317 @@
+{
+  "common": {
+    "appName": "QuickClean",
+    "logo": "QuickClean",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "pricing": "Pricing",
+    "quote": "Request Quote",
+    "login": "Log In",
+    "signup": "Sign Up",
+    "dashboard": "Dashboard",
+    "logout": "Log Out",
+    "cta": "Order Cleaning"
+  },
+  "landing": {
+    "hero": {
+      "headline": "More time. Less stress.",
+      "subheadline": "A home that stays clean on autopilot.",
+      "description": "A simple home care plan that keeps your home calm and fresh, allowing you to spend your time on what truly matters.",
+      "cta": "See Plans & Prices",
+      "ct": "Order cleaning now",
+      "ctaSecondary": "How It Works",
+      "trustText": "Trusted by busy households across Tampere"
+    },
+    "problem": {
+      "headline": "Your time shouldn't disappear into chores.",
+      "intro": "Workdays are full. Family life is busy. Your free time is limited. Yet cleaning keeps returning to the list.",
+      "points": [
+        "Floors need attention.",
+        "The bathroom needs care.",
+        "The kitchen never stays done for long.",
+        "Even when you try to relax, the thought remains: 'We should really clean.'"
+      ],
+      "conclusion": "Your home should help you unwind — not remind you of another task waiting."
+    },
+    "transformation": {
+      "headline": "Imagine coming home to 'already done.'",
+      "intro": "A clean, calm home changes how your whole week feels.",
+      "description": "When the house stays under control, evenings become lighter, weekends feel like real time off again and your home becomes a place to recharge.",
+      "subtitle": "No more mental checklist running in the background. Just a space that feels good to live in.",
+      "benefits": [
+        "Walk into a clean home after work",
+        "Keep your weekends for rest and hobbies",
+        "No more arguments about who cleans what",
+        "No more mental reminders about chores",
+        "Enjoy a calm, organized living space every day"
+      ],
+      "conclusion": "Simply put: life feels easier with a home that stays clean automatically"
+    },
+    "howItWorks": {
+      "headline": "Simple. Reliable. On repeat.",
+      "step1": {
+        "title": "Choose your cleaning plan",
+        "description": "Weekly, bi-weekly, or monthly cleaning depending on your lifestyle."
+      },
+      "step2": {
+        "title": "We take care of the rest",
+        "description": "Your home is looked after on a regular schedule, so things stay fresh and organized."
+      },
+      "step3": {
+        "title": "Enjoy your time",
+        "description": "Come home to a space that feels calm and ready — without spending your free time managing it."
+      },
+      "reassurance": "Your plan can be adjusted anytime as life changes."
+    },
+    "subscription": {
+      "headline": "A home that stays clean on autopilot",
+      "subheadline": "Choose a simple subscription, book once and never have to book again",
+      "description": "Your home is cared for on a regular schedule, so things never pile up. No constant reminders. No weekend catch-up cleaning. Just a home that stays in good shape — quietly in the background.",
+      "plans": {
+        "weekly": {
+          "title": "Weekly cleaning",
+          "description": "Perfect for busy households and families."
+        },
+        "biweekly": {
+          "title": "Bi-weekly cleaning",
+          "description": "Our most popular option for working professionals."
+        },
+        "monthly": {
+          "title": "Monthly cleaning",
+          "description": "A regular reset that keeps cleaning from piling up."
+        }
+      },
+      "benefits": [
+        "Predictable schedule",
+        "Consistent results",
+        "No repeated booking",
+        "A home that stays clean without effort"
+      ]
+    },
+    "trust": {
+      "headline": "A service you can trust in your home.",
+      "intro": "Letting someone into your home requires trust. That's why reliability, transparency, and respect are at the heart of how we work.",
+      "subtitle": "Every visit should feel simple and safe",
+      "whatToExpect": "What you can expect",
+      "features": {
+        "vetted": {
+          "title": "Trusted and vetted team",
+          "description": "Everyone who visits your home is carefully selected and trained at our partner institutions TAKK, Tredu."
+        },
+        "consistency": {
+          "title": "Consistency whenever possible",
+          "description": "Same cleaner whenever possible, consistent quality standards."
+        },
+        "insured": {
+          "title": "Fully insured service",
+          "description": "Your home and belongings are protected."
+        },
+        "transparent": {
+          "title": "Clear and transparent pricing",
+          "description": "No hidden fees. No surprises."
+        },
+        "respect": {
+          "title": "Respect for your space",
+          "description": "Your home is treated with the love, attention, and professionalism it deserves."
+        },
+        "ethical": {
+          "title": "Ethical commitment",
+          "description": "We believe great service begins with how people are treated. Our team works in fair conditions with proper support and training — creating a service you can trust and feel good about."
+        }
+      }
+    },
+    "whyChooseUs": {
+      "headline": "Built to allow you to focus on what matters.",
+      "reasons": {
+        "timeBack": {
+          "title": "Your time back",
+          "description": "Spend evenings and weekends on things you actually enjoy."
+        },
+        "autopilot": {
+          "title": "A home on autopilot",
+          "description": "Regular care keeps everything under control without effort."
+        },
+        "mentalLoad": {
+          "title": "Less mental load",
+          "description": "No reminders, no planning, no weekend catch-up."
+        },
+        "flexible": {
+          "title": "Simple and flexible",
+          "description": "Plans that fit your lifestyle and adjust when life changes."
+        }
+      }
+    },
+    "testimonials": {
+      "headline": "Trusted by busy households in Tampere",
+      "testimonial1": {
+        "quote": "The best decision we made this year. Our weekends are finally free.",
+        "author": "Anna, Tampere"
+      },
+      "testimonial2": {
+        "quote": "Our apartment looks amazing every time, and we don't have to think about cleaning anymore.",
+        "author": "Mikael, Hervanta"
+      }
+    },
+    "servicesOverview": {
+      "headline": "Cleaning services for homes and businesses",
+      "intro": "Our focus is regular home cleaning for busy households, but we also offer additional services when you need extra help.",
+      "services": {
+        "regular": "Regular home cleaning",
+        "deep": "Deep cleaning",
+        "moveOut": "Move-out cleaning",
+        "office": "Office cleaning",
+        "special": "Special cleaning services",
+        "ship": "Ship Cleaning",
+        "yacht": "Luxury Yacht maintenance"
+      },
+      "conclusion": "Each service is delivered by trained professionals who care about quality and detail."
+    },
+    "finalCta": {
+      "headline": "Ready to enjoy a home that takes care of itself?",
+      "description": "Tell us a little about your home and how often you'd like help. We'll show you the plan that fits your life — simple, flexible, and easy to start.",
+      "benefits": "More time for yourself. Less stress at home.",
+      "ctaPrimary": "Get Your Cleaning Plan",
+      "ctaSecondary": "See Plans & Prices"
+    }
+  },
+  "services": {
+    "title": "Our Services",
+    "maintenance": {
+      "name": "Maintenance Cleaning",
+      "description": "Regular cleaning of kitchen, bathroom, and living areas"
+    },
+    "deepClean": {
+      "name": "Deep Cleaning",
+      "description": "Thorough top-to-bottom cleaning including hard-to-reach areas"
+    },
+    "extras": {
+      "title": "Additional Services",
+      "windows": "Window Cleaning",
+      "oven": "Oven Cleaning",
+      "fridge": "Fridge & Freezer Cleaning",
+      "highDust": "High Dust Removal"
+    }
+  },
+  "pricing": {
+    "title": "Transparent Pricing",
+    "frequency": {
+      "oneTime": "One-time",
+      "weekly": "Weekly",
+      "biweekly": "Bi-weekly",
+      "monthly": "Monthly"
+    },
+    "discount": "Save {percentage}%",
+    "startingFrom": "Starting from"
+  },
+  "booking": {
+    "steps": {
+      "service": "Select Service",
+      "frequency": "Choose Frequency",
+      "dateTime": "Pick Date & Time",
+      "address": "Enter Address",
+      "extras": "Add Extras",
+      "payment": "Payment"
+    },
+    "selectService": "Choose your cleaning service",
+    "selectFrequency": "How often do you need cleaning?",
+    "selectDate": "Select a date",
+    "selectTime": "Choose a time slot",
+    "noSlotsAvailable": "No available slots for this date",
+    "addressDetails": "Where should we clean?",
+    "streetAddress": "Street Address",
+    "apartmentNumber": "Apartment Number",
+    "city": "City",
+    "postalCode": "Postal Code",
+    "squareMeters": "Square Meters",
+    "numberOfRooms": "Number of Rooms",
+    "specialNotes": "Special Instructions",
+    "addExtras": "Add extra services",
+    "reviewBooking": "Review Your Booking",
+    "totalPrice": "Total Price",
+    "proceedToPayment": "Proceed to Payment",
+    "confirmBooking": "Confirm Booking"
+  },
+  "quote": {
+    "title": "Request a Free Quote",
+    "subtitle": "Tell us about your cleaning needs and we'll get back to you",
+    "form": {
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "address": "Property Address",
+      "squareMeters": "Square Meters (m²)",
+      "rooms": "Number of Rooms",
+      "frequency": "Preferred Frequency",
+      "extras": "Additional Services Needed",
+      "message": "Additional Information",
+      "submit": "Submit Quote Request"
+    },
+    "success": "Quote request submitted successfully! We'll contact you soon.",
+    "error": "Something went wrong. Please try again."
+  },
+  "dashboard": {
+    "welcome": "Welcome back, {name}",
+    "upcomingBookings": "Upcoming Bookings",
+    "bookingHistory": "Booking History",
+    "totalCleanings": "Total Cleanings",
+    "totalSpent": "Total Spent",
+    "noBookings": "No bookings yet",
+    "bookNow": "Book Your First Cleaning"
+  },
+  "auth": {
+    "login": {
+      "title": "Log In to Your Account",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Log In",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "signupLink": "Sign up"
+    },
+    "signup": {
+      "title": "Create Your Account",
+      "fullName": "Full Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "submit": "Sign Up",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Log in"
+    }
+  },
+  "admin": {
+    "dashboard": "Admin Dashboard",
+    "newQuotes": "New Quote Requests",
+    "pendingBookings": "Pending Bookings",
+    "totalCustomers": "Total Customers",
+    "monthlyRevenue": "Revenue This Month",
+    "todaysSchedule": "Today's Schedule",
+    "viewAll": "View All"
+  },
+  "errors": {
+    "generic": "Something went wrong",
+    "networkError": "Network error. Please check your connection.",
+    "unauthorized": "You are not authorized to access this page",
+    "notFound": "Page not found",
+    "validation": {
+      "required": "This field is required",
+      "email": "Please enter a valid email address",
+      "phone": "Please enter a valid phone number",
+      "minLength": "Must be at least {min} characters",
+      "maxLength": "Must be at most {max} characters"
+    }
+  }
+}

@@ -1,0 +1,316 @@
+{
+  "common": {
+    "appName": "QuickClean",
+    "logo": "QuickClean",
+    "loading": "Ladataan...",
+    "save": "Tallenna",
+    "cancel": "Peruuta",
+    "confirm": "Vahvista",
+    "delete": "Poista",
+    "edit": "Muokkaa",
+    "close": "Sulje",
+    "next": "Seuraava",
+    "previous": "Edellinen",
+    "submit": "Lähetä"
+  },
+  "nav": {
+    "home": "Etusivu",
+    "about": "Tietoa meistä",
+    "services": "Palvelut",
+    "pricing": "Hinnoittelu",
+    "quote": "Pyydä tarjous",
+    "login": "Kirjaudu sisään",
+    "signup": "Rekisteröidy",
+    "dashboard": "Hallintapaneeli",
+    "logout": "Kirjaudu ulos",
+    "cta": "Tilaa siivous"
+  },
+  "landing": {
+    "hero": {
+      "headline": "Enemmän aikaa. Vähemmän stressiä.",
+      "subheadline": "Koti, joka pysyy siistinä automaattisesti.",
+      "description": "Yksinkertainen kodinhoitosuunnitelma, joka pitää kotisi rauhallisena ja raikkaana, jotta voit käyttää aikasi siihen, mikä todella merkitsee.",
+      "cta": "Katso hinnat ja paketit",
+      "ctaSecondary": "Miten se toimii",
+      "trustText": "Kiireisten kotitalouksien luottama palvelu Tampereella"
+    },
+    "problem": {
+      "headline": "Aikasi ei saisi hävitä kotitöihin.",
+      "intro": "Työpäivät ovat täynnä. Perhe-elämä on kiireistä. Vapaa-aikasi on rajallista. Silti siivous palaa listalle yhä uudelleen.",
+      "points": [
+        "Lattiat kaipaavat huomiota.",
+        "Kylpyhuone kaipaa hoitoa.",
+        "Keittiö ei pysy koskaan pitkään siistinä.",
+        "Vaikka yrität rentoutua, ajatus pysyy mielessä: 'Meidän pitäisi todella siivota.'"
+      ],
+      "conclusion": "Kotisi pitäisi auttaa sinua rentoutumaan — ei muistuttaa sinua odottavasta tehtävästä."
+    },
+    "transformation": {
+      "headline": "Kuvittele tulevasi kotiin, jossa kaikki on 'jo tehty.'",
+      "intro": "Puhdas, rauhallinen koti muuttaa koko viikkosi tunnelman.",
+      "description": "Kun talo pysyy hallinnassa, illat kevenevät, viikonloput tuntuvat taas oikealta vapaalta ajalta ja kotisi muuttuu paikaksi ladata akkuja.",
+      "subtitle": "Ei enää mielessä pyörivää tehtävälistaa. Vain tila, jossa on hyvä elää.",
+      "benefits": [
+        "Astu sisään puhtaaseen kotiin työpäivän jälkeen",
+        "Pidä viikonloppusi lepoon ja harrastuksiin",
+        "Ei enää riitoja siitä, kuka siivoaa mitäkin",
+        "Ei enää muistutuksia kotitöistä",
+        "Nauti rauhallisesta, järjestyksessä olevasta kodista joka päivä"
+      ],
+      "conclusion": "Yksinkertaisesti sanottuna: elämä tuntuu helpommalta, kun koti pysyy automaattisesti siistinä"
+    },
+    "howItWorks": {
+      "headline": "Yksinkertaista. Luotettavaa. Toistuvaa.",
+      "step1": {
+        "title": "Valitse siivoussuunnitelmasi",
+        "description": "Viikoittainen, joka toinen viikko tai kuukausittainen siivous elämäntapasi mukaan."
+      },
+      "step2": {
+        "title": "Me hoidamme loput",
+        "description": "Kotisi hoidetaan säännöllisesti, joten kaikki pysyy raikkaana ja järjestyksessä."
+      },
+      "step3": {
+        "title": "Nauti ajastasi",
+        "description": "Tule kotiin tilaan, joka tuntuu rauhalliselta ja valmiilta — käyttämättä vapaa-aikaasi sen hallintaan."
+      },
+      "reassurance": "Suunnitelmaasi voi muuttaa milloin tahansa elämän muuttuessa."
+    },
+    "subscription": {
+      "headline": "Koti, joka pysyy siistinä automaattisesti",
+      "subheadline": "Valitse yksinkertainen tilaus, varaa kerran etkä koskaan enää",
+      "description": "Kotisi hoidetaan säännöllisesti, joten asiat eivät koskaan kasaudu. Ei jatkuvia muistutuksia. Ei viikonlopun kiinniottosiivouksia. Vain koti, joka pysyy hyvässä kunnossa — hiljaa taustalla.",
+      "plans": {
+        "weekly": {
+          "title": "Viikoittainen siivous",
+          "description": "Täydellinen kiireisille kotitalouksille ja perheille."
+        },
+        "biweekly": {
+          "title": "Joka toinen viikko siivous",
+          "description": "Suosituin vaihtoehtomme työssäkäyville ammattilaisille."
+        },
+        "monthly": {
+          "title": "Kuukausittainen siivous",
+          "description": "Säännöllinen nollaus, joka estää siivouksen kasautumisen."
+        }
+      },
+      "benefits": [
+        "Ennakoitava aikataulu",
+        "Johdonmukaiset tulokset",
+        "Ei toistuvaa varausta",
+        "Koti, joka pysyy siistinä ilman vaivaa"
+      ]
+    },
+    "trust": {
+      "headline": "Palvelu, johon voit luottaa kotonasi.",
+      "intro": "Jonkun päästäminen kotiisi vaatii luottamusta. Siksi luotettavuus, läpinäkyvyys ja kunnioitus ovat työmme ytimessä.",
+      "subtitle": "Jokaisen käynnin tulisi tuntua yksinkertaiselta ja turvalliselta",
+      "whatToExpect": "Mitä voit odottaa",
+      "features": {
+        "vetted": {
+          "title": "Luotettava ja tarkastettu tiimi",
+          "description": "Jokainen kotiisi vieraileva on huolellisesti valittu ja koulutettu kumppanilaitoksissamme TAKK, Tredu."
+        },
+        "consistency": {
+          "title": "Johdonmukaisuus aina kun mahdollista",
+          "description": "Sama siivooja aina kun mahdollista, johdonmukaiset laatustandardit."
+        },
+        "insured": {
+          "title": "Täysin vakuutettu palvelu",
+          "description": "Kotisi ja omaisuutesi on suojattu."
+        },
+        "transparent": {
+          "title": "Selkeä ja läpinäkyvä hinnoittelu",
+          "description": "Ei piilomaksuja. Ei yllätyksiä."
+        },
+        "respect": {
+          "title": "Kunnioitus tilaasi kohtaan",
+          "description": "Kotiasi kohdellaan rakkaudella, huomiolla ja ammattimaisuudella, jota se ansaitsee."
+        },
+        "ethical": {
+          "title": "Eettinen sitoutuminen",
+          "description": "Uskomme, että loistava palvelu alkaa siitä, miten ihmisiä kohdellaan. Tiimimme työskentelee oikeudenmukaisissa olosuhteissa asianmukaisella tuella ja koulutuksella — luoden palvelun, johon voit luottaa ja tuntea itsesi hyväksi."
+        }
+      }
+    },
+    "whyChooseUs": {
+      "headline": "Rakennettu antamaan sinun keskittyä siihen, mikä merkitsee.",
+      "reasons": {
+        "timeBack": {
+          "title": "Aikasi takaisin",
+          "description": "Vietä iltasi ja viikonloppusi asioihin, joista todella nautit."
+        },
+        "autopilot": {
+          "title": "Koti autopilotilla",
+          "description": "Säännöllinen hoito pitää kaiken hallinnassa ilman vaivaa."
+        },
+        "mentalLoad": {
+          "title": "Vähemmän henkistä kuormaa",
+          "description": "Ei muistutuksia, ei suunnittelua, ei viikonlopun kiinniottoja."
+        },
+        "flexible": {
+          "title": "Yksinkertaista ja joustavaa",
+          "description": "Suunnitelmat, jotka sopivat elämäntapaasi ja mukautuvat elämän muuttuessa."
+        }
+      }
+    },
+    "testimonials": {
+      "headline": "Kiireisten kotitalouksien luottama palvelu Tampereella",
+      "testimonial1": {
+        "quote": "Paras päätös, jonka teimme tänä vuonna. Viikonloppumme ovat vihdoin vapaita.",
+        "author": "Anna, Tampere"
+      },
+      "testimonial2": {
+        "quote": "Asuntomme näyttää upealta joka kerta, emmekä meidän tarvitse ajatella siivoamista enää.",
+        "author": "Mikael, Hervanta"
+      }
+    },
+    "servicesOverview": {
+      "headline": "Siivouspalvelut kodeille ja yrityksille",
+      "intro": "Keskitymme säännölliseen kodin siivoukseen kiireisille kotitalouksille, mutta tarjoamme myös lisäpalveluita, kun tarvitset ylimääräistä apua.",
+      "services": {
+        "regular": "Säännöllinen kodin siivous",
+        "deep": "Perussiivous",
+        "moveOut": "Muuttosiivous",
+        "office": "Toimiston siivous",
+        "special": "Erikoissiivouspalvelut",
+        "ship": "Laivojen siivous",
+        "yacht": "Luksusjahtien huolto"
+      },
+      "conclusion": "Jokainen palvelu toimitetaan koulutettujen ammattilaisten toimesta, jotka välittävät laadusta ja yksityiskohdista."
+    },
+    "finalCta": {
+      "headline": "Oletko valmis nauttimaan kodista, joka huolehtii itsestään?",
+      "description": "Kerro meille vähän kodistasi ja kuinka usein haluaisit apua. Näytämme sinulle suunnitelman, joka sopii elämääsi — yksinkertainen, joustava ja helppo aloittaa.",
+      "benefits": "Enemmän aikaa itsellesi. Vähemmän stressiä kotona.",
+      "ctaPrimary": "Hanki siivoussuunnitelmasi",
+      "ctaSecondary": "Katso hinnat ja paketit"
+    }
+  },
+  "services": {
+    "title": "Palvelumme",
+    "maintenance": {
+      "name": "Ylläpitosiivous",
+      "description": "Säännöllinen keittiön, kylpyhuoneen ja oleskelutilojen siivous"
+    },
+    "deepClean": {
+      "name": "Perussiivous",
+      "description": "Perusteellinen siivous vaikeapääsyiset alueet mukaan lukien"
+    },
+    "extras": {
+      "title": "Lisäpalvelut",
+      "windows": "Ikkunoiden pesu",
+      "oven": "Uunin puhdistus",
+      "fridge": "Jääkaapin ja pakastimen puhdistus",
+      "highDust": "Korkeiden pintojen pölyjen poisto"
+    }
+  },
+  "pricing": {
+    "title": "Läpinäkyvä hinnoittelu",
+    "frequency": {
+      "oneTime": "Kertasiivous",
+      "weekly": "Viikoittain",
+      "biweekly": "Joka toinen viikko",
+      "monthly": "Kuukausittain"
+    },
+    "discount": "Säästä {percentage}%",
+    "startingFrom": "Alkaen"
+  },
+  "booking": {
+    "steps": {
+      "service": "Valitse palvelu",
+      "frequency": "Valitse tiheys",
+      "dateTime": "Valitse päivä ja aika",
+      "address": "Syötä osoite",
+      "extras": "Lisää lisäpalvelut",
+      "payment": "Maksu"
+    },
+    "selectService": "Valitse siivouspalvelu",
+    "selectFrequency": "Kuinka usein tarvitset siivousta?",
+    "selectDate": "Valitse päivämäärä",
+    "selectTime": "Valitse aika",
+    "noSlotsAvailable": "Tälle päivälle ei ole vapaita aikoja",
+    "addressDetails": "Minne siivous tehdään?",
+    "streetAddress": "Katuosoite",
+    "apartmentNumber": "Asunnon numero",
+    "city": "Kaupunki",
+    "postalCode": "Postinumero",
+    "squareMeters": "Neliömetrit",
+    "numberOfRooms": "Huoneiden määrä",
+    "specialNotes": "Erityisohjeet",
+    "addExtras": "Lisää lisäpalveluja",
+    "reviewBooking": "Tarkista varauksesi",
+    "totalPrice": "Kokonaishinta",
+    "proceedToPayment": "Siirry maksuun",
+    "confirmBooking": "Vahvista varaus"
+  },
+  "quote": {
+    "title": "Pyydä ilmainen tarjous",
+    "subtitle": "Kerro meille siivoustarpeistasi, niin otamme sinuun yhteyttä",
+    "form": {
+      "name": "Koko nimi",
+      "email": "Sähköpostiosoite",
+      "phone": "Puhelinnumero",
+      "address": "Kiinteistön osoite",
+      "squareMeters": "Neliömetrit (m²)",
+      "rooms": "Huoneiden määrä",
+      "frequency": "Toivottu tiheys",
+      "extras": "Tarvittavat lisäpalvelut",
+      "message": "Lisätietoja",
+      "submit": "Lähetä tarjouspyyntö"
+    },
+    "success": "Tarjouspyyntö lähetetty onnistuneesti! Otamme sinuun pian yhteyttä.",
+    "error": "Jokin meni pieleen. Yritä uudelleen."
+  },
+  "dashboard": {
+    "welcome": "Tervetuloa takaisin, {name}",
+    "upcomingBookings": "Tulevat varaukset",
+    "bookingHistory": "Varaushistoria",
+    "totalCleanings": "Siivousten määrä yhteensä",
+    "totalSpent": "Käytetty yhteensä",
+    "noBookings": "Ei vielä varauksia",
+    "bookNow": "Varaa ensimmäinen siivouksesi"
+  },
+  "auth": {
+    "login": {
+      "title": "Kirjaudu tilillesi",
+      "email": "Sähköposti",
+      "password": "Salasana",
+      "submit": "Kirjaudu sisään",
+      "forgotPassword": "Unohditko salasanan?",
+      "noAccount": "Eikö sinulla ole tiliä?",
+      "signupLink": "Rekisteröidy"
+    },
+    "signup": {
+      "title": "Luo tilisi",
+      "fullName": "Koko nimi",
+      "email": "Sähköposti",
+      "password": "Salasana",
+      "confirmPassword": "Vahvista salasana",
+      "submit": "Rekisteröidy",
+      "hasAccount": "Onko sinulla jo tili?",
+      "loginLink": "Kirjaudu sisään"
+    }
+  },
+  "admin": {
+    "dashboard": "Hallintapaneeli",
+    "newQuotes": "Uudet tarjouspyynnöt",
+    "pendingBookings": "Odottavat varaukset",
+    "totalCustomers": "Asiakkaita yhteensä",
+    "monthlyRevenue": "Kuukauden liikevaihto",
+    "todaysSchedule": "Tämän päivän aikataulu",
+    "viewAll": "Näytä kaikki"
+  },
+  "errors": {
+    "generic": "Jokin meni pieleen",
+    "networkError": "Verkkovirhe. Tarkista yhteytesi.",
+    "unauthorized": "Sinulla ei ole oikeutta käyttää tätä sivua",
+    "notFound": "Sivua ei löytynyt",
+    "validation": {
+      "required": "Tämä kenttä on pakollinen",
+      "email": "Anna kelvollinen sähköpostiosoite",
+      "phone": "Anna kelvollinen puhelinnumero",
+      "minLength": "Vähintään {min} merkkiä",
+      "maxLength": "Enintään {max} merkkiä"
+    }
+  }
+}
