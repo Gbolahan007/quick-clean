@@ -12,7 +12,7 @@ export default function ServicesShowcaseSection() {
     {
       id: "regular",
       title: t("services.regular"),
-      image: "/cleaning1.jpg",
+      image: "/cleaning1.JPG",
       description: t("serviceDescriptions.regular"),
     },
     {
@@ -24,13 +24,13 @@ export default function ServicesShowcaseSection() {
     {
       id: "office",
       title: t("services.office"),
-      image: "/cleaning8.jpg",
+      image: "/cleaning8.JPG",
       description: t("serviceDescriptions.office"),
     },
     {
       id: "moveOut",
       title: t("services.moveOut"),
-      image: "/cleaning10.jpg",
+      image: "/cleaning10.JPG",
       description: t("serviceDescriptions.moveOut"),
     },
   ];

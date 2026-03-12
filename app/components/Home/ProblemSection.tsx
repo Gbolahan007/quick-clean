@@ -37,7 +37,7 @@ export default function ProblemSection() {
           {/* Left: Image */}
           <div className="relative h-100 lg:h-155 rounded-xl overflow-hidden shadow-xl order-2 lg:order-1">
             <Image
-              src="/messy.jpg"
+              src="/messy.JPG"
               alt="messy home"
               fill
               className="object-cover grayscale"
