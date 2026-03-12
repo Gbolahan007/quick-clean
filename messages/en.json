@@ -163,7 +163,12 @@
       "testimonial2": {
         "quote": "Our apartment looks amazing every time, and we don't have to think about cleaning anymore.",
         "author": "Mikael, Hervanta"
-      }
+      },
+      "metrics": [
+        { "value": "500+", "label": "Homes cleaned in Tampere" },
+        { "value": "4.9★", "label": "Customer rating" },
+        { "value": "87%", "label": "Repeat customers" }
+      ]
     },
     "servicesOverview": {
       "headline": "Cleaning services for homes and businesses",
@@ -177,7 +182,16 @@
         "ship": "Ship Cleaning",
         "yacht": "Luxury Yacht maintenance"
       },
-      "conclusion": "Each service is delivered by trained professionals who care about quality and detail."
+      "conclusion": "Each service is delivered by trained professionals who care about quality and detail.",
+      "serviceDescriptions": {
+        "regular": "Weekly or bi-weekly home maintenance",
+        "deep": "Thorough top-to-bottom cleaning",
+        "office": "Professional workspace cleaning",
+        "moveOut": "Move-in and move-out services"
+      },
+      "learnMore": "Learn More",
+      "notFound": "Can't find the service you're looking for?",
+      "viewAll": "View All Services"
     },
     "finalCta": {
       "headline": "Ready to enjoy a home that takes care of itself?",
@@ -313,5 +327,19 @@
       "minLength": "Must be at least {min} characters",
       "maxLength": "Must be at most {max} characters"
     }
+  },
+  "footer": {
+    "ctaHeadline": "Contact us today for expert cleaning services",
+    "ctaLine1": "Let's Make",
+    "ctaLine2": "Your Space Shine",
+    "tagline": "At QuickClean, we provide professional and reliable cleaning services for homes, offices, and more.",
+    "linksHeading": "Quick Links",
+    "servicesHeading": "Our Services",
+    "contactHeading": "Get In Touch",
+    "contact": "Contact Us",
+    "allServices": "All Services",
+    "rights": "All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
   }
 }

@@ -7,6 +7,33 @@ import { useState, useRef, useEffect } from "react";
 import { HeaderProvider, useHeader } from "./contexts/HeaderContext";
 import Logo from "./Logo";
 
+// ─── Scroll-aware hook ────────────────────────────────────────────────────────
+function useScrollDirection() {
+  const [visible, setVisible] = useState(true);
+  const [atTop, setAtTop] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const THRESHOLD = 8; // px of scroll needed before we react (prevents jitter)
+
+    function onScroll() {
+      const current = window.scrollY;
+      setAtTop(current < 10);
+
+      if (Math.abs(current - lastScrollY.current) < THRESHOLD) return;
+
+      setVisible(current < lastScrollY.current); // true = scrolling up
+      lastScrollY.current = current;
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return { visible, atTop };
+}
+
+// ─── Nav Dropdown (hover, desktop) ───────────────────────────────────────────
 function Dropdown({
   label,
   isOpen,
@@ -42,7 +69,7 @@ function Dropdown({
   );
 }
 
-// Desktop: click-to-open with click-outside close + active indicator dot
+// ─── Language Dropdown (click, desktop) ──────────────────────────────────────
 function LanguageDropdown({
   locale,
   isOpen,
@@ -109,7 +136,7 @@ function LanguageDropdown({
   );
 }
 
-// Mobile: segmented pill control — no dropdown, just tap to switch
+// ─── Language Pill (tap, mobile) ─────────────────────────────────────────────
 function MobileLanguagePill({
   locale,
   onSwitch,
@@ -145,12 +172,14 @@ function MobileLanguagePill({
   );
 }
 
+// ─── Header ───────────────────────────────────────────────────────────────────
 function HeaderContent() {
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const [isLoggedIn] = useState(false);
+  const { visible, atTop } = useScrollDirection();
 
   const {
     mobileMenuOpen,
@@ -176,7 +205,15 @@ function HeaderContent() {
   };
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50 tracking-widest">
+    <header
+      className={`
+        fixed top-0 left-0 right-0 z-50 tracking-widest
+        bg-white
+        transition-[transform,box-shadow] duration-300 ease-in-out
+        ${visible ? "translate-y-0" : "-translate-y-full"}
+        ${atTop ? "shadow-none" : "shadow-sm"}
+      `}
+    >
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           <Logo />
@@ -256,13 +293,20 @@ function HeaderContent() {
               <>
                 <Link
                   href="/login"
-                  className="px-4 py-2 text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
+                  className="px-5 py-2.5 text-emerald-700 border border-emerald-200 rounded-full 
+               hover:bg-emerald-50 hover:border-emerald-300 
+               font-semibold transition-all duration-200"
                 >
                   {t("nav.login")}
                 </Link>
+
                 <Link
                   href="/signup"
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium transition-colors"
+                  className="px-5 py-2.5 text-emerald-700  rounded-full 
+               border border-emerald-600
+              hover:bg-emerald-50 hover:border-emerald-300 
+               shadow-sm hover:shadow-md
+               font-semibold transition-all duration-200"
                 >
                   {t("nav.signup")}
                 </Link>
@@ -299,7 +343,6 @@ function HeaderContent() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden py-4 space-y-4 border-t border-gray-100">
-            {/* Company */}
             <div>
               <button
                 onClick={() => setCompanyDropdownOpen(!companyDropdownOpen)}
@@ -330,7 +373,6 @@ function HeaderContent() {
               )}
             </div>
 
-            {/* Services */}
             <div>
               <button
                 onClick={() => setServicesDropdownOpen(!servicesDropdownOpen)}
@@ -383,10 +425,8 @@ function HeaderContent() {
               {t("nav.quote")}
             </Link>
 
-            {/* Language pill — replaces the old single-button switcher */}
             <MobileLanguagePill locale={locale} onSwitch={switchLocale} />
 
-            {/* Auth */}
             <div className="space-y-2 pt-4 border-t border-gray-100">
               {isLoggedIn ? (
                 <Link

@@ -162,7 +162,12 @@
       "testimonial2": {
         "quote": "Asuntomme näyttää upealta joka kerta, emmekä meidän tarvitse ajatella siivoamista enää.",
         "author": "Mikael, Hervanta"
-      }
+      },
+      "metrics": [
+        { "value": "500+", "label": "Siivottua kotia Tampereella" },
+        { "value": "4.9★", "label": "Asiakasarvosana" },
+        { "value": "87%", "label": "Palaavista asiakkaista" }
+      ]
     },
     "servicesOverview": {
       "headline": "Siivouspalvelut kodeille ja yrityksille",
@@ -176,7 +181,16 @@
         "ship": "Laivojen siivous",
         "yacht": "Luksusjahtien huolto"
       },
-      "conclusion": "Jokainen palvelu toimitetaan koulutettujen ammattilaisten toimesta, jotka välittävät laadusta ja yksityiskohdista."
+      "conclusion": "Jokainen palvelu toimitetaan koulutettujen ammattilaisten toimesta, jotka välittävät laadusta ja yksityiskohdista.",
+      "serviceDescriptions": {
+        "regular": "Viikoittainen tai joka toinen viikko kotisiivous",
+        "deep": "Perusteellinen siivous ylhäältä alas",
+        "office": "Ammattimainen työtilan siivous",
+        "moveOut": "Muutto- ja vastaanottosiivoukset"
+      },
+      "learnMore": "Lue lisää",
+      "notFound": "Etkö löydä etsimääsi palvelua?",
+      "viewAll": "Näytä kaikki palvelut"
     },
     "finalCta": {
       "headline": "Oletko valmis nauttimaan kodista, joka huolehtii itsestään?",
@@ -312,5 +326,19 @@
       "minLength": "Vähintään {min} merkkiä",
       "maxLength": "Enintään {max} merkkiä"
     }
+  },
+  "footer": {
+    "ctaHeadline": "Ota yhteyttä tänään ammattimaiseen siivouspalveluun",
+    "ctaLine1": "Tehdään tilastasi",
+    "ctaLine2": "täydellinen",
+    "tagline": "QuickClean tarjoaa ammattimaista ja luotettavaa siivouspalvelua kodeille, toimistoille ja muille tiloille.",
+    "linksHeading": "Pikaohjeet",
+    "servicesHeading": "Palvelumme",
+    "contactHeading": "Ota yhteyttä",
+    "contact": "Yhteystiedot",
+    "allServices": "Kaikki palvelut",
+    "rights": "Kaikki oikeudet pidätetään.",
+    "privacy": "Tietosuojaseloste",
+    "terms": "Käyttöehdot"
   }
 }
