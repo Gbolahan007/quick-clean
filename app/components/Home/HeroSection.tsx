@@ -1,11 +1,13 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/navigation";
 import Image from "next/image";
 
 export default function HeroSection() {
   const t = useTranslations("landing.hero");
+  const locale = useLocale();
+  const isFinnish = locale === "fi";
 
   const trustAvatars = [
     { src: "/face1.jpg", alt: "Happy customer" },
@@ -19,7 +21,7 @@ export default function HeroSection() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/pix2.jpg"
+          src="/pix22.jpg"
           alt="Clean Nordic apartment with relaxed couple"
           fill
           className="object-cover"
@@ -31,27 +33,33 @@ export default function HeroSection() {
       {/* Content */}
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 lg:py-20 w-full">
         <div className="max-w-2xl">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+          <h1
+            className={`${isFinnish ? "text-3xl sm:text-4xl lg:text-5xl" : "text-4xl sm:text-5xl lg:text-6xl"} font-bold text-white leading-tight mb-6`}
+          >
             {t("headline")}
             <br />
             <span className="text-gray-100">{t("subheadline")}</span>
           </h1>
 
-          <p className="text-lg sm:text-xl text-gray-100 mb-8">
+          <p
+            className={`${isFinnish ? "text-base sm:text-lg" : "text-lg sm:text-xl"} text-gray-100 mb-8`}
+          >
             {t("description")}
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-8 w-fit">
+          <div
+            className={`flex flex-col sm:flex-row ${isFinnish ? "gap-3" : "gap-4"} mb-8 w-fit`}
+          >
             <Link
               href="/pricing"
-              className="px-8 py-4 bg-[#e07a5f] text-white rounded-full font-semibold text-lg hover:bg-[#c96a4f] transition-all shadow-lg hover:shadow-xl"
+              className={`${isFinnish ? "px-6 py-3 text-base" : "px-8 py-4 text-lg"} bg-[#e07a5f] text-white rounded-full font-semibold hover:bg-[#c96a4f] transition-all shadow-lg hover:shadow-xl`}
             >
               {t("cta")}
             </Link>
             <Link
               href="#how-it-works"
-              className="px-8 py-4 bg-white border-2 border-white text-black rounded-full font-semibold text-lg hover:bg-transparent hover:text-white transition-all"
+              className={`${isFinnish ? "px-6 py-3 text-base" : "px-8 py-4 text-lg"} bg-white border-2 border-white text-black rounded-full font-semibold hover:bg-transparent hover:text-white transition-all`}
             >
               {t("ctaSecondary")}
             </Link>
@@ -77,7 +85,9 @@ export default function HeroSection() {
             </div>
 
             {/* Trust text */}
-            <p className="text-sm text-gray-200">{t("trustText")}</p>
+            <p className={`${isFinnish ? "text-xs" : "text-sm"} text-gray-200`}>
+              {t("trustText")}
+            </p>
           </div>
         </div>
       </div>

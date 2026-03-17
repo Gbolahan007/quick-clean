@@ -4,7 +4,7 @@ import { locales } from "@/i18n";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
-import { Geist, Geist_Mono, Bebas_Neue } from "next/font/google";
+import { Geist, Geist_Mono, Bebas_Neue, Montserrat } from "next/font/google";
 import { notFound } from "next/navigation";
 import Header from "../components/Header";
 import "./globals.css";
@@ -13,7 +13,7 @@ import Footer from "../components/Footer";
 const geistSans = Geist({ subsets: ["latin"] });
 const geistMono = Geist_Mono({ subsets: ["latin"] });
 
-const bebasNeue = Bebas_Neue({
+const monserrat = Montserrat({
   subsets: ["latin"],
   weight: "400",
 });
@@ -107,7 +107,7 @@ export default async function RootLayout({
         className={`${geistSans.className} ${geistMono.className} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
-          <div className={`${bebasNeue.className} `}>
+          <div className={`${monserrat.className} `}>
             <Header />
             {children}
             <Footer />

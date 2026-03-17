@@ -180,6 +180,7 @@ function HeaderContent() {
   const pathname = usePathname();
   const [isLoggedIn] = useState(false);
   const { visible, atTop } = useScrollDirection();
+  const isFinnish = locale === "fi";
 
   const {
     mobileMenuOpen,
@@ -207,8 +208,8 @@ function HeaderContent() {
   return (
     <header
       className={`
-        fixed top-0 left-0 right-0 z-50 tracking-widest
-        bg-white
+        fixed top-0 left-0 right-0 z-50
+        bg-white whitespace-nowrap
         transition-[transform,box-shadow] duration-300 ease-in-out
         ${visible ? "translate-y-0" : "-translate-y-full"}
         ${atTop ? "shadow-none" : "shadow-sm"}
@@ -218,8 +219,10 @@ function HeaderContent() {
         <div className="flex h-20 items-center justify-between">
           <Logo />
 
-          {/* Desktop Nav */}
-          <div className="hidden lg:flex lg:items-center lg:space-x-8">
+          {/* Desktop Nav - Dynamic spacing based on locale */}
+          <div
+            className={`hidden lg:flex lg:items-center ${isFinnish ? "lg:space-x-4" : "lg:space-x-8"}`}
+          >
             <Dropdown
               label={t("nav.about")}
               isOpen={companyDropdownOpen}
@@ -280,8 +283,10 @@ function HeaderContent() {
             </Link>
           </div>
 
-          {/* Desktop Right */}
-          <div className="hidden lg:flex lg:items-center lg:space-x-4">
+          {/* Desktop Right - Dynamic spacing and sizing based on locale */}
+          <div
+            className={`hidden lg:flex lg:items-center ${isFinnish ? "lg:space-x-2" : "lg:space-x-4"}`}
+          >
             {isLoggedIn ? (
               <Link
                 href="/dashboard"
@@ -293,20 +298,20 @@ function HeaderContent() {
               <>
                 <Link
                   href="/login"
-                  className="px-5 py-2.5 text-emerald-700 border border-emerald-200 rounded-full 
+                  className={`${isFinnish ? "px-4 py-2 text-sm" : "px-5 py-2.5"} text-emerald-700 border border-emerald-200 rounded-full 
                hover:bg-emerald-50 hover:border-emerald-300 
-               font-semibold transition-all duration-200"
+               font-semibold transition-all duration-200`}
                 >
                   {t("nav.login")}
                 </Link>
 
                 <Link
                   href="/signup"
-                  className="px-5 py-2.5 text-emerald-700  rounded-full 
+                  className={`${isFinnish ? "px-4 py-2 text-sm" : "px-5 py-2.5"} text-emerald-700 rounded-full 
                border border-emerald-600
               hover:bg-emerald-50 hover:border-emerald-300 
                shadow-sm hover:shadow-md
-               font-semibold transition-all duration-200"
+               font-semibold transition-all duration-200`}
                 >
                   {t("nav.signup")}
                 </Link>
@@ -314,7 +319,7 @@ function HeaderContent() {
             )}
             <Link
               href="/book"
-              className="px-6 py-3 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 font-semibold shadow-md hover:shadow-lg transition-all"
+              className={`${isFinnish ? "px-5 py-2.5 text-sm" : "px-6 py-3"} bg-emerald-600 text-white rounded-full hover:bg-emerald-700 font-semibold shadow-md hover:shadow-lg transition-all`}
             >
               {t("nav.cta")}
             </Link>
