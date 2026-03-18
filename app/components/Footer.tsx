@@ -25,7 +25,7 @@ export default function Footer() {
             {t("footer.ctaHeadline")}
           </h2>
           <Link href="/quote" className="group relative">
-            <div className="w-40 h-40 rounded-full bg-emerald-600 flex items-center justify-center hover:bg-emerald-700 transition-all duration-300 hover:scale-105 shadow-lg">
+            <div className="w-40 h-40 rounded-full bg-[#7c9885] flex items-center justify-center hover:bg-[#6a8573] transition-all duration-300 hover:scale-105 shadow-lg">
               <div className="text-center text-white">
                 <p className="text-sm font-medium mb-1">
                   {t("footer.ctaLine1")}
@@ -56,7 +56,7 @@ export default function Footer() {
             <div className="mb-6">
               <h3 className="text-2xl font-bold mb-2">
                 <span className="text-black">Quick</span>
-                <span className="text-emerald-600">Clean</span>
+                <span className="text-[#7c9885]">Clean</span>
               </h3>
             </div>
             <p className="text-gray-600 mb-6 leading-relaxed">
@@ -69,7 +69,7 @@ export default function Footer() {
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-emerald-600 hover:bg-emerald-600 hover:text-white transition-all"
+                className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-[#7c9885] hover:bg-[#7c9885] hover:text-white transition-all"
               >
                 <Linkedin className="w-5 h-5" />
               </a>
@@ -77,7 +77,7 @@ export default function Footer() {
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-emerald-600 hover:bg-emerald-600 hover:text-white transition-all"
+                className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-[#7c9885] hover:bg-[#7c9885] hover:text-white transition-all"
               >
                 <Facebook className="w-5 h-5" />
               </a>
@@ -85,7 +85,7 @@ export default function Footer() {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-emerald-600 hover:bg-emerald-600 hover:text-white transition-all"
+                className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-[#7c9885] hover:bg-[#7c9885] hover:text-white transition-all"
               >
                 <Instagram className="w-5 h-5" />
               </a>
@@ -93,7 +93,7 @@ export default function Footer() {
                 href="https://wa.me/358503484537"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-emerald-600 hover:bg-emerald-600 hover:text-white transition-all"
+                className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-[#7c9885] hover:bg-[#7c9885] hover:text-white transition-all"
               >
                 <MessageCircle className="w-5 h-5" />
               </a>
@@ -109,45 +109,45 @@ export default function Footer() {
               <li>
                 <Link
                   href="/"
-                  className="text-gray-600 hover:text-emerald-600 transition-colors flex items-center group"
+                  className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-center group"
                 >
-                  <span className="w-2 h-2 bg-emerald-600 rounded-full mr-3 group-hover:bg-black transition-colors"></span>
+                  <span className="w-2 h-2 bg-[#7c9885] rounded-full mr-3 group-hover:bg-black transition-colors"></span>
                   {t("nav.home")}
                 </Link>
               </li>
               <li>
                 <Link
                   href="/about"
-                  className="text-gray-600 hover:text-emerald-600 transition-colors flex items-center group"
+                  className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-center group"
                 >
-                  <span className="w-2 h-2 bg-emerald-600 rounded-full mr-3 group-hover:bg-black transition-colors"></span>
+                  <span className="w-2 h-2 bg-[#7c9885] rounded-full mr-3 group-hover:bg-black transition-colors"></span>
                   {t("nav.about")}
                 </Link>
               </li>
               <li>
                 <Link
                   href="/services"
-                  className="text-gray-600 hover:text-emerald-600 transition-colors flex items-center group"
+                  className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-center group"
                 >
-                  <span className="w-2 h-2 bg-emerald-600 rounded-full mr-3 group-hover:bg-black transition-colors"></span>
+                  <span className="w-2 h-2 bg-[#7c9885] rounded-full mr-3 group-hover:bg-black transition-colors"></span>
                   {t("nav.services")}
                 </Link>
               </li>
               <li>
                 <Link
                   href="/pricing"
-                  className="text-gray-600 hover:text-emerald-600 transition-colors flex items-center group"
+                  className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-center group"
                 >
-                  <span className="w-2 h-2 bg-emerald-600 rounded-full mr-3 group-hover:bg-black transition-colors"></span>
+                  <span className="w-2 h-2 bg-[#7c9885] rounded-full mr-3 group-hover:bg-black transition-colors"></span>
                   {t("nav.pricing")}
                 </Link>
               </li>
               <li>
                 <Link
                   href="/contact"
-                  className="text-gray-600 hover:text-emerald-600 transition-colors flex items-center group"
+                  className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-center group"
                 >
-                  <span className="w-2 h-2 bg-emerald-600 rounded-full mr-3 group-hover:bg-black transition-colors"></span>
+                  <span className="w-2 h-2 bg-[#7c9885] rounded-full mr-3 group-hover:bg-black transition-colors"></span>
                   {t("footer.contact")}
                 </Link>
               </li>
@@ -163,36 +163,36 @@ export default function Footer() {
               <li>
                 <Link
                   href="/services#residential"
-                  className="text-gray-600 hover:text-emerald-600 transition-colors flex items-center group"
+                  className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-center group"
                 >
-                  <span className="w-2 h-2 bg-emerald-600 rounded-full mr-3 group-hover:bg-black transition-colors"></span>
+                  <span className="w-2 h-2 bg-[#7c9885] rounded-full mr-3 group-hover:bg-black transition-colors"></span>
                   {t("landing.servicesOverview.services.regular")}
                 </Link>
               </li>
               <li>
                 <Link
                   href="/services#commercial"
-                  className="text-gray-600 hover:text-emerald-600 transition-colors flex items-center group"
+                  className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-center group"
                 >
-                  <span className="w-2 h-2 bg-emerald-600 rounded-full mr-3 group-hover:bg-black transition-colors"></span>
+                  <span className="w-2 h-2 bg-[#7c9885] rounded-full mr-3 group-hover:bg-black transition-colors"></span>
                   {t("landing.servicesOverview.services.office")}
                 </Link>
               </li>
               <li>
                 <Link
                   href="/services#specialized"
-                  className="text-gray-600 hover:text-emerald-600 transition-colors flex items-center group"
+                  className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-center group"
                 >
-                  <span className="w-2 h-2 bg-emerald-600 rounded-full mr-3 group-hover:bg-black transition-colors"></span>
+                  <span className="w-2 h-2 bg-[#7c9885] rounded-full mr-3 group-hover:bg-black transition-colors"></span>
                   {t("landing.servicesOverview.services.special")}
                 </Link>
               </li>
               <li>
                 <Link
                   href="/services"
-                  className="text-gray-600 hover:text-emerald-600 transition-colors flex items-center group"
+                  className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-center group"
                 >
-                  <span className="w-2 h-2 bg-emerald-600 rounded-full mr-3 group-hover:bg-black transition-colors"></span>
+                  <span className="w-2 h-2 bg-[#7c9885] rounded-full mr-3 group-hover:bg-black transition-colors"></span>
                   {t("footer.allServices")}
                 </Link>
               </li>
@@ -208,24 +208,24 @@ export default function Footer() {
               <li>
                 <a
                   href="tel:+358503484537"
-                  className="text-gray-600 hover:text-emerald-600 transition-colors flex items-start group"
+                  className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-start group"
                 >
-                  <Phone className="w-5 h-5 mr-3 mt-1 shrink-0 group-hover:text-emerald-600" />
+                  <Phone className="w-5 h-5 mr-3 mt-1 shrink-0 group-hover:text-[#7c9885]" />
                   <span>+358 50 348 4537</span>
                 </a>
               </li>
               <li>
                 <a
                   href="mailto:hello@quickclean.fi"
-                  className="text-gray-600 hover:text-emerald-600 transition-colors flex items-start group"
+                  className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-start group"
                 >
-                  <Mail className="w-5 h-5 mr-3 mt-1 shrink-0 group-hover:text-emerald-600" />
+                  <Mail className="w-5 h-5 mr-3 mt-1 shrink-0 group-hover:text-[#7c9885]" />
                   <span>hello@quickclean.fi</span>
                 </a>
               </li>
               <li>
                 <div className="text-gray-600 flex items-start group">
-                  <MapPin className="w-5 h-5 mr-3 mt-1 shrink-0 group-hover:text-emerald-600" />
+                  <MapPin className="w-5 h-5 mr-3 mt-1 shrink-0 group-hover:text-[#7c9885]" />
                   <span>Tampere, Finland</span>
                 </div>
               </li>
@@ -244,13 +244,13 @@ export default function Footer() {
             <div className="flex space-x-6">
               <Link
                 href="/privacy"
-                className="hover:text-emerald-600 transition-colors"
+                className="hover:text-[#7c9885] transition-colors"
               >
                 {t("footer.privacy")}
               </Link>
               <Link
                 href="/terms"
-                className="hover:text-emerald-600 transition-colors"
+                className="hover:text-[#7c9885] transition-colors"
               >
                 {t("footer.terms")}
               </Link>
