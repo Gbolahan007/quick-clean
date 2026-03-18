@@ -37,13 +37,18 @@
     },
     "problem": {
       "headline": "Your time shouldn't disappear into chores.",
-      "intro": "Workdays are full. Family life is busy. Your free time is limited. Yet cleaning keeps returning to the list.",
-      "points": [
-        "Floors need attention.",
-        "The bathroom needs care.",
-        "The kitchen never stays done for long.",
-        "Even when you try to relax, the thought remains: 'We should really clean.'"
-      ],
+      "workdays": {
+        "title": "Workdays are full.",
+        "subtitle": "Evenings disappear."
+      },
+      "weekends": {
+        "title": "Weekends vanish into",
+        "subtitle": "cleaning catch-up."
+      },
+      "mental": {
+        "title": "The mental load never",
+        "subtitle": "really switches off."
+      },
       "conclusion": "Your home should help you unwind — not remind you of another task waiting."
     },
     "transformation": {

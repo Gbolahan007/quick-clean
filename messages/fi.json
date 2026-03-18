@@ -36,13 +36,18 @@
     },
     "problem": {
       "headline": "Aikasi ei saisi hävitä kotitöihin.",
-      "intro": "Työpäivät ovat täynnä. Perhe-elämä on kiireistä. Vapaa-aikasi on rajallista. Silti siivous palaa listalle yhä uudelleen.",
-      "points": [
-        "Lattiat kaipaavat huomiota.",
-        "Kylpyhuone kaipaa hoitoa.",
-        "Keittiö ei pysy koskaan pitkään siistinä.",
-        "Vaikka yrität rentoutua, ajatus pysyy mielessä: 'Meidän pitäisi todella siivota.'"
-      ],
+      "workdays": {
+        "title": "Työpäivät ovat täynnä.",
+        "subtitle": "Illat katoavat."
+      },
+      "weekends": {
+        "title": "Viikonloput menevät",
+        "subtitle": "kiinniottosiivoukseen."
+      },
+      "mental": {
+        "title": "Henkinen kuorma ei",
+        "subtitle": "koskaan oikein sammukaan."
+      },
       "conclusion": "Kotisi pitäisi auttaa sinua rentoutumaan — ei muistuttaa sinua odottavasta tehtävästä."
     },
     "transformation": {

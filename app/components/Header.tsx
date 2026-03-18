@@ -7,22 +7,19 @@ import { useState, useRef, useEffect } from "react";
 import { HeaderProvider, useHeader } from "./contexts/HeaderContext";
 import Logo from "./Logo";
 
-// ─── Scroll-aware hook ────────────────────────────────────────────────────────
 function useScrollDirection() {
   const [visible, setVisible] = useState(true);
   const [atTop, setAtTop] = useState(true);
   const lastScrollY = useRef(0);
 
   useEffect(() => {
-    const THRESHOLD = 8; // px of scroll needed before we react (prevents jitter)
+    const THRESHOLD = 8;
 
     function onScroll() {
       const current = window.scrollY;
       setAtTop(current < 10);
-
       if (Math.abs(current - lastScrollY.current) < THRESHOLD) return;
-
-      setVisible(current < lastScrollY.current); // true = scrolling up
+      setVisible(current < lastScrollY.current);
       lastScrollY.current = current;
     }
 
@@ -33,7 +30,6 @@ function useScrollDirection() {
   return { visible, atTop };
 }
 
-// ─── Nav Dropdown (hover, desktop) ───────────────────────────────────────────
 function Dropdown({
   label,
   isOpen,
@@ -51,7 +47,7 @@ function Dropdown({
     <div className="relative" onMouseEnter={onOpen} onMouseLeave={onClose}>
       <button
         onClick={onOpen}
-        className="flex items-center space-x-1 text-gray-700 hover:text-emerald-600 font-medium transition-colors py-2"
+        className="flex items-center space-x-1 text-gray-700 hover:text-[#7c9885] font-medium transition-colors py-2"
       >
         <span>{label}</span>
         <ChevronDown
@@ -69,7 +65,6 @@ function Dropdown({
   );
 }
 
-// ─── Language Dropdown (click, desktop) ──────────────────────────────────────
 function LanguageDropdown({
   locale,
   isOpen,
@@ -97,7 +92,7 @@ function LanguageDropdown({
     <div ref={ref} className="relative">
       <button
         onClick={onToggle}
-        className="flex items-center space-x-1.5 text-gray-700 hover:text-emerald-600 font-medium transition-colors py-2"
+        className="flex items-center space-x-1.5 text-gray-700 hover:text-[#7c9885] font-medium transition-colors py-2"
       >
         <span className={`fi ${locale === "en" ? "fi-gb" : "fi-fi"}`} />
         <span className="text-sm font-medium">{locale.toUpperCase()}</span>
@@ -118,14 +113,14 @@ function LanguageDropdown({
                 onClick={() => onSwitch(code)}
                 className={`flex items-center gap-3 w-full px-4 py-2 text-sm transition-colors ${
                   locale === code
-                    ? "text-emerald-600 bg-emerald-50"
-                    : "text-gray-700 hover:bg-emerald-50 hover:text-emerald-600"
+                    ? "text-[#7c9885] bg-[#7c9885]/10"
+                    : "text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885]"
                 }`}
               >
                 <span className={`fi ${flag}`} />
                 <span className="font-medium">{label}</span>
                 {locale === code && (
-                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#7c9885]" />
                 )}
               </button>
             ))}
@@ -136,7 +131,6 @@ function LanguageDropdown({
   );
 }
 
-// ─── Language Pill (tap, mobile) ─────────────────────────────────────────────
 function MobileLanguagePill({
   locale,
   onSwitch,
@@ -159,7 +153,7 @@ function MobileLanguagePill({
             onClick={() => onSwitch(code)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
               locale === code
-                ? "bg-white text-emerald-600 shadow-sm"
+                ? "bg-white text-[#7c9885] shadow-sm"
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
@@ -172,7 +166,6 @@ function MobileLanguagePill({
   );
 }
 
-// ─── Header ───────────────────────────────────────────────────────────────────
 function HeaderContent() {
   const t = useTranslations();
   const locale = useLocale();
@@ -219,7 +212,7 @@ function HeaderContent() {
         <div className="flex h-20 items-center justify-between">
           <Logo />
 
-          {/* Desktop Nav - Dynamic spacing based on locale */}
+          {/* Desktop Nav */}
           <div
             className={`hidden lg:flex lg:items-center ${isFinnish ? "lg:space-x-4" : "lg:space-x-8"}`}
           >
@@ -231,13 +224,13 @@ function HeaderContent() {
             >
               <Link
                 href="/about"
-                className="block px-4 py-2 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors"
               >
                 {t("nav.about")}
               </Link>
               <Link
                 href="/our-story"
-                className="block px-4 py-2 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors"
               >
                 Our Story
               </Link>
@@ -251,19 +244,19 @@ function HeaderContent() {
             >
               <Link
                 href="/services/residential"
-                className="block px-4 py-2 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors"
               >
                 {t("services.maintenance.name")}
               </Link>
               <Link
                 href="/services/corporate"
-                className="block px-4 py-2 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors"
               >
                 {t("services.deepClean.name")}
               </Link>
               <Link
                 href="/services/specialized"
-                className="block px-4 py-2 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors"
               >
                 {t("services.extras.title")}
               </Link>
@@ -271,26 +264,26 @@ function HeaderContent() {
 
             <Link
               href="/pricing"
-              className="text-gray-700 hover:text-emerald-600 font-medium transition-colors"
+              className="text-gray-700 hover:text-[#7c9885] font-medium transition-colors"
             >
               {t("nav.pricing")}
             </Link>
             <Link
               href="/contact"
-              className="text-gray-700 hover:text-emerald-600 font-medium transition-colors"
+              className="text-gray-700 hover:text-[#7c9885] font-medium transition-colors"
             >
               {t("nav.quote")}
             </Link>
           </div>
 
-          {/* Desktop Right - Dynamic spacing and sizing based on locale */}
+          {/* Desktop Right */}
           <div
             className={`hidden lg:flex lg:items-center ${isFinnish ? "lg:space-x-2" : "lg:space-x-4"}`}
           >
             {isLoggedIn ? (
               <Link
                 href="/dashboard"
-                className="px-4 py-2 text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
+                className="px-4 py-2 text-[#7c9885] hover:text-[#435247] font-medium transition-colors"
               >
                 {t("nav.dashboard")}
               </Link>
@@ -298,20 +291,20 @@ function HeaderContent() {
               <>
                 <Link
                   href="/login"
-                  className={`${isFinnish ? "px-4 py-2 text-sm" : "px-5 py-2.5"} text-emerald-700 border border-emerald-200 rounded-full 
-               hover:bg-emerald-50 hover:border-emerald-300 
-               font-semibold transition-all duration-200`}
+                  className={`${isFinnish ? "px-4 py-2 text-sm" : "px-5 py-2.5"} text-[#7c9885] border border-[#7c9885]/40 rounded-full 
+                    hover:bg-[#7c9885]/10 hover:border-[#7c9885]
+                    font-semibold transition-all duration-200`}
                 >
                   {t("nav.login")}
                 </Link>
 
                 <Link
                   href="/signup"
-                  className={`${isFinnish ? "px-4 py-2 text-sm" : "px-5 py-2.5"} text-emerald-700 rounded-full 
-               border border-emerald-600
-              hover:bg-emerald-50 hover:border-emerald-300 
-               shadow-sm hover:shadow-md
-               font-semibold transition-all duration-200`}
+                  className={`${isFinnish ? "px-4 py-2 text-sm" : "px-5 py-2.5"} text-[#7c9885] rounded-full 
+                    border border-[#7c9885]
+                    hover:bg-[#7c9885]/10 hover:border-[#435247]
+                    shadow-sm hover:shadow-md
+                    font-semibold transition-all duration-200`}
                 >
                   {t("nav.signup")}
                 </Link>
@@ -319,7 +312,7 @@ function HeaderContent() {
             )}
             <Link
               href="/book"
-              className={`${isFinnish ? "px-5 py-2.5 text-sm" : "px-6 py-3"} bg-emerald-600 text-white rounded-full hover:bg-emerald-700 font-semibold shadow-md hover:shadow-lg transition-all`}
+              className={`${isFinnish ? "px-5 py-2.5 text-sm" : "px-6 py-3"} bg-[#7c9885] text-white rounded-full hover:bg-[#435247] font-semibold shadow-md hover:shadow-lg transition-all`}
             >
               {t("nav.cta")}
             </Link>
@@ -362,14 +355,14 @@ function HeaderContent() {
                 <div className="pl-4 space-y-2 mt-2">
                   <Link
                     href="/about"
-                    className="block py-2 text-gray-600 hover:text-emerald-600"
+                    className="block py-2 text-gray-600 hover:text-[#7c9885]"
                     onClick={handleMobileClick}
                   >
                     {t("nav.about")}
                   </Link>
                   <Link
                     href="/our-story"
-                    className="block py-2 text-gray-600 hover:text-emerald-600"
+                    className="block py-2 text-gray-600 hover:text-[#7c9885]"
                     onClick={handleMobileClick}
                   >
                     Our Story
@@ -392,21 +385,21 @@ function HeaderContent() {
                 <div className="pl-4 space-y-2 mt-2">
                   <Link
                     href="/services/residential"
-                    className="block py-2 text-gray-600 hover:text-emerald-600"
+                    className="block py-2 text-gray-600 hover:text-[#7c9885]"
                     onClick={handleMobileClick}
                   >
                     {t("services.maintenance.name")}
                   </Link>
                   <Link
                     href="/services/corporate"
-                    className="block py-2 text-gray-600 hover:text-emerald-600"
+                    className="block py-2 text-gray-600 hover:text-[#7c9885]"
                     onClick={handleMobileClick}
                   >
                     {t("services.deepClean.name")}
                   </Link>
                   <Link
                     href="/services/specialized"
-                    className="block py-2 text-gray-600 hover:text-emerald-600"
+                    className="block py-2 text-gray-600 hover:text-[#7c9885]"
                     onClick={handleMobileClick}
                   >
                     {t("services.extras.title")}
@@ -417,14 +410,14 @@ function HeaderContent() {
 
             <Link
               href="/pricing"
-              className="block py-2 text-gray-700 font-medium hover:text-emerald-600"
+              className="block py-2 text-gray-700 font-medium hover:text-[#7c9885]"
               onClick={handleMobileClick}
             >
               {t("nav.pricing")}
             </Link>
             <Link
               href="/contact"
-              className="block py-2 text-gray-700 font-medium hover:text-emerald-600"
+              className="block py-2 text-gray-700 font-medium hover:text-[#7c9885]"
               onClick={handleMobileClick}
             >
               {t("nav.quote")}
@@ -436,7 +429,7 @@ function HeaderContent() {
               {isLoggedIn ? (
                 <Link
                   href="/dashboard"
-                  className="block w-full px-4 py-3 text-center bg-emerald-600 text-white rounded-lg font-semibold"
+                  className="block w-full px-4 py-3 text-center bg-[#7c9885] text-white rounded-lg font-semibold hover:bg-[#435247] transition-all"
                   onClick={handleMobileClick}
                 >
                   {t("nav.dashboard")}
@@ -445,14 +438,14 @@ function HeaderContent() {
                 <>
                   <Link
                     href="/login"
-                    className="block w-full px-4 py-3 text-center border border-emerald-600 text-emerald-600 rounded-lg font-semibold"
+                    className="block w-full px-4 py-3 text-center border border-[#7c9885] text-[#7c9885] rounded-lg font-semibold hover:bg-[#7c9885]/10 transition-all"
                     onClick={handleMobileClick}
                   >
                     {t("nav.login")}
                   </Link>
                   <Link
                     href="/signup"
-                    className="block w-full px-4 py-3 text-center bg-gray-100 text-gray-700 rounded-lg font-semibold"
+                    className="block w-full px-4 py-3 text-center bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-all"
                     onClick={handleMobileClick}
                   >
                     {t("nav.signup")}
@@ -461,7 +454,7 @@ function HeaderContent() {
               )}
               <Link
                 href="/book"
-                className="block w-full px-4 py-3 text-center bg-emerald-600 text-white rounded-lg font-semibold shadow-md"
+                className="block w-full px-4 py-3 text-center bg-[#7c9885] text-white rounded-lg font-semibold shadow-md hover:bg-[#435247] transition-all"
                 onClick={handleMobileClick}
               >
                 {t("nav.cta")}

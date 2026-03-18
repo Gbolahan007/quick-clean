@@ -53,7 +53,7 @@ export default function HeroSection() {
           >
             <Link
               href="/pricing"
-              className={`${isFinnish ? "px-6 py-3 text-base" : "px-8 py-4 text-lg"} bg-[#e07a5f] text-white rounded-full font-semibold hover:bg-[#c96a4f] transition-all shadow-lg hover:shadow-xl`}
+              className={`${isFinnish ? "px-6 py-3 text-base" : "px-8 py-4 text-lg"} bg-[#7c9885] text-white rounded-full font-semibold hover:bg-transparent hover:text-white transition-all shadow-lg hover:shadow-xl`}
             >
               {t("cta")}
             </Link>

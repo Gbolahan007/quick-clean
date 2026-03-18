@@ -12,7 +12,7 @@ export default function HomePage() {
     <main className="tracking-widest">
       <HeroSection />
       <ProblemSection />
-      {/* <TransformationSection /> */}
+      <TransformationSection />
       <HowItWorksSection />
       <SubscriptionSection />
       <ServicesOverviewSection />

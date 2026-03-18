@@ -13,12 +13,12 @@ export default function Logo() {
 
   return (
     <Link href="/" className="flex items-center space-x-2 group">
-      <div className="bg-emerald-600 p-2 rounded-lg group-hover:bg-emerald-700 transition-colors">
+      <div className="bg-[#7c9885] p-2 rounded-lg group-hover:bg-[#5f7465] transition-colors">
         <Home className="h-6 w-6 text-white" />
       </div>
       <span className="text-2xl font-bold text-gray-900">
         {firstPart}
-        <span className="text-emerald-600">Clean</span>
+        <span className="text-[#7c9885]">Clean</span>
         {lastPart}
       </span>
     </Link>
