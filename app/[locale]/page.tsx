@@ -6,6 +6,7 @@ import ServicesOverviewSection from "../components/Home/ServicesOverviewSection"
 import SubscriptionSection from "../components/Home/SubscriptionSection";
 import TestimonialsSection from "../components/Home/TestimonialsSection";
 import TransformationSection from "../components/Home/TransformationSection";
+import TrustSection from "../components/Home/TrustSection";
 
 export default function HomePage() {
   return (
@@ -14,6 +15,7 @@ export default function HomePage() {
       <ProblemSection />
       <TransformationSection />
       <HowItWorksSection />
+      <TrustSection />
       <SubscriptionSection />
       <ServicesOverviewSection />
       <TestimonialsSection />

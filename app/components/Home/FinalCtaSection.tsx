@@ -1,44 +1,72 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/navigation";
+import { ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 export default function FinalCtaSection() {
   const t = useTranslations("landing.finalCta");
+  const locale = useLocale();
+  const isFinnish = locale === "fi";
 
   return (
-    <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
+    <section className="relative py-24 overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/home.jpg"
+          alt="Happy family relaxing at home"
+          fill
+          className="object-cover"
+          priority
+        />
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-black/60"></div>
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
         {/* Headline */}
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-black mb-6">
+        <h2
+          className={`${isFinnish ? "text-3xl sm:text-4xl" : "text-3xl sm:text-4xl lg:text-5xl"} font-bold text-white mb-6 leading-tight`}
+        >
           {t("headline")}
         </h2>
 
         {/* Description */}
-        <p className="text-lg sm:text-xl text-gray-700 mb-6 leading-relaxed">
+        <p
+          className={`${isFinnish ? "text-base sm:text-lg" : "text-lg sm:text-xl"} text-white/90 mb-10 leading-relaxed max-w-3xl mx-auto`}
+        >
           {t("description")}
         </p>
 
-        {/* Benefits */}
-        <p className="text-xl font-semibold text-black mb-10">
-          {t("benefits")}
-        </p>
-
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
           <Link
             href="/quote"
-            className="px-8 py-4 bg-[#e07a5f] text-white rounded-full font-semibold text-lg hover:bg-[#c96a4f] transition-all shadow-lg hover:shadow-xl"
+            className={`${isFinnish ? "px-6 py-3 text-base" : "px-8 py-4 text-lg"} bg-[#7c9885] text-white rounded-full font-semibold hover:bg-[#6a8573] transition-all shadow-lg hover:shadow-xl`}
           >
             {t("ctaPrimary")}
           </Link>
           <Link
             href="/pricing"
-            className="px-8 py-4 bg-white border-2 border-gray-300 text-black rounded-full font-semibold text-lg hover:border-[#e07a5f] hover:text-[#e07a5f] transition-all"
+            className={`${isFinnish ? "px-6 py-3 text-base" : "px-8 py-4 text-lg"} bg-white/10 backdrop-blur-sm border-2 border-white text-white rounded-full font-semibold hover:bg-white/20 transition-all`}
           >
             {t("ctaSecondary")}
           </Link>
         </div>
+
+        {/* Additional link with arrow */}
+        <Link
+          href="/pricing"
+          className="inline-flex items-center gap-2 text-white/90 hover:text-white transition-colors group"
+        >
+          <span className={`${isFinnish ? "text-sm" : "text-base"}`}>
+            {t("ctaLink")}
+          </span>
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </Link>
       </div>
     </section>
   );

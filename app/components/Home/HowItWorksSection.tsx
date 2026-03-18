@@ -38,7 +38,7 @@ export default function HowItWorksSection() {
         </div>
 
         {/* Steps with connecting lines */}
-        <div className="relative max-w-5xl mx-auto">
+        <div className="relative max-w-5xl mx-auto ">
           {/* Desktop: Horizontal connector line */}
           <div
             className="hidden md:block absolute top-8 left-0 right-0 h-0.5 bg-white/30"
@@ -50,10 +50,10 @@ export default function HowItWorksSection() {
 
           {/* Mobile: Vertical connector line */}
           <div
-            className="md:hidden absolute left-8 top-0 bottom-0 w-0.5 bg-white/30"
+            className="md:hidden absolute left-8 top-0 bottom-0 w-0.5  bg-white/30"
             style={{
-              top: "calc(2rem + 20px)",
-              bottom: "calc(2rem + 20px)",
+              top: "calc(2.5rem + 20px)",
+              bottom: "calc(8rem + 20px)",
             }}
           />
 

@@ -203,7 +203,8 @@
       "description": "Tell us a little about your home and how often you'd like help. We'll show you the plan that fits your life — simple, flexible, and easy to start.",
       "benefits": "More time for yourself. Less stress at home.",
       "ctaPrimary": "Get Your Cleaning Plan",
-      "ctaSecondary": "See Plans & Prices"
+      "ctaSecondary": "See Plans & Prices",
+      "ctaLink": "Calculate how much free time you'd get back"
     }
   },
   "services": {

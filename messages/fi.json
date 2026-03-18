@@ -202,7 +202,8 @@
       "description": "Kerro meille vähän kodistasi ja kuinka usein haluaisit apua. Näytämme sinulle suunnitelman, joka sopii elämääsi — yksinkertainen, joustava ja helppo aloittaa.",
       "benefits": "Enemmän aikaa itsellesi. Vähemmän stressiä kotona.",
       "ctaPrimary": "Hanki siivoussuunnitelmasi",
-      "ctaSecondary": "Katso hinnat ja paketit"
+      "ctaSecondary": "Katso hinnat ja paketit",
+      "ctaLink": "Laske kuinka paljon vapaa-aikaa saisit takaisin"
     }
   },
   "services": {

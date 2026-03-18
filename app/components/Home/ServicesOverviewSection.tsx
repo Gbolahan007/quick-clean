@@ -36,7 +36,7 @@ export default function ServicesShowcaseSection() {
   ];
 
   return (
-    <section className="py-20 bg-linear-to-b from-white to-gray-50">
+    <section className="py-10 bg-linear-to-b from-white to-gray-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -94,7 +94,7 @@ export default function ServicesShowcaseSection() {
           <p className="text-gray-600 mb-6">{t("notFound")}</p>
           <Link
             href="/services"
-            className="inline-flex items-center px-8 py-4 bg-emerald-600 text-white rounded-full font-semibold hover:bg-emerald-700 transition-all shadow-lg hover:shadow-xl group"
+            className="inline-flex items-center px-8 py-4 bg-[#7c9885] text-white rounded-full font-semibold hover:bg-[[#7c9885] transition-all shadow-lg hover:shadow-xl group"
           >
             {t("viewAll")}
             <ArrowUpRight className="ml-2 w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
