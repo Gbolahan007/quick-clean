@@ -47,7 +47,7 @@ function Dropdown({
     <div className="relative" onMouseEnter={onOpen} onMouseLeave={onClose}>
       <button
         onClick={onOpen}
-        className="flex items-center space-x-1 text-gray-700 hover:text-[#7c9885] font-medium transition-colors py-2"
+        className="flex items-center space-x-1 text-gray-700 hover:text-[#7c9885] font-medium transition-colors py-2 "
       >
         <span>{label}</span>
         <ChevronDown
@@ -55,7 +55,7 @@ function Dropdown({
         />
       </button>
       {isOpen && (
-        <div className="absolute left-0 top-full pt-2 w-48">
+        <div className="absolute left-0 top-full pt-2 w-52">
           <div className="bg-white rounded-lg shadow-lg border border-gray-100 py-2">
             {children}
           </div>
@@ -214,7 +214,7 @@ function HeaderContent() {
 
           {/* Desktop Nav */}
           <div
-            className={`hidden lg:flex lg:items-center ${isFinnish ? "lg:space-x-4" : "lg:space-x-8"}`}
+            className={`hidden lg:flex lg:items-center  ${isFinnish ? "lg:space-x-4" : "lg:space-x-8"}`}
           >
             <Dropdown
               label={t("nav.about")}
@@ -224,7 +224,7 @@ function HeaderContent() {
             >
               <Link
                 href="/about"
-                className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors"
+                className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors "
               >
                 {t("nav.about")}
               </Link>
@@ -244,7 +244,7 @@ function HeaderContent() {
             >
               <Link
                 href="/services/residential"
-                className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors"
+                className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors "
               >
                 {t("services.maintenance.name")}
               </Link>
