@@ -202,14 +202,19 @@ function HeaderContent() {
     <header
       className={`
         fixed top-0 left-0 right-0 z-50
-        bg-white whitespace-nowrap
-        transition-[transform,box-shadow] duration-300 ease-in-out
+        transition-[transform,box-shadow]  duration-300 ease-in-out
         ${visible ? "translate-y-0" : "-translate-y-full"}
-        ${atTop ? "shadow-none" : "shadow-sm"}
       `}
     >
-      <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-20 items-center justify-between">
+      <nav className="mx-auto max-w-7xl sm:px-6 lg:px-8 ">
+        <div
+          className={`
+          flex h-20 items-center justify-between whitespace-nowrap
+           lg:rounded-2xl lg:mx-0 lg:shadow-none
+          bg-white rounded-2xl mx-3 mt-3 px-4 shadow-md 
+          ${!atTop ? "lg:shadow-sm" : ""}
+        `}
+        >
           <Logo />
 
           {/* Desktop Nav */}
@@ -340,7 +345,7 @@ function HeaderContent() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden py-4 space-y-4 border-t border-gray-100">
+          <div className="lg:hidden py-4 px-3 mt-2 bg-white rounded-2xl shadow-md mx-3 space-y-4 border-t border-gray-100">
             <div>
               <button
                 onClick={() => setCompanyDropdownOpen(!companyDropdownOpen)}
