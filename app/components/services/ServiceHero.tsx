@@ -12,7 +12,7 @@ export default function ServiceHero() {
     <section className="relative min-h-[85vh] flex items-center overflow-hidden">
       {/* Background Image */}
       <Image
-        src="/services1.jpg"
+        src="/services3.jpg"
         alt="Clean modern living space"
         fill
         priority
