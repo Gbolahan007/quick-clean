@@ -9,14 +9,14 @@ export default function ServiceHero() {
   const isFinnish = locale === "fi";
 
   return (
-    <section className="relative min-h-[85vh] flex items-center overflow-hidden">
+    <section className="relative min-h-160 lg:min-h-150 flex items-center overflow-hidden">
       {/* Background Image */}
       <Image
         src="/services3.jpg"
         alt="Clean modern living space"
         fill
         priority
-        className="object-cover object-center"
+        className="object-cover"
       />
 
       {/* Dark gradient overlay — heavier on left for text legibility */}

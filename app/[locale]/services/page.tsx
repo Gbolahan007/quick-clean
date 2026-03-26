@@ -272,7 +272,7 @@ export default function ServicesPage() {
           src="/services2.jpg"
           alt="Clean professional space"
           fill
-          className="object-cover object-center"
+          className="object-cover"
         />
 
         {/* Dark + sage overlay */}
