@@ -209,6 +209,180 @@
   },
   "services": {
     "title": "Our Services",
+    "hero": {
+      "headline": "Care for every space that matters",
+      "description": "From regular home care to business spaces — everything designed to keep your environment running smoothly.",
+      "trustedInsured": "Trusted & Insured",
+      "vettedCleaners": "Vetted Cleaners",
+      "flexiblePlans": "Flexible Plans"
+    },
+    "overview": {
+      "headline": "Our Services",
+      "description": "Professional cleaning solutions for homes and businesses"
+    },
+    "cards": {
+      "homeCare": {
+        "title": "Home Care",
+        "description": "Regular home care that keeps your space fresh and comfortable — week after week.",
+        "features": [
+          "Weekly, bi-weekly, or monthly plans",
+          "Same cleaner when possible",
+          "Flexible scheduling"
+        ]
+      },
+      "office": {
+        "title": "Office Cleaning",
+        "description": "An organized workspace where people do their best work.",
+        "features": [
+          "Scheduled cleaning for offices",
+          "Meeting rooms & common areas",
+          "Kitchen and restroom care"
+        ]
+      },
+      "deepClean": {
+        "title": "Deep Cleaning",
+        "description": "A thorough reset that brings your space back to its best condition.",
+        "features": [
+          "Complete home refresh",
+          "Hard-to-reach areas",
+          "Detailed attention"
+        ]
+      },
+      "airbnb": {
+        "title": "Airbnb Care",
+        "description": "Guest-ready spaces, every single stay.",
+        "features": [
+          "Turnaround cleaning",
+          "Linen change service",
+          "Quality inspection"
+        ]
+      },
+      "moveOut": {
+        "title": "Move-Out Cleaning",
+        "description": "Leave the cleaning behind — focus on the move.",
+        "features": [
+          "End-of-lease ready",
+          "Complete property clean",
+          "Inspection ready"
+        ]
+      },
+      "renovation": {
+        "title": "Post-Renovation",
+        "description": "The final step after renovation work.",
+        "features": [
+          "Dust and debris removal",
+          "Surface restoration",
+          "Construction cleanup"
+        ]
+      },
+      "yacht": {
+        "title": "Ship & Yacht Care",
+        "description": "Marine interiors kept fresh and welcoming.",
+        "features": [
+          "Compact space expertise",
+          "Marine-grade cleaning",
+          "Regular maintenance"
+        ]
+      },
+      "luxury": {
+        "title": "Luxury & Special Care",
+        "description": "Thoughtful care for spaces that deserve extra attention.",
+        "features": [
+          "Premium materials care",
+          "Countryside cottages",
+          "Waterfront villas"
+        ]
+      }
+    },
+    "checklist": {
+      "headline": "What's Included",
+      "description": "Click each area to see detailed cleaning tasks",
+      "general": {
+        "title": "General / All Facilities",
+        "tasks": [
+          "Dusting all flat surfaces (up to 180cm height)",
+          "Vacuuming floors and carpets",
+          "Damp mopping suitable floors",
+          "Stain removal from door frames and handles",
+          "Wiping mirrors and glass surfaces",
+          "Garbage removal"
+        ]
+      },
+      "kitchen": {
+        "title": "Kitchen",
+        "tasks": [
+          "Cleaning sink, stove and range hood",
+          "Exterior cleaning of appliances",
+          "Loading dishwasher with dirty dishes",
+          "Wiping kitchen equipment",
+          "Vacuuming and mopping floors"
+        ]
+      },
+      "bathroom": {
+        "title": "Bathroom",
+        "tasks": [
+          "Cleaning bathtubs, toilets, sinks",
+          "Washing shower and glass screen",
+          "Disinfectant cleaning",
+          "Floor cleaning and mopping",
+          "Mirror and glass wiping"
+        ]
+      },
+      "bedroom": {
+        "title": "Bedroom",
+        "tasks": [
+          "Making the bed",
+          "Changing sheets (if provided)",
+          "Dusting all surfaces",
+          "Vacuuming and mopping"
+        ]
+      },
+      "extras": {
+        "title": "Extra Services (Separate Order)",
+        "tasks": [
+          "Interior refrigerator cleaning (60 min)",
+          "Interior oven cleaning (60 min)",
+          "Window cleaning",
+          "Sauna cleaning (60 min)",
+          "Ironing services (5-7 shirts / 30 min)",
+          "Laundry services"
+        ]
+      },
+      "notIncluded": {
+        "title": "Not Included:",
+        "description": "Wall/ceiling cleaning, extreme stain removal, post-renovation cleaning, furniture moving, air conditioning cleaning, floor drain cleaning"
+      }
+    },
+    "officeSection": {
+      "headline": "Office Cleaning Excellence",
+      "description": "High quality, reliable, insured. Your satisfaction is our measure of success.",
+      "halls": {
+        "title": "Halls & Entrances",
+        "description": "Floor care, glass cleaning, general maintenance"
+      },
+      "meetingRooms": {
+        "title": "Meeting Rooms",
+        "description": "Table wiping, chair arrangement, tech cleaning"
+      },
+      "kitchen": {
+        "title": "Kitchen & Dining",
+        "description": "Dishwasher service, surface cleaning, supplies refill"
+      },
+      "restrooms": {
+        "title": "Restrooms",
+        "description": "Disinfection, supplies, floor care"
+      },
+      "cta": "Get Office Cleaning Quote"
+    },
+    "finalCta": {
+      "headline": "Whatever the space, the goal is the same",
+      "subtitle": "More comfort. Less stress.",
+      "description": "Spaces that feel ready to enjoy.",
+      "primaryCta": "Explore Your Cleaning Plan",
+      "secondaryCta": "Contact Us"
+    },
+    "learnMore": "Learn More",
+    "mostPopular": "Most Popular",
     "maintenance": {
       "name": "Maintenance Cleaning",
       "description": "Regular cleaning of kitchen, bathroom, and living areas"

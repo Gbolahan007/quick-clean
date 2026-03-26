@@ -208,6 +208,176 @@
   },
   "services": {
     "title": "Palvelumme",
+    "hero": {
+      "headline": "Hoitoa jokaiselle tilalle, joka merkitsee",
+      "description": "Säännöllisestä kotihoidosta yritystiloihin — kaikki suunniteltu pitämään ympäristösi sujuvasti toimivana.",
+      "trustedInsured": "Luotettu ja vakuutettu",
+      "vettedCleaners": "Tarkastetut siivoojat",
+      "flexiblePlans": "Joustavat suunnitelmat"
+    },
+    "overview": {
+      "headline": "Palvelumme",
+      "description": "Ammattimaisia siivousratkaisuja kodeille ja yrityksille"
+    },
+    "cards": {
+      "homeCare": {
+        "title": "Kodinhoito",
+        "description": "Säännöllistä kodinhoitoa, joka pitää tilasi raikkaana ja mukavana — viikosta toiseen.",
+        "features": [
+          "Viikoittainen, joka toinen viikko tai kuukausittainen",
+          "Sama siivooja aina kun mahdollista",
+          "Joustava aikataulutus"
+        ]
+      },
+      "office": {
+        "title": "Toimiston siivous",
+        "description": "Järjestetty työtila, jossa ihmiset tekevät parasta työtään.",
+        "features": [
+          "Aikataulutettu toimiston siivous",
+          "Kokoushuoneet ja yhteiset tilat",
+          "Keittiön ja wc:n hoito"
+        ]
+      },
+      "deepClean": {
+        "title": "Perussiivous",
+        "description": "Perusteellinen nollaus, joka palauttaa tilasi parhaaseen kuntoon.",
+        "features": [
+          "Täydellinen kodin virkistys",
+          "Vaikeapääsyiset alueet",
+          "Yksityiskohtainen huomio"
+        ]
+      },
+      "airbnb": {
+        "title": "Airbnb-hoito",
+        "description": "Vieraille valmiit tilat, joka kerta.",
+        "features": ["Vaihtosiivous", "Liinavaihtopalvelu", "Laatutarkastus"]
+      },
+      "moveOut": {
+        "title": "Muuttosiivous",
+        "description": "Jätä siivous taakse — keskity muuttoon.",
+        "features": [
+          "Vuokrasopimuksen päättymiseen valmis",
+          "Täydellinen kiinteistön siivous",
+          "Tarkastukseen valmis"
+        ]
+      },
+      "renovation": {
+        "title": "Remontin jälkeinen",
+        "description": "Viimeinen askel remonttityön jälkeen.",
+        "features": [
+          "Pölyn ja roskien poisto",
+          "Pintojen kunnostus",
+          "Rakennussiivous"
+        ]
+      },
+      "yacht": {
+        "title": "Laiva- ja jahtisiivous",
+        "description": "Merellisten sisätilojen pitäminen raikkaana ja viihtyisänä.",
+        "features": [
+          "Kompaktien tilojen asiantuntemus",
+          "Meritason siivous",
+          "Säännöllinen huolto"
+        ]
+      },
+      "luxury": {
+        "title": "Luksus- ja erikoishoito",
+        "description": "Harkittua hoitoa tiloille, jotka ansaitsevat ylimääräistä huomiota.",
+        "features": [
+          "Premium-materiaalien hoito",
+          "Maaseutumökit",
+          "Rantahuvilat"
+        ]
+      }
+    },
+    "checklist": {
+      "headline": "Mitä sisältyy",
+      "description": "Klikkaa jokaista aluetta nähdäksesi yksityiskohtaiset siivoustehtävät",
+      "general": {
+        "title": "Yleiset / Kaikki tilat",
+        "tasks": [
+          "Kaikkien tasaisten pintojen pölyäminen (180 cm korkeuteen asti)",
+          "Lattioiden ja mattojen imurointi",
+          "Kostea moppaus sopivilla lattioilla",
+          "Tahrojen poisto ovenpieleksistä ja kahvoista",
+          "Peilien ja lasipintojen pyyhkiminen",
+          "Roskien vienti"
+        ]
+      },
+      "kitchen": {
+        "title": "Keittiö",
+        "tasks": [
+          "Tiskialtaan, lieden ja liesituulettimen puhdistus",
+          "Laitteiden ulkopuolinen puhdistus",
+          "Likaisten astioiden lastaaminen astianpesukoneeseen",
+          "Keittiölaitteiden pyyhkiminen",
+          "Lattioiden imurointi ja moppaus"
+        ]
+      },
+      "bathroom": {
+        "title": "Kylpyhuone",
+        "tasks": [
+          "Kylpyammeenenen, wc:n, pesualtaiden puhdistus",
+          "Suihkun ja lasioven pesu",
+          "Desinfioiva puhdistus",
+          "Lattian puhdistus ja moppaus",
+          "Peilien ja lasien pyyhkiminen"
+        ]
+      },
+      "bedroom": {
+        "title": "Makuuhuone",
+        "tasks": [
+          "Sängyn petaaminen",
+          "Lakanoiden vaihto (jos saatavilla)",
+          "Kaikkien pintojen pölyäminen",
+          "Imurointi ja moppaus"
+        ]
+      },
+      "extras": {
+        "title": "Lisäpalvelut (erillinen tilaus)",
+        "tasks": [
+          "Jääkaapin sisäpuolinen puhdistus (60 min)",
+          "Uunin sisäpuolinen puhdistus (60 min)",
+          "Ikkunoiden pesu",
+          "Saunan puhdistus (60 min)",
+          "Silitypalvelu (5-7 paitaa / 30 min)",
+          "Pesulapalvelut"
+        ]
+      },
+      "notIncluded": {
+        "title": "Ei sisälly:",
+        "description": "Seinien/kattojen puhdistus, äärimmäisten tahrojen poisto, remontin jälkeinen siivous, huonekalujen siirto, ilmastoinnin puhdistus, lattiakaivon puhdistus"
+      }
+    },
+    "officeSection": {
+      "headline": "Toimiston siivouksen huippuosaaminen",
+      "description": "Korkea laatu, luotettava, vakuutettu. Tyytyväisyytesi on menestystämme mittaava.",
+      "halls": {
+        "title": "Aulat ja sisäänkäynnit",
+        "description": "Lattiahoito, lasien puhdistus, yleinen ylläpito"
+      },
+      "meetingRooms": {
+        "title": "Kokoushuoneet",
+        "description": "Pöytien pyyhkiminen, tuolien järjestely, tekniikan puhdistus"
+      },
+      "kitchen": {
+        "title": "Keittiö ja ruokailutila",
+        "description": "Astianpesukoneen tyhjennys, pintojen puhdistus, tarvikkeiden täydennys"
+      },
+      "restrooms": {
+        "title": "WC-tilat",
+        "description": "Desinfiointi, tarvikkeet, lattiahoito"
+      },
+      "cta": "Hanki toimiston siivouksen tarjous"
+    },
+    "finalCta": {
+      "headline": "Tilasta riippumatta tavoite on sama",
+      "subtitle": "Enemmän mukavuutta. Vähemmän stressiä.",
+      "description": "Tiloja, jotka tuntuvat valmiilta nautittavaksi.",
+      "primaryCta": "Tutustu siivoussuunnitelmaasi",
+      "secondaryCta": "Ota yhteyttä"
+    },
+    "learnMore": "Lue lisää",
+    "mostPopular": "Suosituin",
     "maintenance": {
       "name": "Ylläpitosiivous",
       "description": "Säännöllinen keittiön, kylpyhuoneen ja oleskelutilojen siivous"

@@ -10,7 +10,7 @@ import TrustSection from "../components/Home/TrustSection";
 
 export default function HomePage() {
   return (
-    <main className="tracking-widest">
+    <main>
       <HeroSection />
       <ProblemSection />
       <TransformationSection />
