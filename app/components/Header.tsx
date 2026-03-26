@@ -398,21 +398,21 @@ function HeaderContent() {
                     className="block py-2 text-gray-600 hover:text-[#7c9885]"
                     onClick={handleMobileClick}
                   >
-                    {t("services.homeCare")}
+                    {t("services.maintenance.name")}
                   </Link>
                   <Link
                     href="/services/office"
                     className="block py-2 text-gray-600 hover:text-[#7c9885]"
                     onClick={handleMobileClick}
                   >
-                    {t("services.officeCleaning")}
+                    {t("services.extras.title")}
                   </Link>
                   <Link
                     href="/services/deep-clean"
                     className="block py-2 text-gray-600 hover:text-[#7c9885]"
                     onClick={handleMobileClick}
                   >
-                    {t("services.deepCleaning")}
+                    {t("services.deepClean.name")}
                   </Link>
                   <Link
                     href="/services"

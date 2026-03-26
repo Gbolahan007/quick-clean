@@ -269,7 +269,7 @@ export default function ServicesPage() {
       <section className="py-14 relative overflow-hidden">
         {/* Background Image */}
         <Image
-          src="/services2.JPG"
+          src="/services2.jpg"
           alt="Clean professional space"
           fill
           className="object-cover object-center"
