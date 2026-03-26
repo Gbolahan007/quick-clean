@@ -392,7 +392,8 @@
       "oven": "Uunin puhdistus",
       "fridge": "Jääkaapin ja pakastimen puhdistus",
       "highDust": "Korkeiden pintojen pölyjen poisto"
-    }
+    },
+    "viewAll": "Näytä kaikki palvelut"
   },
   "pricing": {
     "title": "Läpinäkyvä hinnoittelu",

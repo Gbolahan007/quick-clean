@@ -240,7 +240,6 @@ function HeaderContent() {
                 Our Story
               </Link>
             </Dropdown>
-
             <Dropdown
               label={t("nav.services")}
               isOpen={servicesDropdownOpen}
@@ -265,8 +264,14 @@ function HeaderContent() {
               >
                 {t("services.extras.title")}
               </Link>
+              <Link
+                href="/services"
+                className="block px-4 py-2 text-[#7c9885] font-semibold hover:bg-[#7c9885]/10 transition-colors"
+              >
+                {t("services.viewAll")}
+              </Link>
             </Dropdown>
-
+            ;
             <Link
               href="/pricing"
               className="text-gray-700 hover:text-[#7c9885] font-medium transition-colors"
@@ -389,25 +394,32 @@ function HeaderContent() {
               {servicesDropdownOpen && (
                 <div className="pl-4 space-y-2 mt-2">
                   <Link
-                    href="/services/residential"
+                    href="/services/home-care"
                     className="block py-2 text-gray-600 hover:text-[#7c9885]"
                     onClick={handleMobileClick}
                   >
-                    {t("services.maintenance.name")}
+                    {t("services.homeCare")}
                   </Link>
                   <Link
-                    href="/services/corporate"
+                    href="/services/office"
                     className="block py-2 text-gray-600 hover:text-[#7c9885]"
                     onClick={handleMobileClick}
                   >
-                    {t("services.deepClean.name")}
+                    {t("services.officeCleaning")}
                   </Link>
                   <Link
-                    href="/services/specialized"
+                    href="/services/deep-clean"
                     className="block py-2 text-gray-600 hover:text-[#7c9885]"
                     onClick={handleMobileClick}
                   >
-                    {t("services.extras.title")}
+                    {t("services.deepCleaning")}
+                  </Link>
+                  <Link
+                    href="/services"
+                    className="block py-2 text-[#7c9885] font-semibold hover:text-[#435247]"
+                    onClick={handleMobileClick}
+                  >
+                    {t("services.viewAll")}
                   </Link>
                 </div>
               )}

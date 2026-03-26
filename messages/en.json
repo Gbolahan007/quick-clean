@@ -207,6 +207,7 @@
       "ctaLink": "Calculate how much free time you'd get back"
     }
   },
+
   "services": {
     "title": "Our Services",
     "hero": {
@@ -384,12 +385,12 @@
     "learnMore": "Learn More",
     "mostPopular": "Most Popular",
     "maintenance": {
-      "name": "Maintenance Cleaning",
+      "name": "Home Care",
       "description": "Regular cleaning of kitchen, bathroom, and living areas"
     },
     "deepClean": {
-      "name": "Deep Cleaning",
-      "description": "Thorough top-to-bottom cleaning including hard-to-reach areas"
+      "name": "Office Cleaning",
+      "description": "Thorough top-to-bottom office cleaning including hard-to-reach areas"
     },
     "extras": {
       "title": "Additional Services",
@@ -397,7 +398,8 @@
       "oven": "Oven Cleaning",
       "fridge": "Fridge & Freezer Cleaning",
       "highDust": "High Dust Removal"
-    }
+    },
+    "viewAll": "View All Services"
   },
   "pricing": {
     "title": "Transparent Pricing",
@@ -508,6 +510,7 @@
       "maxLength": "Must be at most {max} characters"
     }
   },
+
   "footer": {
     "ctaHeadline": "Contact us today for expert cleaning services",
     "ctaLine1": "Let's Make",
