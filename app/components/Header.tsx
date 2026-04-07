@@ -247,19 +247,19 @@ function HeaderContent() {
               onClose={() => setServicesDropdownOpen(false)}
             >
               <Link
-                href="/services/residential"
+                href="/services/home-care"
                 className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors "
               >
                 {t("services.maintenance.name")}
               </Link>
               <Link
-                href="/services/corporate"
+                href="/services/office"
                 className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors"
               >
                 {t("services.deepClean.name")}
               </Link>
               <Link
-                href="/services/specialized"
+                href="/services/deep-clean"
                 className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors"
               >
                 {t("services.extras.title")}

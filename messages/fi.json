@@ -383,11 +383,11 @@
       "description": "Säännöllinen keittiön, kylpyhuoneen ja oleskelutilojen siivous"
     },
     "deepClean": {
-      "name": "Perussiivous",
+      "name": "Toimiston siivous",
       "description": "Perusteellinen siivous vaikeapääsyiset alueet mukaan lukien"
     },
     "extras": {
-      "title": "Lisäpalvelut",
+      "title": "Perussiivous",
       "windows": "Ikkunoiden pesu",
       "oven": "Uunin puhdistus",
       "fridge": "Jääkaapin ja pakastimen puhdistus",
