@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
 interface Service {
   id: string;
@@ -13,6 +15,7 @@ interface Service {
   description_en: string;
   description_fi: string;
   base_price: number | null;
+  image: string;
 }
 
 interface Task {
@@ -128,8 +131,8 @@ export default function ServiceDetail({
   exclusions,
   locale,
 }: Props) {
+  console.log(service.image);
   const isFinnish = locale === "fi";
-  const headline = isFinnish ? service.headline_fi : service.headline_en;
   const description = isFinnish
     ? service.description_fi
     : service.description_en;
@@ -146,29 +149,77 @@ export default function ServiceDetail({
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="py-20 bg-[#7c9885]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center py-10">
-          <span className="text-6xl mb-6 block">{service.icon}</span>
-          <h1
-            className={`${isFinnish ? "text-2xl sm:text-3xl lg:text-4xl" : "text-3xl sm:text-4xl lg:text-5xl"} font-bold text-white mb-6`}
-          >
-            {headline}
+      <section className="relative sm:min-h-[580px]  flex items-center justify-center overflow-hidden">
+        {/* Background Image */}
+        <Image
+          src={service.image}
+          alt={isFinnish ? service.name_fi : service.name_en}
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+        />
+
+        {/* Color Overlay */}
+        <div className="absolute inset-0 bg-black/60" />
+
+        {/* Content */}
+        <div className="relative z-10 mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center mt-20 py-7">
+          {/* Breadcrumb */}
+          <nav className="flex items-center justify-center gap-1.5 text-white/70 text-sm mb-10">
+            <Link href="/" className="hover:text-white transition-colors">
+              {isFinnish ? "Etusivu" : "Home"}
+            </Link>
+            <span>›</span>
+            <Link
+              href={`/${locale}/services`}
+              className="hover:text-white transition-colors"
+            >
+              {isFinnish ? "Palvelut" : "Services"}
+            </Link>
+            <span>›</span>
+            <span className="text-white">
+              {isFinnish ? service.name_fi : service.name_en}
+            </span>
+          </nav>
+
+          {/* Title */}
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
+            {isFinnish ? service.name_fi : service.name_en}
           </h1>
-          <p
-            className={`${isFinnish ? "text-sm" : "text-base"} text-white/90 max-w-2xl mx-auto leading-relaxed`}
-          >
+
+          {/* Divider */}
+          <div className="w-24 h-0.5 bg-white/50 mx-auto mb-8" />
+
+          {/* Description */}
+          <p className="text-white/90 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed mb-10">
             {description}
           </p>
+
+          {/* Price */}
           {service.base_price ? (
-            <p className="mt-6 text-white font-semibold text-lg">
-              {isFinnish ? "Alkaen" : "Starting from"}{" "}
-              <span className="text-2xl">€{service.base_price}</span>
+            <p className="text-white/80 text-sm mb-8">
+              {isFinnish ? "Alkaen " : "Starting from "}
+              <span className="font-bold text-white text-lg">
+                €{service.base_price}
+              </span>
             </p>
           ) : (
-            <p className="mt-6 text-white/80 text-sm">
+            <p className="text-white/70 text-sm mb-8">
               {isFinnish ? "Hinta tarjouksen mukaan" : "Price based on quote"}
             </p>
           )}
+
+          {/* CTA */}
+          <Link
+            href="/booking"
+            className="inline-flex items-center justify-center gap-2 bg-white text-[#7c9885] font-bold px-10 py-4 rounded-full hover:bg-white/90 transition-colors text-base shadow-md"
+          >
+            {isFinnish
+              ? `Valitse ${service.name_fi}`
+              : `Choose ${service.name_en}`}{" "}
+            →
+          </Link>
         </div>
       </section>
 
