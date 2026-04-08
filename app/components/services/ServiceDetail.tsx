@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import QuoteForm from "../QuoteForm";
 
 interface Service {
   id: string;
@@ -305,6 +306,15 @@ export default function ServiceDetail({
           </div>
         </section>
       )}
+
+      <section className="py-20 bg-[#7c9885]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <QuoteForm
+            isFinnish={isFinnish}
+            serviceName={isFinnish ? service.name_fi : service.name_en}
+          />
+        </div>
+      </section>
     </div>
   );
 }
