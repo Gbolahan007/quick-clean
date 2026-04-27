@@ -13,6 +13,7 @@
     "previous": "Previous",
     "submit": "Submit"
   },
+
   "nav": {
     "home": "Home",
     "about": "About",
@@ -25,187 +26,187 @@
     "logout": "Log Out",
     "cta": "Order Cleaning"
   },
-  "landing": {
-    "hero": {
-      "headline": "More time. Less stress.",
-      "subheadline": "A home that stays clean on autopilot.",
-      "description": "A simple home care plan that keeps your home calm and fresh, allowing you to spend your time on what truly matters.",
-      "cta": "See Plans & Prices",
-      "ct": "Order cleaning now",
-      "ctaSecondary": "How It Works",
-      "trustText": "Trusted by busy households across Tampere"
+
+  "pricing": {
+    "title": "Transparent Pricing",
+    "subtitle": "Simple, honest prices. No surprises.",
+
+    "serviceToggle": ["Maintenance Cleaning", "Deep Cleaning"],
+    "vatToggle": ["Full price (incl. VAT)", "After tax deduction (35%)"],
+
+    "chooseApartment": "Select apartment type",
+    "choosePlan": "Select frequency",
+
+    "apartments": {
+      "studio": "Studio (Yksiö)",
+      "two": "2 Rooms (Kaksio)",
+      "three": "3 Rooms (Kolmio)",
+      "four": "4+ Rooms (Neliö)"
     },
-    "problem": {
-      "headline": "Your time shouldn't disappear into chores.",
-      "workdays": {
-        "title": "Workdays are full.",
-        "subtitle": "Evenings disappear."
-      },
-      "weekends": {
-        "title": "Weekends vanish into",
-        "subtitle": "cleaning catch-up."
-      },
-      "mental": {
-        "title": "The mental load never",
-        "subtitle": "really switches off."
-      },
-      "conclusion": "Your home should help you unwind — not remind you of another task waiting."
+
+    "plans": {
+      "weekly": "Weekly",
+      "biweekly": "Bi-weekly",
+      "monthly": "Monthly",
+      "onetime": "One-time",
+      "deepMonthly": "Monthly subscription",
+      "deepQuarterly": "Quarterly subscription",
+      "deepOnetime": "One-time"
     },
-    "transformation": {
-      "headline": "Imagine coming home to 'already done.'",
-      "intro": "A clean, calm home changes how your whole week feels.",
-      "description": "When the house stays under control, evenings become lighter, weekends feel like real time off again and your home becomes a place to recharge.",
-      "subtitle": "No more mental checklist running in the background. Just a space that feels good to live in.",
-      "benefits": [
-        "Walk into a clean home after work",
-        "Keep your weekends for rest and hobbies",
-        "No more arguments about who cleans what",
-        "No more mental reminders about chores",
-        "Enjoy a calm, organized living space every day"
-      ],
-      "conclusion": "Simply put: life feels easier with a home that stays clean automatically"
+
+    "visitInfo": {
+      "weeklyVisits": "4× / month",
+      "biweeklyVisits": "2× / month",
+      "monthlyVisits": "1× / month",
+      "deepMonthlyVisits": "1 visit/month",
+      "deepQuarterlyVisits": "4 visits/year"
     },
-    "howItWorks": {
-      "headline": "Simple. Reliable. On repeat.",
-      "step1": {
-        "title": "Choose your cleaning plan",
-        "description": "Weekly, bi-weekly, or monthly cleaning depending on your lifestyle."
+
+    "apartmentType": "Apartment type",
+    "size": "Size",
+    "duration": "Duration",
+    "visitsPerMonth": "Visits / month",
+    "cleaners": "Cleaners",
+    "cleanersSingular": "cleaner",
+    "cleanersPlural": "cleaners",
+    "pricePerMonth": "Monthly price",
+    "pricePerVisit": "Price per visit",
+    "perMonth": "/ month",
+    "perVisit": "/ visit",
+    "perVisitPerYear": "/ visit · 4×/year",
+
+    "mostPopular": "Most Popular",
+    "recommended": "Recommended",
+    "recommendedShort": "Recommended",
+    "noApt": "Please select an apartment type above",
+
+    "cleaners15Discount": "15% off one-time price",
+    "cleaners10Discount": "10% off one-time price",
+
+    "addonsTitle": "Optional Add-ons",
+    "addonsSubtitle": "Add extra services to your cleaning visit",
+    "addonsNote": "Add-ons are booked alongside a main cleaning service — not as standalone.",
+    "discount10": "10% discount applied — 2+ add-ons selected!",
+    "originalTotal": "Original total",
+    "discountedTotal": "Your total",
+    "addonsSelected": "add-on(s) selected",
+    "perLoad": "per load",
+    "loads": "loads",
+
+    "addons": {
+      "sauna": { "label": "Sauna cleaning", "note": null },
+      "oven": { "label": "Oven interior", "note": null },
+      "fridge": {
+        "label": "Fridge / freezer interior",
+        "note": "Must be empty and defrosted before cleaning."
       },
-      "step2": {
-        "title": "We take care of the rest",
-        "description": "Your home is looked after on a regular schedule, so things stay fresh and organized."
-      },
-      "step3": {
-        "title": "Enjoy your time",
-        "description": "Come home to a space that feels calm and ready — without spending your free time managing it."
-      },
-      "reassurance": "Your plan can be adjusted anytime as life changes."
+      "trash": { "label": "Trash cabinet interior", "note": null },
+      "ironing": { "label": "Ironing (5–7 shirts)", "note": null },
+      "laundry": { "label": "Laundry (per load)", "note": null }
     },
-    "subscription": {
-      "headline": "A home that stays clean on autopilot",
-      "subheadline": "Choose a simple subscription, book once and never have to book again",
-      "description": "Your home is cared for on a regular schedule, so things never pile up. No constant reminders. No weekend catch-up cleaning. Just a home that stays in good shape — quietly in the background.",
-      "plans": {
-        "weekly": {
-          "title": "Weekly cleaning",
-          "description": "Perfect for busy households and families."
-        },
-        "biweekly": {
-          "title": "Bi-weekly cleaning",
-          "description": "Our most popular option for working professionals."
-        },
-        "monthly": {
-          "title": "Monthly cleaning",
-          "description": "A regular reset that keeps cleaning from piling up."
-        }
-      },
-      "benefits": [
-        "Predictable schedule",
-        "Consistent results",
-        "No repeated booking",
-        "A home that stays clean without effort"
-      ]
+
+    "saunaNote": "Recommended for 3-room and 4+ room apartments.",
+    "saunaAddonNote": "* Sauna cleaning is a separate add-on service.",
+    "disclaimer": "Prices include VAT 25.5%. The household deduction is an estimate — the final amount depends on your personal tax situation.",
+
+    "summary": "Booking Summary",
+    "livePrice": "Estimated price",
+    "bookNow": "Book Now",
+
+    "trustBadge1": "Vetted & Insured",
+    "trustBadge2": "Same Cleaner",
+    "trustBadge3": "Flexible Plans",
+    "trustBadge4": "No Hidden Fees"
+  },
+
+  "booking": {
+    "steps": {
+      "service": "Select Service",
+      "frequency": "Choose Frequency",
+      "dateTime": "Pick Date & Time",
+      "address": "Enter Address",
+      "extras": "Add Extras",
+      "payment": "Payment"
     },
-    "trust": {
-      "headline": "A service you can trust in your home.",
-      "intro": "Letting someone into your home requires trust. That's why reliability, transparency, and respect are at the heart of how we work.",
-      "subtitle": "Every visit should feel simple and safe",
-      "whatToExpect": "What you can expect",
-      "features": {
-        "vetted": {
-          "title": "Trusted and vetted team",
-          "description": "Everyone who visits your home is carefully selected and trained at our partner institutions TAKK, Tredu."
-        },
-        "consistency": {
-          "title": "Consistency whenever possible",
-          "description": "Same cleaner whenever possible, consistent quality standards."
-        },
-        "insured": {
-          "title": "Fully insured service",
-          "description": "Your home and belongings are protected."
-        },
-        "transparent": {
-          "title": "Clear and transparent pricing",
-          "description": "No hidden fees. No surprises."
-        },
-        "respect": {
-          "title": "Respect for your space",
-          "description": "Your home is treated with the love, attention, and professionalism it deserves."
-        },
-        "ethical": {
-          "title": "Ethical commitment",
-          "description": "We believe great service begins with how people are treated. Our team works in fair conditions with proper support and training — creating a service you can trust and feel good about."
-        }
-      }
+    "selectService": "Choose your cleaning service",
+    "selectFrequency": "How often do you need cleaning?",
+    "selectDate": "Select a date",
+    "selectTime": "Choose a time slot",
+    "noSlotsAvailable": "No available slots for this date",
+    "addressDetails": "Where should we clean?",
+    "streetAddress": "Street Address",
+    "apartmentNumber": "Apartment Number",
+    "city": "City",
+    "postalCode": "Postal Code",
+    "squareMeters": "Square Meters",
+    "numberOfRooms": "Number of Rooms",
+    "specialNotes": "Special Instructions",
+    "addExtras": "Add extra services",
+    "reviewBooking": "Review Your Booking",
+    "totalPrice": "Total Price",
+    "proceedToPayment": "Proceed to Payment",
+    "confirmBooking": "Confirm Booking"
+  },
+
+  "quote": {
+    "title": "Request a Free Quote",
+    "subtitle": "Tell us about your cleaning needs and we'll get back to you",
+    "form": {
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "address": "Property Address",
+      "squareMeters": "Square Meters (m²)",
+      "rooms": "Number of Rooms",
+      "frequency": "Preferred Frequency",
+      "extras": "Additional Services Needed",
+      "message": "Additional Information",
+      "submit": "Submit Quote Request"
     },
-    "whyChooseUs": {
-      "headline": "Built to allow you to focus on what matters.",
-      "reasons": {
-        "timeBack": {
-          "title": "Your time back",
-          "description": "Spend evenings and weekends on things you actually enjoy."
-        },
-        "autopilot": {
-          "title": "A home on autopilot",
-          "description": "Regular care keeps everything under control without effort."
-        },
-        "mentalLoad": {
-          "title": "Less mental load",
-          "description": "No reminders, no planning, no weekend catch-up."
-        },
-        "flexible": {
-          "title": "Simple and flexible",
-          "description": "Plans that fit your lifestyle and adjust when life changes."
-        }
-      }
+    "success": "Quote request submitted successfully! We'll contact you soon.",
+    "error": "Something went wrong. Please try again."
+  },
+
+  "dashboard": {
+    "welcome": "Welcome back, {name}",
+    "upcomingBookings": "Upcoming Bookings",
+    "bookingHistory": "Booking History",
+    "totalCleanings": "Total Cleanings",
+    "totalSpent": "Total Spent",
+    "noBookings": "No bookings yet",
+    "bookNow": "Book Your First Cleaning"
+  },
+
+  "auth": {
+    "login": {
+      "title": "Log In to Your Account",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Log In",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "signupLink": "Sign up"
     },
-    "testimonials": {
-      "headline": "Trusted by busy households in Tampere",
-      "testimonial1": {
-        "quote": "The best decision we made this year. Our weekends are finally free.",
-        "author": "Anna, Tampere"
-      },
-      "testimonial2": {
-        "quote": "Our apartment looks amazing every time, and we don't have to think about cleaning anymore.",
-        "author": "Mikael, Hervanta"
-      },
-      "metrics": [
-        { "value": "500+", "label": "Homes cleaned in Tampere" },
-        { "value": "4.9★", "label": "Customer rating" },
-        { "value": "87%", "label": "Repeat customers" }
-      ]
-    },
-    "servicesOverview": {
-      "headline": "Cleaning services for homes and businesses",
-      "intro": "Our focus is regular home cleaning for busy households, but we also offer additional services when you need extra help.",
-      "services": {
-        "regular": "Regular home cleaning",
-        "deep": "Deep cleaning",
-        "moveOut": "Move-out cleaning",
-        "office": "Office cleaning",
-        "special": "Special cleaning services",
-        "ship": "Ship Cleaning",
-        "yacht": "Luxury Yacht maintenance"
-      },
-      "conclusion": "Each service is delivered by trained professionals who care about quality and detail.",
-      "serviceDescriptions": {
-        "regular": "Weekly or bi-weekly home maintenance",
-        "deep": "Thorough top-to-bottom cleaning",
-        "office": "Professional workspace cleaning",
-        "moveOut": "Move-in and move-out services"
-      },
-      "learnMore": "Learn More",
-      "notFound": "Can't find the service you're looking for?",
-      "viewAll": "View All Services"
-    },
-    "finalCta": {
-      "headline": "Ready to enjoy a home that takes care of itself?",
-      "description": "Tell us a little about your home and how often you'd like help. We'll show you the plan that fits your life — simple, flexible, and easy to start.",
-      "benefits": "More time for yourself. Less stress at home.",
-      "ctaPrimary": "Get Your Cleaning Plan",
-      "ctaSecondary": "See Plans & Prices",
-      "ctaLink": "Calculate how much free time you'd get back"
+    "signup": {
+      "title": "Create Your Account",
+      "fullName": "Full Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "submit": "Sign Up",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Log in"
     }
+  },
+
+  "admin": {
+    "dashboard": "Admin Dashboard",
+    "newQuotes": "New Quote Requests",
+    "pendingBookings": "Pending Bookings",
+    "totalCustomers": "Total Customers",
+    "monthlyRevenue": "Revenue This Month",
+    "todaysSchedule": "Today's Schedule",
+    "viewAll": "View All"
   },
 
   "services": {
@@ -384,119 +385,191 @@
     },
     "learnMore": "Learn More",
     "mostPopular": "Most Popular",
-    "maintenance": {
-      "name": "Home Care",
-      "description": "Regular cleaning of kitchen, bathroom, and living areas"
-    },
-    "deepClean": {
-      "name": "Office Cleaning",
-      "description": "Thorough top-to-bottom office cleaning including hard-to-reach areas"
-    },
-    "extras": {
-      "title": "Deep Cleaning",
-      "windows": "Window Cleaning",
-      "oven": "Oven Cleaning",
-      "fridge": "Fridge & Freezer Cleaning",
-      "highDust": "High Dust Removal"
-    },
     "viewAll": "View All Services"
   },
-  "pricing": {
-    "title": "Transparent Pricing",
-    "frequency": {
-      "oneTime": "One-time",
-      "weekly": "Weekly",
-      "biweekly": "Bi-weekly",
-      "monthly": "Monthly"
+
+  "landing": {
+    "hero": {
+      "headline": "More time. Less stress.",
+      "subheadline": "A home that stays clean on autopilot.",
+      "description": "A simple home care plan that keeps your home calm and fresh, allowing you to spend your time on what truly matters.",
+      "cta": "See Plans & Prices",
+      "ctaSecondary": "How It Works",
+      "trustText": "Trusted by busy households across Tampere"
     },
-    "discount": "Save {percentage}%",
-    "startingFrom": "Starting from"
-  },
-  "booking": {
-    "steps": {
-      "service": "Select Service",
-      "frequency": "Choose Frequency",
-      "dateTime": "Pick Date & Time",
-      "address": "Enter Address",
-      "extras": "Add Extras",
-      "payment": "Payment"
+    "problem": {
+      "headline": "Your time shouldn't disappear into chores.",
+      "workdays": {
+        "title": "Workdays are full.",
+        "subtitle": "Evenings disappear."
+      },
+      "weekends": {
+        "title": "Weekends vanish into",
+        "subtitle": "cleaning catch-up."
+      },
+      "mental": {
+        "title": "The mental load never",
+        "subtitle": "really switches off."
+      },
+      "conclusion": "Your home should help you unwind — not remind you of another task waiting."
     },
-    "selectService": "Choose your cleaning service",
-    "selectFrequency": "How often do you need cleaning?",
-    "selectDate": "Select a date",
-    "selectTime": "Choose a time slot",
-    "noSlotsAvailable": "No available slots for this date",
-    "addressDetails": "Where should we clean?",
-    "streetAddress": "Street Address",
-    "apartmentNumber": "Apartment Number",
-    "city": "City",
-    "postalCode": "Postal Code",
-    "squareMeters": "Square Meters",
-    "numberOfRooms": "Number of Rooms",
-    "specialNotes": "Special Instructions",
-    "addExtras": "Add extra services",
-    "reviewBooking": "Review Your Booking",
-    "totalPrice": "Total Price",
-    "proceedToPayment": "Proceed to Payment",
-    "confirmBooking": "Confirm Booking"
-  },
-  "quote": {
-    "title": "Request a Free Quote",
-    "subtitle": "Tell us about your cleaning needs and we'll get back to you",
-    "form": {
-      "name": "Full Name",
-      "email": "Email Address",
-      "phone": "Phone Number",
-      "address": "Property Address",
-      "squareMeters": "Square Meters (m²)",
-      "rooms": "Number of Rooms",
-      "frequency": "Preferred Frequency",
-      "extras": "Additional Services Needed",
-      "message": "Additional Information",
-      "submit": "Submit Quote Request"
+    "transformation": {
+      "headline": "Imagine coming home to 'already done.'",
+      "intro": "A clean, calm home changes how your whole week feels.",
+      "description": "When the house stays under control, evenings become lighter, weekends feel like real time off again and your home becomes a place to recharge.",
+      "subtitle": "No more mental checklist running in the background. Just a space that feels good to live in.",
+      "benefits": [
+        "Walk into a clean home after work",
+        "Keep your weekends for rest and hobbies",
+        "No more arguments about who cleans what",
+        "No more mental reminders about chores",
+        "Enjoy a calm, organized living space every day"
+      ],
+      "conclusion": "Simply put: life feels easier with a home that stays clean automatically"
     },
-    "success": "Quote request submitted successfully! We'll contact you soon.",
-    "error": "Something went wrong. Please try again."
-  },
-  "dashboard": {
-    "welcome": "Welcome back, {name}",
-    "upcomingBookings": "Upcoming Bookings",
-    "bookingHistory": "Booking History",
-    "totalCleanings": "Total Cleanings",
-    "totalSpent": "Total Spent",
-    "noBookings": "No bookings yet",
-    "bookNow": "Book Your First Cleaning"
-  },
-  "auth": {
-    "login": {
-      "title": "Log In to Your Account",
-      "email": "Email",
-      "password": "Password",
-      "submit": "Log In",
-      "forgotPassword": "Forgot password?",
-      "noAccount": "Don't have an account?",
-      "signupLink": "Sign up"
+    "howItWorks": {
+      "headline": "Simple. Reliable. On repeat.",
+      "step1": {
+        "title": "Choose your cleaning plan",
+        "description": "Weekly, bi-weekly, or monthly cleaning depending on your lifestyle."
+      },
+      "step2": {
+        "title": "We take care of the rest",
+        "description": "Your home is looked after on a regular schedule, so things stay fresh and organized."
+      },
+      "step3": {
+        "title": "Enjoy your time",
+        "description": "Come home to a space that feels calm and ready — without spending your free time managing it."
+      },
+      "reassurance": "Your plan can be adjusted anytime as life changes."
     },
-    "signup": {
-      "title": "Create Your Account",
-      "fullName": "Full Name",
-      "email": "Email",
-      "password": "Password",
-      "confirmPassword": "Confirm Password",
-      "submit": "Sign Up",
-      "hasAccount": "Already have an account?",
-      "loginLink": "Log in"
+    "subscription": {
+      "headline": "A home that stays clean on autopilot",
+      "subheadline": "Choose a simple subscription, book once and never have to book again",
+      "description": "Your home is cared for on a regular schedule, so things never pile up. No constant reminders. No weekend catch-up cleaning. Just a home that stays in good shape — quietly in the background.",
+      "plans": {
+        "weekly": {
+          "title": "Weekly cleaning",
+          "description": "Perfect for busy households and families."
+        },
+        "biweekly": {
+          "title": "Bi-weekly cleaning",
+          "description": "Our most popular option for working professionals."
+        },
+        "monthly": {
+          "title": "Monthly cleaning",
+          "description": "A regular reset that keeps cleaning from piling up."
+        }
+      },
+      "benefits": [
+        "Predictable schedule",
+        "Consistent results",
+        "No repeated booking",
+        "A home that stays clean without effort"
+      ]
+    },
+    "trust": {
+      "headline": "A service you can trust in your home.",
+      "intro": "Letting someone into your home requires trust. That's why reliability, transparency, and respect are at the heart of how we work.",
+      "subtitle": "Every visit should feel simple and safe",
+      "whatToExpect": "What you can expect",
+      "features": {
+        "vetted": {
+          "title": "Trusted and vetted team",
+          "description": "Everyone who visits your home is carefully selected and trained at our partner institutions TAKK, Tredu."
+        },
+        "consistency": {
+          "title": "Consistency whenever possible",
+          "description": "Same cleaner whenever possible, consistent quality standards."
+        },
+        "insured": {
+          "title": "Fully insured service",
+          "description": "Your home and belongings are protected."
+        },
+        "transparent": {
+          "title": "Clear and transparent pricing",
+          "description": "No hidden fees. No surprises."
+        },
+        "respect": {
+          "title": "Respect for your space",
+          "description": "Your home is treated with the love, attention, and professionalism it deserves."
+        },
+        "ethical": {
+          "title": "Ethical commitment",
+          "description": "We believe great service begins with how people are treated. Our team works in fair conditions with proper support and training — creating a service you can trust and feel good about."
+        }
+      }
+    },
+    "whyChooseUs": {
+      "headline": "Built to allow you to focus on what matters.",
+      "reasons": {
+        "timeBack": {
+          "title": "Your time back",
+          "description": "Spend evenings and weekends on things you actually enjoy."
+        },
+        "autopilot": {
+          "title": "A home on autopilot",
+          "description": "Regular care keeps everything under control without effort."
+        },
+        "mentalLoad": {
+          "title": "Less mental load",
+          "description": "No reminders, no planning, no weekend catch-up."
+        },
+        "flexible": {
+          "title": "Simple and flexible",
+          "description": "Plans that fit your lifestyle and adjust when life changes."
+        }
+      }
+    },
+    "testimonials": {
+      "headline": "Trusted by busy households in Tampere",
+      "testimonial1": {
+        "quote": "The best decision we made this year. Our weekends are finally free.",
+        "author": "Anna, Tampere"
+      },
+      "testimonial2": {
+        "quote": "Our apartment looks amazing every time, and we don't have to think about cleaning anymore.",
+        "author": "Mikael, Hervanta"
+      },
+      "metrics": [
+        { "value": "500+", "label": "Homes cleaned in Tampere" },
+        { "value": "4.9★", "label": "Customer rating" },
+        { "value": "87%", "label": "Repeat customers" }
+      ]
+    },
+    "servicesOverview": {
+      "headline": "Cleaning services for homes and businesses",
+      "intro": "Our focus is regular home cleaning for busy households, but we also offer additional services when you need extra help.",
+      "services": {
+        "regular": "Regular home cleaning",
+        "deep": "Deep cleaning",
+        "moveOut": "Move-out cleaning",
+        "office": "Office cleaning",
+        "special": "Special cleaning services",
+        "ship": "Ship Cleaning",
+        "yacht": "Luxury Yacht maintenance"
+      },
+      "conclusion": "Each service is delivered by trained professionals who care about quality and detail.",
+      "serviceDescriptions": {
+        "regular": "Weekly or bi-weekly home maintenance",
+        "deep": "Thorough top-to-bottom cleaning",
+        "office": "Professional workspace cleaning",
+        "moveOut": "Move-in and move-out services"
+      },
+      "learnMore": "Learn More",
+      "notFound": "Can't find the service you're looking for?",
+      "viewAll": "View All Services"
+    },
+    "finalCta": {
+      "headline": "Ready to enjoy a home that takes care of itself?",
+      "description": "Tell us a little about your home and how often you'd like help. We'll show you the plan that fits your life — simple, flexible, and easy to start.",
+      "benefits": "More time for yourself. Less stress at home.",
+      "ctaPrimary": "Get Your Cleaning Plan",
+      "ctaSecondary": "See Plans & Prices",
+      "ctaLink": "Calculate how much free time you'd get back"
     }
   },
-  "admin": {
-    "dashboard": "Admin Dashboard",
-    "newQuotes": "New Quote Requests",
-    "pendingBookings": "Pending Bookings",
-    "totalCustomers": "Total Customers",
-    "monthlyRevenue": "Revenue This Month",
-    "todaysSchedule": "Today's Schedule",
-    "viewAll": "View All"
-  },
+
   "errors": {
     "generic": "Something went wrong",
     "networkError": "Network error. Please check your connection.",
