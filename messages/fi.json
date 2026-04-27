@@ -384,7 +384,23 @@
     },
     "learnMore": "Lue lisää",
     "mostPopular": "Suosituin",
-    "viewAll": "Näytä kaikki palvelut"
+    "viewAll": "Näytä kaikki palvelut",
+
+    "maintenance": {
+      "name": "Ylläpitosiivous",
+      "description": "Säännöllinen keittiön, kylpyhuoneen ja oleskelutilojen siivous"
+    },
+    "deepClean": {
+      "name": "Toimiston siivous",
+      "description": "Perusteellinen siivous vaikeapääsyiset alueet mukaan lukien"
+    },
+    "extras": {
+      "title": "Perussiivous",
+      "windows": "Ikkunoiden pesu",
+      "oven": "Uunin puhdistus",
+      "fridge": "Jääkaapin ja pakastimen puhdistus",
+      "highDust": "Korkeiden pintojen pölyjen poisto"
+    }
   },
 
   "landing": {

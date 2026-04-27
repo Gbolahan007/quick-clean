@@ -385,7 +385,23 @@
     },
     "learnMore": "Learn More",
     "mostPopular": "Most Popular",
-    "viewAll": "View All Services"
+    "viewAll": "View All Services",
+
+    "maintenance": {
+      "name": "Home Care",
+      "description": "Regular cleaning of kitchen, bathroom, and living areas"
+    },
+    "deepClean": {
+      "name": "Office Cleaning",
+      "description": "Thorough top-to-bottom office cleaning including hard-to-reach areas"
+    },
+    "extras": {
+      "title": "Deep Cleaning",
+      "windows": "Window Cleaning",
+      "oven": "Oven Cleaning",
+      "fridge": "Fridge & Freezer Cleaning",
+      "highDust": "High Dust Removal"
+    }
   },
 
   "landing": {
