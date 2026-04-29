@@ -56,9 +56,9 @@ export function SummaryBar({
     addonCount > 0 ? ` + ${addonCount} ${t("addonsSelected")}` : "";
 
   return (
-    <div className="sticky bottom-0 z-20 flex flex-wrap items-center gap-3 border-t border-gray-200 bg-white px-6 py-4 shadow-[0_-4px_24px_rgba(10,22,40,0.07)]">
+    <div className="fixed w-full bottom-0 z-20 flex flex-wrap items-center gap-3 border-t border-gray-200 bg-white px-6 py-4 shadow-[0_-4px_24px_rgba(10,22,40,0.07)] ">
       {/* Left Content */}
-      <div className="min-w-50 flex-1">
+      <div className="min-w-50 flex-1 ">
         <p className="mb-0.5 text-[11px] font-bold uppercase tracking-[0.08em] text-slate-900/45">
           {t("summary")}
         </p>

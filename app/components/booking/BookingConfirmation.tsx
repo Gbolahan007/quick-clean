@@ -8,14 +8,11 @@ export function BookingConfirmation() {
   const t = useTranslations("booking.confirmation");
   const router = useRouter();
 
-  const { confirmedBookingId, resetBooking, pricing, contact, schedule } =
-    useBookingStore((s) => ({
-      confirmedBookingId: s.confirmedBookingId,
-      resetBooking: s.resetBooking,
-      pricing: s.pricing,
-      contact: s.contact,
-      schedule: s.schedule,
-    }));
+  const confirmedBookingId = useBookingStore((s) => s.confirmedBookingId);
+  const resetBooking = useBookingStore((s) => s.resetBooking);
+  const pricing = useBookingStore((s) => s.pricing);
+  const contact = useBookingStore((s) => s.contact);
+  const schedule = useBookingStore((s) => s.schedule);
 
   const handleNewBooking = () => {
     resetBooking();
