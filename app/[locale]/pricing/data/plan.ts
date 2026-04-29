@@ -1,24 +1,4 @@
-/**
- * Pricing plan definitions.
- *
- * All numeric data (prices, durations, cleaners) is index-aligned with
- * APARTMENT_TYPES: [studio, kaksio, kolmio, neliö].
- *
- * labelKey      → pricing.plans.<key>        in en.json / fi.json
- * visitInfoKey  → pricing.visitInfo.<key>    in en.json / fi.json  (or null)
- * discountKey   → pricing.<discountKey>      in en.json / fi.json  (or null)
- *
- * priceType:
- *   "monthly"  → display as monthly total (subscription plans)
- *   "visit"    → display as per-visit price (one-time / quarterly)
- *
- * badge:
- *   null            → plain card header
- *   "popular"       → dark navy header + "Most Popular" badge
- *   "recommended"   → green header + "Recommended" badge
- */
-
-import { Plan } from "../components/PlanGrid";
+import { Plan } from "@/app/types/pricing";
 
 // ─── Maintenance plans ────────────────────────────────────────────────────────
 

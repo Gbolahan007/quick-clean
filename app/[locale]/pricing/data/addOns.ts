@@ -1,12 +1,3 @@
-/**
- * Add-on service definitions.
- *
- * labelKey  → pricing.addons.<key>.label  in en.json / fi.json
- * noteKey   → pricing.addons.<key>.note   in en.json / fi.json  (or null)
- *
- * prominent  true  → show "Recommended" badge for Kolmio & Neliö apartments
- * perLoad    true  → render a quantity stepper instead of a single checkbox
- */
 export const ADDONS = [
   {
     key: "sauna",
