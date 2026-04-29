@@ -76,7 +76,7 @@ export function PricingHeader({
         <p className="mb-7 text-base text-white/85">{t("subtitle")}</p>
 
         {/* Toggles */}
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-3 ">
           <PillToggle
             options={[t("serviceToggle.0"), t("serviceToggle.1")]}
             selected={serviceType === "maintenance" ? 0 : 1}

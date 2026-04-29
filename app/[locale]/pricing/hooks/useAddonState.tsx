@@ -36,7 +36,8 @@ export function useAddonState(showDeducted: boolean, onChange?: OnChange) {
    */
   useEffect(() => {
     onChange?.(summary);
-  }, [onChange, summary]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [summary]);
 
   /**
    * Toggle checkbox addons OR cycle stepper addons

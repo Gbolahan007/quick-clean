@@ -123,32 +123,165 @@
   },
 
   "booking": {
+    "pageTitle": "Viimeistele varauksesi",
+    "backToPricing": "Takaisin hinnoitteluun",
+    "loading": "Ladataan varaustasi…",
+    "back": "← Takaisin",
+    "total": "Yhteensä",
+    "stepOf": "Vaihe {current} / {total}",
+
     "steps": {
-      "service": "Valitse palvelu",
-      "frequency": "Valitse tiheys",
-      "dateTime": "Valitse päivä ja aika",
-      "address": "Syötä osoite",
-      "extras": "Lisää lisäpalvelut",
-      "payment": "Maksu"
+      "contact": "Yhteystiedot",
+      "address": "Osoite",
+      "schedule": "Aikataulu",
+      "notes": "Lisätiedot",
+      "review": "Tarkistus"
     },
-    "selectService": "Valitse siivouspalvelu",
-    "selectFrequency": "Kuinka usein tarvitset siivousta?",
-    "selectDate": "Valitse päivämäärä",
-    "selectTime": "Valitse aika",
-    "noSlotsAvailable": "Tälle päivälle ei ole vapaita aikoja",
-    "addressDetails": "Minne siivous tehdään?",
-    "streetAddress": "Katuosoite",
-    "apartmentNumber": "Asunnon numero",
-    "city": "Kaupunki",
-    "postalCode": "Postinumero",
-    "squareMeters": "Neliömetrit",
-    "numberOfRooms": "Huoneiden määrä",
-    "specialNotes": "Erityisohjeet",
-    "addExtras": "Lisää lisäpalveluja",
-    "reviewBooking": "Tarkista varauksesi",
-    "totalPrice": "Kokonaishinta",
-    "proceedToPayment": "Siirry maksuun",
-    "confirmBooking": "Vahvista varaus"
+
+    "sidebar": {
+      "yourBooking": "Varauksesi",
+      "service": "Palvelu",
+      "plan": "Paketti",
+      "pricing": "Hintatapa",
+      "taxDeducted": "Kotitalousvähennyksen jälkeen",
+      "normalPrice": "Normaalihinta",
+      "basePrice": "Perushinta",
+      "addons": "lisäpalvelua",
+      "discount10": "Monilisäpalvelualennus",
+      "total": "Yhteensä",
+      "trust1": "Ilmainen peruutus 48 h ennen käyntiä",
+      "trust2": "Täysin vakuutetut ammattisiivoojat",
+      "trust3": "Tyytyväisyystakuu tai uusintasiivous ilmaiseksi"
+    },
+
+    "contact": {
+      "title": "Yhteystietosi",
+      "subtitle": "Lähetämme varausvahvistuksen tähän sähköpostiin.",
+      "firstName": "Etunimi",
+      "lastName": "Sukunimi",
+      "email": "Sähköpostiosoite",
+      "emailHint": "Vahvistus lähetetään tähän osoitteeseen",
+      "phone": "Puhelinnumero",
+      "phoneHint": "Saatamme ottaa sinuun yhteyttä ennen käyntiä",
+      "company": "Yritys (valinnainen)",
+      "companyPlaceholder": "Esimerkki Oy",
+      "companyHint": "Jätä tyhjäksi henkilökohtaisille varauksille",
+      "next": "Jatka →",
+      "errors": {
+        "required": "Tämä kenttä on pakollinen",
+        "minLength": "Vähintään {n} merkkiä",
+        "invalidEmail": "Anna kelvollinen sähköpostiosoite",
+        "invalidPhone": "Anna kelvollinen puhelinnumero"
+      }
+    },
+
+    "address": {
+      "title": "Palveluosoite",
+      "subtitle": "Minne lähetetään siivoustiimi?",
+      "street": "Katuosoite",
+      "apartment": "Asunto / porras (valinnainen)",
+      "apartmentHint": "esim. A 14 tai B 3",
+      "postalCode": "Postinumero",
+      "city": "Kaupunki",
+      "accessInstructions": "Kulkuohjeet (valinnainen)",
+      "accessPlaceholder": "esim. Ovikoodi on 1234, soita kahdesti ovikelloa",
+      "accessHint": "Miten tiimi pääsee rakennukseen?",
+      "next": "Jatka →",
+      "back": "← Yhteystiedot",
+      "errors": {
+        "required": "Tämä kenttä on pakollinen",
+        "invalidPostalCode": "Suomalaiset postinumerot ovat 5 numeroa"
+      }
+    },
+
+    "schedule": {
+      "title": "Toivottu päivä ja aika",
+      "subtitle": "Valitse ensisijainen toiveesi — vahvistamme saatavuuden 24 tunnin kuluessa.",
+      "preferredDate": "Toivottu päivä",
+      "dateHint": "Aikaisin saatavilla: 2 arkipäivää tästä päivästä",
+      "preferredTime": "Toivottu aika",
+      "timeHint": "Kaikki ajat Helsingin aikaa",
+      "alternateDate": "Vaihtoehtoinen päivä (valinnainen)",
+      "alternateDateHint": "Jos ensisijainen toiveesi ei ole saatavilla",
+      "next": "Jatka →",
+      "back": "← Osoite",
+      "errors": {
+        "required": "Valitse päivä ja aika",
+        "dateTooSoon": "Valitse päivä vähintään 2 arkipäivän päähän"
+      }
+    },
+
+    "notes": {
+      "title": "Mitään muuta mitä meidän pitäisi tietää?",
+      "subtitle": "Kaikki tämän vaiheen kentät ovat valinnaisia.",
+      "specialInstructions": "Erityisohjeet",
+      "instructionsPlaceholder": "esim. Käytä enemmän aikaa keittiöön, älä siirrä tavaroita pöydältä",
+      "instructionsHint": "Erityiset tehtävät tai alueet, joihin keskittyä",
+      "hasPets": "Minulla on lemmikkejä",
+      "hasPetsDescription": "Jotta tiimimme voi suunnitella sen mukaan",
+      "petDetails": "Lemmikkitiedot",
+      "petDetailsPlaceholder": "esim. Yksi ystävällinen kultainennoutaja, on pihalla",
+      "petDetailsHint": "Laji, rotu, luonne — kaikki hyödyllinen tieto",
+      "infoNote": "Tiimimme käy läpi muistiinpanosi ennen käyntiä. Kiireellisiä muutoksia varten ota yhteyttä vähintään 24 tuntia etukäteen.",
+      "next": "Jatka tarkistukseen →",
+      "back": "← Aikataulu"
+    },
+
+    "review": {
+      "title": "Tarkista varauksesi",
+      "subtitle": "Kaikki oikein? Vahvista lukitaksesi varauksesi.",
+      "sections": {
+        "service": "Palvelu",
+        "contact": "Yhteystiedot",
+        "address": "Osoite",
+        "schedule": "Aikataulu",
+        "notes": "Lisätiedot ja toiveet"
+      },
+      "fields": {
+        "apartment": "Asunto",
+        "serviceType": "Palvelutyyppi",
+        "plan": "Paketti",
+        "totalPrice": "Kokonaishinta",
+        "name": "Nimi",
+        "email": "Sähköposti",
+        "phone": "Puhelin",
+        "company": "Yritys",
+        "address": "Osoite",
+        "access": "Kulkuohjeet",
+        "date": "Toivottu päivä",
+        "time": "Aika",
+        "alternateDate": "Vaihtoehtoinen päivä",
+        "instructions": "Ohjeet",
+        "pets": "Lemmikit"
+      },
+      "noNotes": "Ei erityisohjeita",
+      "noPets": "Ei lemmikkejä",
+      "hasPets": "On lemmikkejä",
+      "legalNote": "Vahvistamalla tämän varauksen hyväksyt käyttöehtomme ja tietosuojakäytäntömme. Voit peruuttaa maksutta 48 tuntia ennen sovittua käyntiä.",
+      "confirm": "Vahvista varaus ✓"
+    },
+
+    "confirmation": {
+      "title": "Varaus tehty! 🎉",
+      "subtitle": "Vahvistus on lähetetty osoitteeseen {email}",
+      "bookingRef": "Varausnumero",
+      "fields": {
+        "service": "Palvelu",
+        "date": "Päivä",
+        "time": "Aika",
+        "total": "Yhteensä"
+      },
+      "nextSteps": {
+        "title": "Mitä tapahtuu seuraavaksi",
+        "items": [
+          "Saat vahvistussähköpostin muutaman minuutin kuluessa.",
+          "Tiimimme ottaa sinuun yhteyttä 24 tuntia ennen käyntiä vahvistaakseen kulkuohjeet.",
+          "Siivouksen jälkeen saat lyhyen tyytyväisyyskyselyn."
+        ]
+      },
+      "bookAnother": "Varaa uusi siivous",
+      "goHome": "Siirry etusivulle"
+    }
   },
 
   "quote": {

@@ -23,11 +23,11 @@ export function ApartmentSelector({
   const t = useTranslations("pricing");
 
   return (
-    <div className="-mt-10 relative mb-8 z-50">
+    <div className="-mt-10  relative mb-8 z-50 ">
       <div className="bg-white rounded-[20px] p-6 shadow-[0_4px_24px_rgba(10,22,40,0.07)] border border-gray-200">
         <SectionLabel>{t("chooseApartment")}</SectionLabel>
 
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-2.5">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-2.5 ">
           {(APARTMENT_TYPES as ApartmentType[]).map((apt) => {
             const isActive = selected?.key === apt.key;
 
@@ -37,7 +37,7 @@ export function ApartmentSelector({
                 type="button"
                 onClick={() => onSelect(apt)}
                 className={`
-                  p-[14px_16px] rounded-[14px] text-left transition-all
+                  p-[14px_16px] cursor-pointer rounded-[14px] text-left transition-all
                   ${
                     isActive
                       ? "border-[2.5px] border-[#7c9885] bg-[#f0f8f3] shadow-[0_0_0_4px_rgba(124,152,133,0.15)]"
@@ -48,7 +48,7 @@ export function ApartmentSelector({
                 <div className="text-lg mb-1">{apt.emoji}</div>
 
                 <p
-                  className={`text-[13px] font-bold mb-0.5 ${
+                  className={`text-[13px]  font-bold mb-0.5  ${
                     isActive ? "text-[#3d6b47]" : "text-[#0a1628]"
                   }`}
                 >

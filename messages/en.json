@@ -120,32 +120,165 @@
   },
 
   "booking": {
+    "pageTitle": "Complete your booking",
+    "backToPricing": "Back to pricing",
+    "loading": "Loading your booking…",
+    "back": "← Back",
+    "total": "Total",
+    "stepOf": "Step {current} of {total}",
+
     "steps": {
-      "service": "Select Service",
-      "frequency": "Choose Frequency",
-      "dateTime": "Pick Date & Time",
-      "address": "Enter Address",
-      "extras": "Add Extras",
-      "payment": "Payment"
+      "contact": "Contact",
+      "address": "Address",
+      "schedule": "Schedule",
+      "notes": "Notes",
+      "review": "Review"
     },
-    "selectService": "Choose your cleaning service",
-    "selectFrequency": "How often do you need cleaning?",
-    "selectDate": "Select a date",
-    "selectTime": "Choose a time slot",
-    "noSlotsAvailable": "No available slots for this date",
-    "addressDetails": "Where should we clean?",
-    "streetAddress": "Street Address",
-    "apartmentNumber": "Apartment Number",
-    "city": "City",
-    "postalCode": "Postal Code",
-    "squareMeters": "Square Meters",
-    "numberOfRooms": "Number of Rooms",
-    "specialNotes": "Special Instructions",
-    "addExtras": "Add extra services",
-    "reviewBooking": "Review Your Booking",
-    "totalPrice": "Total Price",
-    "proceedToPayment": "Proceed to Payment",
-    "confirmBooking": "Confirm Booking"
+
+    "sidebar": {
+      "yourBooking": "Your booking",
+      "service": "Service",
+      "plan": "Plan",
+      "pricing": "Pricing mode",
+      "taxDeducted": "Tax deducted (kotitalousvähennys)",
+      "normalPrice": "Normal price",
+      "basePrice": "Base price",
+      "addons": "add-ons",
+      "discount10": "Multi-addon discount",
+      "total": "Total",
+      "trust1": "Free cancellation up to 48 h before",
+      "trust2": "Fully insured cleaning professionals",
+      "trust3": "Satisfaction guaranteed or re-clean free"
+    },
+
+    "contact": {
+      "title": "Your contact details",
+      "subtitle": "We'll send your booking confirmation to this email.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email address",
+      "emailHint": "Confirmation will be sent here",
+      "phone": "Phone number",
+      "phoneHint": "We may contact you before the visit",
+      "company": "Company (optional)",
+      "companyPlaceholder": "Acme Oy",
+      "companyHint": "Leave empty for personal bookings",
+      "next": "Continue →",
+      "errors": {
+        "required": "This field is required",
+        "minLength": "Must be at least {n} characters",
+        "invalidEmail": "Please enter a valid email address",
+        "invalidPhone": "Please enter a valid phone number"
+      }
+    },
+
+    "address": {
+      "title": "Service address",
+      "subtitle": "Where should we send the cleaning team?",
+      "street": "Street address",
+      "apartment": "Apartment / stairwell (optional)",
+      "apartmentHint": "e.g. A 14 or B 3",
+      "postalCode": "Postal code",
+      "city": "City",
+      "accessInstructions": "Access instructions (optional)",
+      "accessPlaceholder": "e.g. Door code is 1234, ring bell twice",
+      "accessHint": "How should the team enter the building?",
+      "next": "Continue →",
+      "back": "← Contact",
+      "errors": {
+        "required": "This field is required",
+        "invalidPostalCode": "Finnish postal codes are 5 digits"
+      }
+    },
+
+    "schedule": {
+      "title": "Preferred date & time",
+      "subtitle": "Pick your first choice — we'll confirm availability within 24 h.",
+      "preferredDate": "Preferred date",
+      "dateHint": "Earliest available: 2 business days from today",
+      "preferredTime": "Preferred time slot",
+      "timeHint": "All times are local (Helsinki)",
+      "alternateDate": "Alternative date (optional)",
+      "alternateDateHint": "In case your first choice isn't available",
+      "next": "Continue →",
+      "back": "← Address",
+      "errors": {
+        "required": "Please select a date and time",
+        "dateTooSoon": "Please choose a date at least 2 business days away"
+      }
+    },
+
+    "notes": {
+      "title": "Anything else we should know?",
+      "subtitle": "All fields on this step are optional.",
+      "specialInstructions": "Special instructions",
+      "instructionsPlaceholder": "e.g. Focus extra time on the kitchen, don't move items on the desk",
+      "instructionsHint": "Specific tasks or areas to focus on",
+      "hasPets": "I have pets",
+      "hasPetsDescription": "So our team can plan accordingly",
+      "petDetails": "Pet details",
+      "petDetailsPlaceholder": "e.g. One friendly golden retriever, will be in the yard",
+      "petDetailsHint": "Type, breed, temperament — anything helpful",
+      "infoNote": "Our team will review your notes before the visit. For urgent changes, please call us at least 24 hours in advance.",
+      "next": "Continue to review →",
+      "back": "← Schedule"
+    },
+
+    "review": {
+      "title": "Review your booking",
+      "subtitle": "Everything look right? Confirm to lock in your booking.",
+      "sections": {
+        "service": "Service",
+        "contact": "Contact",
+        "address": "Address",
+        "schedule": "Schedule",
+        "notes": "Notes & preferences"
+      },
+      "fields": {
+        "apartment": "Apartment",
+        "serviceType": "Service type",
+        "plan": "Plan",
+        "totalPrice": "Total price",
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone",
+        "company": "Company",
+        "address": "Address",
+        "access": "Access",
+        "date": "Preferred date",
+        "time": "Time slot",
+        "alternateDate": "Alternate date",
+        "instructions": "Instructions",
+        "pets": "Pets"
+      },
+      "noNotes": "No special instructions",
+      "noPets": "No pets",
+      "hasPets": "Has pets",
+      "legalNote": "By confirming this booking you agree to our Terms of Service and Privacy Policy. You can cancel free of charge up to 48 hours before the scheduled visit.",
+      "confirm": "Confirm booking ✓"
+    },
+
+    "confirmation": {
+      "title": "You're booked! 🎉",
+      "subtitle": "A confirmation has been sent to {email}",
+      "bookingRef": "Booking reference",
+      "fields": {
+        "service": "Service",
+        "date": "Date",
+        "time": "Time",
+        "total": "Total"
+      },
+      "nextSteps": {
+        "title": "What happens next",
+        "items": [
+          "You'll receive a confirmation email within a few minutes.",
+          "Our team will reach out 24 h before your visit to confirm access.",
+          "After the clean, you'll get a brief satisfaction survey."
+        ]
+      },
+      "bookAnother": "Book another cleaning",
+      "goHome": "Go to homepage"
+    }
   },
 
   "quote": {

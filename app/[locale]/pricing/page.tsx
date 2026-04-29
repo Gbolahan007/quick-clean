@@ -9,21 +9,12 @@ import { PlanGrid } from "./components/PlanGrid";
 import { PricingTable } from "./components/PricingTable";
 import { AddonsSection } from "./components/AddonsSection";
 import { SummaryBar } from "./components/SummaryBar";
-import { aptIndex, buildBookingParams } from "./data/pricing";
+import { aptIndex } from "./data/pricing";
 
 type Props = {
   localeProp: "en" | "fi";
 };
-/**
- * PricingPage
- *
- * Thin orchestrator. All state lives in usePricingState; all UI is in the
- * imported components. This file should only contain wiring — no styles,
- * no business logic.
- *
- * Props:
- *   locale  "en" | "fi"  (passed from the Next.js route segment)
- */
+
 export default function PricingPage({ localeProp }: Props) {
   const t = useTranslations("pricing");
 
@@ -43,24 +34,6 @@ export default function PricingPage({ localeProp }: Props) {
     handleVatChange,
   } = usePricingState(localeProp);
 
-  // ── Booking hand-off ────────────────────────────────────────────────────────
-  const handleBook = () => {
-    const params = buildBookingParams({
-      serviceType,
-      apt: selectedApt,
-      plan: selectedPlan,
-      showDeducted,
-      addons: addonsSummary.qtyMap ?? {},
-    });
-
-    // In production: router.push(`/booking?${params}`)
-    // eslint-disable-next-line no-alert
-    alert(
-      `Redirecting to: /booking?${params}\n\n(Replace this alert with router.push in production)`,
-    );
-  };
-
-  // ── Derived values used by multiple children ────────────────────────────────
   const currentAptIdx = selectedApt ? aptIndex(selectedApt.key) : null;
 
   return (
@@ -71,7 +44,6 @@ export default function PricingPage({ localeProp }: Props) {
         fontFamily: "system-ui, -apple-system, sans-serif",
       }}
     >
-      {/* ── 1. Hero header with toggles ── */}
       <PricingHeader
         locale={locale}
         serviceType={serviceType}
@@ -81,12 +53,9 @@ export default function PricingPage({ localeProp }: Props) {
         onVatChange={handleVatChange}
       />
 
-      {/* ── 2. Main content ── */}
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 20px 140px" }}>
-        {/* 2a. Apartment type selector */}
         <ApartmentSelector selected={selectedApt} onSelect={setSelectedApt} />
 
-        {/* 2b. Plan cards */}
         <PlanGrid
           plans={plans}
           aptIdx={currentAptIdx}
@@ -105,7 +74,6 @@ export default function PricingPage({ localeProp }: Props) {
           onSelectApt={setSelectedApt}
         />
 
-        {/* 2d. Optional add-ons */}
         <section style={{ marginBottom: 48 }}>
           <h2
             style={{
@@ -135,7 +103,6 @@ export default function PricingPage({ localeProp }: Props) {
           />
         </section>
 
-        {/* 2e. Legal disclaimer */}
         <div style={{ borderTop: "1px solid #e5e7eb", paddingTop: 24 }}>
           <p
             style={{
@@ -150,7 +117,7 @@ export default function PricingPage({ localeProp }: Props) {
         </div>
       </div>
 
-      {/* ── 3. Sticky booking bar ── */}
+      {/* locale replaces onBook — navigation is now inside SummaryBar */}
       <SummaryBar
         serviceType={serviceType}
         apt={selectedApt}
@@ -158,7 +125,6 @@ export default function PricingPage({ localeProp }: Props) {
         plans={plans}
         showDeducted={showDeducted}
         addonsSummary={addonsSummary}
-        onBook={handleBook}
       />
     </div>
   );
