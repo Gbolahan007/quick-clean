@@ -1,8 +1,3 @@
-// types/booking.ts
-// ─────────────────────────────────────────────────────────────────────────────
-// All shared types for the booking funnel.
-// ─────────────────────────────────────────────────────────────────────────────
-
 export type ServiceType = "maintenance" | "deep";
 
 export type Locale = "en" | "fi";
@@ -54,10 +49,9 @@ export interface PricingSnapshot {
   apartment: ApartmentType;
   planKey: string;
   planLabel: string;
-  /** base price for the chosen apt × plan combination */
+
   basePrice: number;
   addonsSummary: AddonsSummary;
-  /** basePrice + addonsSummary.discountedTotal */
   totalPrice: number;
 }
 

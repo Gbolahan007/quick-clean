@@ -37,13 +37,8 @@ export default function PricingPage({ localeProp }: Props) {
   const currentAptIdx = selectedApt ? aptIndex(selectedApt.key) : null;
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#f8faf9",
-        fontFamily: "system-ui, -apple-system, sans-serif",
-      }}
-    >
+    <div className="min-h-screen bg-[#f8faf9] font-sans">
+      {/* Header */}
       <PricingHeader
         locale={locale}
         serviceType={serviceType}
@@ -53,9 +48,12 @@ export default function PricingPage({ localeProp }: Props) {
         onVatChange={handleVatChange}
       />
 
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 20px 140px" }}>
+      {/* Main Content */}
+      <div className="mx-auto max-w-225 px-5 pb-36">
+        {/* Apartment Selector */}
         <ApartmentSelector selected={selectedApt} onSelect={setSelectedApt} />
 
+        {/* Plan Cards */}
         <PlanGrid
           plans={plans}
           aptIdx={currentAptIdx}
@@ -65,6 +63,7 @@ export default function PricingPage({ localeProp }: Props) {
           serviceType={serviceType}
         />
 
+        {/* Pricing Table */}
         <PricingTable
           plans={plans}
           selectedPlan={selectedPlan}
@@ -74,25 +73,13 @@ export default function PricingPage({ localeProp }: Props) {
           onSelectApt={setSelectedApt}
         />
 
-        <section style={{ marginBottom: 48 }}>
-          <h2
-            style={{
-              fontSize: 22,
-              fontWeight: 900,
-              color: "#0a1628",
-              margin: "0 0 4px",
-              letterSpacing: "-0.5px",
-            }}
-          >
+        {/* Add-ons */}
+        <section className="mb-12">
+          <h2 className="mb-1 text-[22px] font-black tracking-[-0.5px] text-[#0a1628]">
             {t("addonsTitle")}
           </h2>
-          <p
-            style={{
-              fontSize: 14,
-              color: "rgba(10,22,40,0.55)",
-              margin: "0 0 20px",
-            }}
-          >
+
+          <p className="mb-5 text-sm text-[#0a1628]/55">
             {t("addonsSubtitle")}
           </p>
 
@@ -103,21 +90,15 @@ export default function PricingPage({ localeProp }: Props) {
           />
         </section>
 
-        <div style={{ borderTop: "1px solid #e5e7eb", paddingTop: 24 }}>
-          <p
-            style={{
-              fontSize: 12,
-              color: "rgba(10,22,40,0.4)",
-              lineHeight: 1.7,
-              maxWidth: 640,
-            }}
-          >
+        {/* Disclaimer */}
+        <div className="border-t border-gray-200 pt-6">
+          <p className="max-w-160 text-xs leading-7 text-[#0a1628]/40">
             {t("disclaimer")}
           </p>
         </div>
       </div>
 
-      {/* locale replaces onBook — navigation is now inside SummaryBar */}
+      {/* Sticky Summary Bar */}
       <SummaryBar
         serviceType={serviceType}
         apt={selectedApt}

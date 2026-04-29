@@ -1,14 +1,8 @@
-// components/booking/BookingConfirmation.tsx
-// ─────────────────────────────────────────────────────────────────────────────
-// Full-page confirmation shown when submitBooking() succeeds.
-// ─────────────────────────────────────────────────────────────────────────────
-
 "use client";
 
-import React from "react";
+import { useBookingStore } from "@/app/store/useBookingStore";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useBookingStore } from "@/app/store/useBookingStore";
 
 export function BookingConfirmation() {
   const t = useTranslations("booking.confirmation");

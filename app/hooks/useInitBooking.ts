@@ -1,5 +1,3 @@
-// hooks/useInitBooking.ts
-
 import { useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useTranslations } from "next-intl";

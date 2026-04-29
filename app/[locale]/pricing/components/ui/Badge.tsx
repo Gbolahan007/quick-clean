@@ -2,13 +2,6 @@
 
 import { ReactNode } from "react";
 
-/**
- * Small pill badge placed inside plan card headers.
- *
- * variant:
- *   "popular"      — dark navy background
- *   "recommended"  — translucent white (for use on coloured headers)
- */
 type BadgeVariant = "popular" | "recommended";
 
 type BadgeProps = {

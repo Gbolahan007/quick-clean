@@ -1,14 +1,11 @@
-// components/booking/BookingSidebar.tsx
-
 "use client";
 
-import React from "react";
-import { useTranslations } from "next-intl";
 import { useBookingStore } from "@/app/store/useBookingStore";
+import { useTranslations } from "next-intl";
 
 export function BookingSidebar() {
   const tBooking = useTranslations("booking");
-  const tPricing = useTranslations("pricing"); // ← add this
+  const tPricing = useTranslations("pricing");
 
   const pricing = useBookingStore((s) => s.pricing);
 

@@ -1,45 +1,25 @@
-// components/booking/steps/StepReview.tsx
-// ─────────────────────────────────────────────────────────────────────────────
-// Step 5: Full-summary review before final submission.
-// Shows every collected piece of data and allows editing any step.
-// ─────────────────────────────────────────────────────────────────────────────
-
 "use client";
 
-import React from "react";
 import { useTranslations } from "next-intl";
+import React from "react";
 
-import { StepActions } from "../FormField";
-import type { BookingStep } from "../../../types/booking";
 import { useBookingStore } from "@/app/store/useBookingStore";
+import { StepActions } from "../FormField";
 
 export function StepReview() {
   const t = useTranslations("booking.review");
   const tCommon = useTranslations("booking");
 
-  const {
-    pricing,
-    contact,
-    address,
-    schedule,
-    notes,
-    prevStep,
-    goToStep,
-    submitBooking,
-    isSubmitting,
-    submissionError,
-  } = useBookingStore((s) => ({
-    pricing: s.pricing,
-    contact: s.contact,
-    address: s.address,
-    schedule: s.schedule,
-    notes: s.notes,
-    prevStep: s.prevStep,
-    goToStep: s.goToStep,
-    submitBooking: s.submitBooking,
-    isSubmitting: s.isSubmitting,
-    submissionError: s.submissionError,
-  }));
+  const pricing = useBookingStore((s) => s.pricing);
+  const contact = useBookingStore((s) => s.contact);
+  const address = useBookingStore((s) => s.address);
+  const schedule = useBookingStore((s) => s.schedule);
+  const notes = useBookingStore((s) => s.notes);
+  const prevStep = useBookingStore((s) => s.prevStep);
+  const goToStep = useBookingStore((s) => s.goToStep);
+  const submitBooking = useBookingStore((s) => s.submitBooking);
+  const isSubmitting = useBookingStore((s) => s.isSubmitting);
+  const submissionError = useBookingStore((s) => s.submissionError);
 
   if (!pricing) return null;
 

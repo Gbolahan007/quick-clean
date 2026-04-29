@@ -1,16 +1,10 @@
-// components/booking/steps/StepSchedule.tsx
-// ─────────────────────────────────────────────────────────────────────────────
-// Step 3: Preferred date & time slot selection.
-// ─────────────────────────────────────────────────────────────────────────────
-
 "use client";
 
-import React from "react";
-import { useForm, Controller } from "react-hook-form";
-import { useTranslations } from "next-intl";
-import { Input, StepActions } from "../FormField";
-import type { ScheduleInfo } from "../../../types/booking";
 import { useBookingStore } from "@/app/store/useBookingStore";
+import { useTranslations } from "next-intl";
+import { Controller, useForm } from "react-hook-form";
+import type { ScheduleInfo } from "../../../types/booking";
+import { Input, StepActions } from "../FormField";
 
 /** Available time slots */
 const TIME_SLOTS = [
@@ -30,11 +24,9 @@ function isoDateOffset(daysAhead: number): string {
 
 export function StepSchedule() {
   const t = useTranslations("booking.schedule");
-  const { schedule, saveSchedule, prevStep } = useBookingStore((s) => ({
-    schedule: s.schedule,
-    saveSchedule: s.saveSchedule,
-    prevStep: s.prevStep,
-  }));
+  const schedule = useBookingStore((s) => s.schedule);
+  const saveSchedule = useBookingStore((s) => s.saveSchedule);
+  const prevStep = useBookingStore((s) => s.prevStep);
 
   const {
     register,

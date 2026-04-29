@@ -1,17 +1,16 @@
 "use client";
 
-import React from "react";
-import { useTranslations } from "next-intl";
-import { aptIndex, getPrice } from "../data/pricing";
+import { useInitBooking } from "@/app/hooks/useInitBooking";
 import {
   AddonsSummary,
   ApartmentType,
   Plan,
   ServiceType,
 } from "@/app/types/booking";
-import { useInitBooking } from "@/app/hooks/useInitBooking";
+import { useTranslations } from "next-intl";
+import { aptIndex, getPrice } from "../data/pricing";
 
-export type { ApartmentType, Plan, AddonsSummary };
+export type { AddonsSummary, ApartmentType, Plan };
 
 interface SummaryBarProps {
   serviceType: ServiceType;

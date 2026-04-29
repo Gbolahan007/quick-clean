@@ -1,5 +1,3 @@
-// app/[locale]/booking/page.tsx
-
 "use client";
 
 import React, { use, useEffect } from "react";
@@ -61,14 +59,14 @@ export default function BookingPage({ params }: BookingPageProps) {
   const ActiveStep = STEP_COMPONENTS[currentStep];
 
   return (
-    <div className="min-h-screen bg-[#f7faf8]">
+    <div className="min-h-screen bg-[#f7faf8] pt-24">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4 ">
           <button
             type="button"
             onClick={() => router.push(`/${locale}/pricing`)}
             className={[
-              "flex items-center gap-2 text-sm text-gray-500",
+              "flex cursor-pointer items-center gap-2 text-sm text-gray-500",
               "hover:text-[#0a1628] transition-colors",
               "focus-visible:outline-none focus-visible:underline",
             ].join(" ")}

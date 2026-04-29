@@ -8,15 +8,7 @@ type PillToggleProps = {
 };
 
 // ─── PillToggle ───────────────────────────────────────────────────────────────
-/**
- * Segmented pill control used for the service-type and VAT toggles.
- *
- * Props:
- *   options   string[]              — segment labels
- *   selected  number                — index of the active segment
- *   onChange  (index: number) => void
- *   small     boolean               — compact padding for secondary toggles
- */
+
 export function PillToggle({
   options,
   selected,

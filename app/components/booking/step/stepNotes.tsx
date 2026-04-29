@@ -5,21 +5,18 @@
 
 "use client";
 
-import React from "react";
-import { useForm, Controller } from "react-hook-form";
 import { useTranslations } from "next-intl";
+import { Controller, useForm } from "react-hook-form";
 
-import { Textarea, CheckToggle, StepActions } from "../FormField";
-import type { NotesInfo } from "../../../types/booking";
 import { useBookingStore } from "@/app/store/useBookingStore";
+import type { NotesInfo } from "../../../types/booking";
+import { CheckToggle, StepActions, Textarea } from "../FormField";
 
 export function StepNotes() {
   const t = useTranslations("booking.notes");
-  const { notes, saveNotes, prevStep } = useBookingStore((s) => ({
-    notes: s.notes,
-    saveNotes: s.saveNotes,
-    prevStep: s.prevStep,
-  }));
+  const notes = useBookingStore((s) => s.notes);
+  const saveNotes = useBookingStore((s) => s.saveNotes);
+  const prevStep = useBookingStore((s) => s.prevStep);
 
   const {
     register,

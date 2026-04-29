@@ -1,24 +1,17 @@
-// components/booking/steps/StepAddress.tsx
-// ─────────────────────────────────────────────────────────────────────────────
-// Step 2: Service address.
-// ─────────────────────────────────────────────────────────────────────────────
-
 "use client";
 
-import React from "react";
-import { useForm } from "react-hook-form";
-import { useTranslations } from "next-intl";
-import { Input, Textarea, StepActions } from "../FormField";
-import type { AddressInfo } from "../../../types/booking";
 import { useBookingStore } from "@/app/store/useBookingStore";
+import { useTranslations } from "next-intl";
+import { useForm } from "react-hook-form";
+import type { AddressInfo } from "../../../types/booking";
+import { Input, StepActions, Textarea } from "../FormField";
 
 export function StepAddress() {
   const t = useTranslations("booking.address");
-  const { address, saveAddress, prevStep } = useBookingStore((s) => ({
-    address: s.address,
-    saveAddress: s.saveAddress,
-    prevStep: s.prevStep,
-  }));
+
+  const address = useBookingStore((s) => s.address);
+  const saveAddress = useBookingStore((s) => s.saveAddress);
+  const prevStep = useBookingStore((s) => s.prevStep);
 
   const {
     register,

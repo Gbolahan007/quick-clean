@@ -1,9 +1,3 @@
-// components/booking/FormField.tsx
-// ─────────────────────────────────────────────────────────────────────────────
-// Reusable, accessible form primitives used across all booking steps.
-// All components are fully typed and use Tailwind utility classes.
-// ─────────────────────────────────────────────────────────────────────────────
-
 "use client";
 
 import React, { forwardRef } from "react";
@@ -329,7 +323,7 @@ export function StepActions({
           onClick={onBack}
           className={[
             "px-5 py-3 rounded-xl text-sm font-semibold text-[#0a1628]",
-            "border border-gray-200 bg-white hover:bg-gray-50",
+            "border border-gray-200 cursor-pointer bg-white hover:bg-gray-50",
             "transition-all duration-150 focus-visible:outline-none",
             "focus-visible:ring-2 focus-visible:ring-[#7c9885]/40",
           ].join(" ")}
@@ -350,7 +344,7 @@ export function StepActions({
           "shadow-[0_2px_8px_rgba(124,152,133,0.4)]",
           "transition-all duration-150 focus-visible:outline-none",
           "focus-visible:ring-2 focus-visible:ring-[#7c9885]/60 focus-visible:ring-offset-2",
-          "disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none",
+          "disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none cursor-pointer ",
         ].join(" ")}
       >
         {isLoading ? (

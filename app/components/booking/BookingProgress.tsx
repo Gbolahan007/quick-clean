@@ -1,17 +1,12 @@
-// components/booking/BookingProgress.tsx
-// ─────────────────────────────────────────────────────────────────────────────
-// Horizontal step progress bar shown at the top of the booking page.
-// ─────────────────────────────────────────────────────────────────────────────
-
 "use client";
 
-import React from "react";
-import { useTranslations } from "next-intl";
-import { BOOKING_STEPS, type BookingStep } from "../../types/booking";
 import {
   useBookingStore,
   useStepCompletion,
 } from "@/app/store/useBookingStore";
+import { useTranslations } from "next-intl";
+import React from "react";
+import { BOOKING_STEPS, type BookingStep } from "../../types/booking";
 
 const STEP_ICONS: Record<BookingStep, string> = {
   contact: "👤",
@@ -42,7 +37,7 @@ export function BookingProgress() {
           return (
             <React.Fragment key={step}>
               {/* Step node */}
-              <li className="flex flex-col items-center flex-shrink-0">
+              <li className="flex flex-col items-center shrink-0">
                 <button
                   type="button"
                   onClick={() => isClickable && goToStep(step)}

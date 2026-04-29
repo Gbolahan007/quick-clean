@@ -14,13 +14,12 @@ interface ApartmentType {
   emoji: string;
 }
 
-// In PlanGrid.tsx (or a shared types file)
 interface Plan {
   key: string;
   labelKey: string;
   badge: string | null;
-  discountKey: string | null; // was optional, but data has explicit null
-  visitInfoKey: string | null; // same
+  discountKey: string | null;
+  visitInfoKey: string | null;
   priceType: string;
   prices: number[];
   deducted: number[];
