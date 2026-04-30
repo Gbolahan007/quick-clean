@@ -23,7 +23,7 @@ export function ApartmentSelector({
   const t = useTranslations("pricing");
 
   return (
-    <div className="-mt-10  relative mb-8 z-50 ">
+    <div className="-mt-10 relative mb-8W ">
       <div className="bg-white rounded-[20px] p-6 shadow-[0_4px_24px_rgba(10,22,40,0.07)] border border-gray-200">
         <SectionLabel>{t("chooseApartment")}</SectionLabel>
 
