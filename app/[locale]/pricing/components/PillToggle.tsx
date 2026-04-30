@@ -1,3 +1,4 @@
+// components/PillToggle.tsx
 "use client";
 
 type PillToggleProps = {
@@ -7,8 +8,6 @@ type PillToggleProps = {
   small?: boolean;
 };
 
-// ─── PillToggle ───────────────────────────────────────────────────────────────
-
 export function PillToggle({
   options,
   selected,
@@ -16,37 +15,27 @@ export function PillToggle({
   small = false,
 }: PillToggleProps) {
   return (
-    <div
-      style={{
-        display: "inline-flex",
-        borderRadius: 999,
-        border: "1.5px solid rgba(124,152,133,0.3)",
-        background: "#f0f5f2",
-        padding: 4,
-      }}
-    >
-      {options.map((label, i) => (
-        <button
-          key={i}
-          type="button"
-          onClick={() => onChange(i)}
-          style={{
-            padding: small ? "6px 14px" : "9px 20px",
-            borderRadius: 999,
-            border: "none",
-            fontSize: small ? 13 : 14,
-            fontWeight: 600,
-            cursor: "pointer",
-            whiteSpace: "nowrap",
-            transition: "all 0.18s",
-            background: selected === i ? "#7c9885" : "transparent",
-            color: selected === i ? "#fff" : "rgba(10,22,40,0.6)",
-            boxShadow: selected === i ? "0 1px 4px rgba(0,0,0,0.15)" : "none",
-          }}
-        >
-          {label}
-        </button>
-      ))}
+    <div className="inline-flex w-full rounded-full border border-[#7c9885]/30 bg-[#f0f5f2] p-1 md:w-auto">
+      {options.map((label, i) => {
+        const isActive = selected === i;
+
+        return (
+          <button
+            key={`${label}-${i}`}
+            type="button"
+            onClick={() => onChange(i)}
+            className={[
+              "min-w-0 flex-1 rounded-full font-semibold transition-all duration-200 whitespace-normal leading-snug md:flex-none md:whitespace-nowrap",
+              small ? "px-3.5 py-1.5 text-[13px]" : "px-5 py-2.5 text-sm",
+              isActive
+                ? "bg-[#7c9885] text-white shadow-[0_1px_4px_rgba(0,0,0,0.15)]"
+                : "bg-transparent text-slate-900/60 hover:bg-white/60",
+            ].join(" ")}
+          >
+            {label}
+          </button>
+        );
+      })}
     </div>
   );
 }

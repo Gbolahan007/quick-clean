@@ -1,3 +1,4 @@
+// components/PricingHeader.tsx
 "use client";
 
 import Image from "next/image";
@@ -13,7 +14,7 @@ type PricingHeaderProps = {
   onVatChange: (index: number) => void;
 };
 
-// ─── TrustBar ────────────────────────────────────────────────────────────────
+// ─── TrustBar ─────────────────────────────────────────────────────────────────
 function TrustBar() {
   const t = useTranslations("pricing");
 
@@ -40,7 +41,7 @@ function TrustBar() {
   );
 }
 
-// ─── PricingHeader ───────────────────────────────────────────────────────────
+// ─── PricingHeader ────────────────────────────────────────────────────────────
 export function PricingHeader({
   serviceType,
   showDeducted,
@@ -50,7 +51,7 @@ export function PricingHeader({
   const t = useTranslations("pricing");
 
   return (
-    <div className="relative pb-12 overflow-hidden">
+    <div className="relative overflow-hidden pb-12">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -60,13 +61,11 @@ export function PricingHeader({
           className="object-cover"
           priority
         />
-
-        {/* Overlay (important for readability) */}
         <div className="absolute inset-0 bg-black/50" />
       </div>
 
       {/* Content */}
-      <div className="relative z-10 mx-auto max-w-225 px-5 text-center pt-24">
+      <div className="relative z-10 mx-auto max-w-225 px-5 pt-24 text-center">
         {/* Title */}
         <h1 className="mb-2 text-4xl font-black leading-tight tracking-[-1px] text-white md:text-5xl">
           {t("title")}
@@ -76,7 +75,7 @@ export function PricingHeader({
         <p className="mb-7 text-base text-white/85">{t("subtitle")}</p>
 
         {/* Toggles */}
-        <div className="flex flex-col items-center gap-3 ">
+        <div className="flex flex-col items-center gap-3">
           <PillToggle
             options={[t("serviceToggle.0"), t("serviceToggle.1")]}
             selected={serviceType === "maintenance" ? 0 : 1}
