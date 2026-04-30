@@ -1,4 +1,3 @@
-// store/usePricingStore.ts
 "use client";
 
 import { create } from "zustand";
@@ -22,27 +21,23 @@ export type AddonsSummary = {
   qtyMap: QtyMap;
 };
 
-const EMPTY_ADDONS: AddonsSummary = {
-  selectedCount: 0,
-  rawTotal: 0,
-  discount: 0,
-  discountedTotal: 0,
-  qtyMap: {},
-};
+// const EMPTY_ADDONS: AddonsSummary = {
+//   selectedCount: 0,
+//   rawTotal: 0,
+//   discount: 0,
+//   discountedTotal: 0,
+//   qtyMap: {},
+// };
 
 // ─── State shape ──────────────────────────────────────────────────────────────
 
 interface PricingState {
-  // Persisted selections
   locale: Locale;
   serviceType: ServiceType;
   showDeducted: boolean;
-  selectedAptKey: string | null; // store key only, not the full object
+  selectedAptKey: string | null;
   selectedPlan: PlanKey;
-  addonQtyMap: QtyMap; // raw qty map — totals are derived
-
-  // Derived (computed in selectors, not persisted separately)
-  // → use usePricingSelectors() below
+  addonQtyMap: QtyMap;
 }
 
 interface PricingActions {
@@ -76,10 +71,10 @@ export const usePricingStore = create<PricingState & PricingActions>()(
         const nextService: ServiceType = index === 0 ? "maintenance" : "deep";
         set({
           serviceType: nextService,
-          // Reset plan to the default for this service type
+
           selectedPlan:
             nextService === "maintenance" ? "biweekly" : "quarterly",
-          // Clear addons when switching service — avoids stale selections
+
           addonQtyMap: {},
         });
       },
@@ -95,9 +90,9 @@ export const usePricingStore = create<PricingState & PricingActions>()(
       resetAddons: () => set({ addonQtyMap: {} }),
     }),
     {
-      name: "pricing-selections", // localStorage key
+      name: "pricing-selections",
       storage: createJSONStorage(() => localStorage),
-      // Only persist the selection fields — skip any transient UI state
+
       partialize: (state) => ({
         locale: state.locale,
         serviceType: state.serviceType,
@@ -110,13 +105,6 @@ export const usePricingStore = create<PricingState & PricingActions>()(
   ),
 );
 
-// ─── Derived selectors (use these in components) ──────────────────────────────
-
-/**
- * Returns the full ApartmentType object from the persisted key,
- * plus the derived plans object and addonsSummary shape expected by
- * existing components.
- */
 export function usePricingSelectors() {
   const {
     locale,

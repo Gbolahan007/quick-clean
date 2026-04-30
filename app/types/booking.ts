@@ -49,7 +49,7 @@ export interface PricingSnapshot {
   apartment: ApartmentType;
   planKey: string;
   planLabel: string;
-
+  selectedAddonNames: string[];
   basePrice: number;
   addonsSummary: AddonsSummary;
   totalPrice: number;

@@ -1,7 +1,9 @@
+// hooks/useInitBooking.ts
 import { useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useBookingStore } from "../store/useBookingStore";
+import { ADDONS } from "../[locale]/pricing/data/addOns";
 import type {
   ApartmentType,
   AddonsSummary,
@@ -44,6 +46,19 @@ export function useInitBooking({
     const basePrice = getPrice(plan, idx, showDeducted) ?? 0;
     const totalPrice = basePrice + (addonsSummary?.discountedTotal ?? 0);
 
+    // Resolve human-readable addon names + quantities for DB storage
+    const selectedAddonNames: string[] = Object.entries(
+      addonsSummary?.qtyMap ?? {},
+    )
+      .filter(([, qty]) => qty > 0)
+      .map(([key, qty]) => {
+        const addon = ADDONS.find((a) => a.key === key);
+        if (!addon) return null;
+        const label = t(`addons.${addon.labelKey}.label`);
+        return qty > 1 ? `${label} ×${qty}` : label;
+      })
+      .filter(Boolean) as string[];
+
     const snapshot: PricingSnapshot = {
       serviceType,
       showDeducted,
@@ -58,6 +73,8 @@ export function useInitBooking({
         discountedTotal: 0,
         qtyMap: {},
       },
+      // Addon names stored as a flat array — maps to a text[] or jsonb column in Supabase
+      selectedAddonNames,
       totalPrice,
     };
 

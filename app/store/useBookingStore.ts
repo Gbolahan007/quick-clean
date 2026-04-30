@@ -1,10 +1,3 @@
-// store/useBookingStore.ts
-// ─────────────────────────────────────────────────────────────────────────────
-// Zustand store for the entire booking funnel.
-// Persisted to localStorage via the persist middleware so state survives
-// page reloads and tab refreshes.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type {
@@ -190,8 +183,6 @@ export const useBookingStore = create<BookingState & BookingActions>()(
       name: "booking-store",
       storage: createJSONStorage(() => localStorage),
 
-      // Only persist the data we need to survive a reload.
-      // Don't persist isSubmitting / submissionError (transient UI state).
       partialize: (state) => ({
         pricing: state.pricing,
         currentStep: state.currentStep,

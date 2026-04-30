@@ -1,3 +1,4 @@
+// components/BookingSidebar.tsx
 "use client";
 
 import { useBookingStore } from "@/app/store/useBookingStore";
@@ -18,6 +19,7 @@ export function BookingSidebar() {
     showDeducted,
     basePrice,
     addonsSummary,
+    selectedAddonNames,
     totalPrice,
   } = pricing;
 
@@ -70,6 +72,7 @@ export function BookingSidebar() {
 
           {hasAddons && (
             <>
+              {/* Addon count + price row */}
               <Row
                 label={`${addonsSummary.selectedCount} ${tBooking("sidebar.addons")}`}
                 value={
@@ -79,6 +82,21 @@ export function BookingSidebar() {
                 }
                 valueClass="font-semibold text-[#0a1628]"
               />
+
+              {/* Addon names — one per line, indented under the count row */}
+              {selectedAddonNames && selectedAddonNames.length > 0 && (
+                <div className="flex flex-col gap-1 pl-1">
+                  {selectedAddonNames.map((name) => (
+                    <div key={name} className="flex items-center gap-1.5">
+                      <span className="text-[#7c9885] text-[10px]">✓</span>
+                      <span className="text-xs text-gray-400 leading-snug">
+                        {name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {hasDiscount && (
                 <Row
                   label={tBooking("sidebar.discount10")}

@@ -1,3 +1,4 @@
+// components/SummaryBar.tsx
 "use client";
 
 import { useInitBooking } from "@/app/hooks/useInitBooking";
@@ -7,6 +8,7 @@ import {
   Plan,
   ServiceType,
 } from "@/app/types/booking";
+import { ADDONS } from "../data/addOns";
 import { useTranslations } from "next-intl";
 import { aptIndex, getPrice } from "../data/pricing";
 
@@ -51,22 +53,46 @@ export function SummaryBar({
   const aptLabel = t(`apartments.${apt.labelKey}`);
   const planLabel = plan ? t(`plans.${plan.labelKey}`) : "—";
 
+  // Resolve selected addon names from qtyMap keys
+  const selectedAddonNames: string[] = Object.entries(
+    addonsSummary?.qtyMap ?? {},
+  )
+    .filter(([, qty]) => qty > 0)
+    .map(([key, qty]) => {
+      const addon = ADDONS.find((a) => a.key === key);
+      if (!addon) return null;
+      const label = t(`addons.${addon.labelKey}.label`);
+      // For per-load addons (e.g. laundry), append the quantity
+      return qty > 1 ? `${label} ×${qty}` : label;
+    })
+    .filter(Boolean) as string[];
+
   const addonCount = addonsSummary?.selectedCount ?? 0;
-  const addonSuffix =
-    addonCount > 0 ? ` + ${addonCount} ${t("addonsSelected")}` : "";
 
   return (
-    <div className="fixed w-full bottom-0 z-20 flex flex-wrap items-center gap-3 border-t border-gray-200 bg-white px-6 py-4 shadow-[0_-4px_24px_rgba(10,22,40,0.07)] ">
+    <div className="fixed w-full bottom-0 z-20 flex flex-wrap items-center gap-3 border-t border-gray-200 bg-white px-6 py-4 shadow-[0_-4px_24px_rgba(10,22,40,0.07)]">
       {/* Left Content */}
-      <div className="min-w-50 flex-1 ">
+      <div className="min-w-50 flex-1">
         <p className="mb-0.5 text-[11px] font-bold uppercase tracking-[0.08em] text-slate-900/45">
           {t("summary")}
         </p>
 
         <p className="text-[13px] font-semibold text-slate-900">
           {aptLabel} · {planLabel}
-          {addonSuffix}
+          {addonCount > 0 && (
+            <span className="text-slate-900/50">
+              {" "}
+              + {addonCount} {t("addonsSelected")}
+            </span>
+          )}
         </p>
+
+        {/* Addon names — shown below the plan line */}
+        {selectedAddonNames.length > 0 && (
+          <p className="mt-0.5 text-xs text-slate-900/40 leading-snug">
+            {selectedAddonNames.join(" · ")}
+          </p>
+        )}
       </div>
 
       {/* Price */}
