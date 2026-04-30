@@ -150,7 +150,7 @@ export default function ServiceDetail({
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative sm:min-h-[580px]  flex items-center justify-center overflow-hidden">
+      <section className="relative sm:min-h-145  flex items-center justify-center overflow-hidden">
         {/* Background Image */}
         <Image
           src={service.image}
@@ -213,7 +213,7 @@ export default function ServiceDetail({
 
           {/* CTA */}
           <Link
-            href="/booking"
+            href="/pricing"
             className="inline-flex items-center justify-center gap-2 bg-white text-[#7c9885] font-bold px-10 py-4 rounded-full hover:bg-white/90 transition-colors text-base shadow-md"
           >
             {isFinnish
