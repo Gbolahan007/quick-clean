@@ -1,14 +1,44 @@
+import { ApartmentType } from "../components/SummaryBar";
 import { ADDONS } from "./addOns";
-import { APARTMENT_TYPES } from "./apartmentType";
 
+export const APARTMENTS: ApartmentType[] = [
+  {
+    key: "studio",
+    labelKey: "studio",
+    size: "up to 35 m²",
+    emoji: "🏠",
+    squareMeters: 30,
+    numberOfRooms: 1,
+  },
+  {
+    key: "two",
+    labelKey: "two",
+    size: "35–55 m²",
+    emoji: "🏡",
+    squareMeters: 45,
+    numberOfRooms: 2,
+  },
+  {
+    key: "three",
+    labelKey: "three",
+    size: "55–75 m²",
+    emoji: "🏘",
+    squareMeters: 65,
+    numberOfRooms: 3,
+  },
+  {
+    key: "four",
+    labelKey: "four",
+    size: "75–100 m²",
+    emoji: "🏢",
+    squareMeters: 85,
+    numberOfRooms: 4,
+  },
+];
 /**
- * Shared types
+ * Plan pricing structure
  */
-type ApartmentType = {
-  key: string;
-};
-
-type Plan = {
+export type Plan = {
   prices: number[];
   deducted: number[];
 };
@@ -31,18 +61,15 @@ type AddonTotals = {
 };
 
 /**
- * Returns the array index of an apartment key (0–3).
- * Returns null if the key is not found.
+ * Returns apartment index
  */
 export function aptIndex(key: string): number | null {
-  const idx = APARTMENT_TYPES.findIndex((a: ApartmentType) => a.key === key);
-
+  const idx = APARTMENTS.findIndex((a) => a.key === key);
   return idx === -1 ? null : idx;
 }
 
 /**
- * Returns the display price for a plan at a given apartment index.
- * Respects the showDeducted toggle.
+ * Get plan price based on apartment + VAT toggle
  */
 export function getPrice(
   plan: Plan | null | undefined,
@@ -57,8 +84,7 @@ export function getPrice(
 }
 
 /**
- * Computes add-on totals from a qty map { [addonKey]: number }.
- * Returns { selectedCount, rawTotal, discount, discountedTotal }.
+ * Calculate add-on totals
  */
 export function calcAddonTotals(
   qtyMap: QtyMap,
@@ -92,8 +118,7 @@ export function calcAddonTotals(
 }
 
 /**
- * Builds the URLSearchParams string used when handing off to the booking page.
- * /booking?service=maintenance&apt=studio&plan=biweekly&deducted=0&addons={…}
+ * Build booking URL params
  */
 export function buildBookingParams({
   serviceType,

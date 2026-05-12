@@ -144,8 +144,8 @@ export function usePricingSelectors() {
 
     // Actions
     toggleLocale,
-    handleServiceChange: setServiceType, // matches existing prop name
-    handleVatChange: setShowDeducted, // matches existing prop name
+    handleServiceChange: setServiceType,
+    handleVatChange: setShowDeducted,
     setSelectedApt,
     setSelectedPlan,
     setAddonQtyMap,

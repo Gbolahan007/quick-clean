@@ -1,17 +1,11 @@
+import type { ApartmentType } from "../[locale]/pricing/data/apartmentType";
+
+export type { ApartmentType };
+
 export type ServiceType = "maintenance" | "deep";
+export type BookingFrequency = "one-time" | "weekly" | "biweekly" | "monthly";
 
-export type Locale = "en" | "fi";
-
-// ── Apartment ────────────────────────────────────────────────────────────────
-
-export interface ApartmentType {
-  key: string;
-  labelKey: string;
-  size: string;
-  emoji: string;
-}
-
-// ── Plan ─────────────────────────────────────────────────────────────────────
+// ── Plan ──────────────────────────────────────────────────────────────────────
 
 export interface Plan {
   key: string;
@@ -29,7 +23,7 @@ export interface Plan {
   visitsPerYear?: number | null;
 }
 
-// ── Addons ───────────────────────────────────────────────────────────────────
+// ── Addons ────────────────────────────────────────────────────────────────────
 
 export type QtyMap = Record<string, number>;
 
@@ -41,62 +35,79 @@ export interface AddonsSummary {
   qtyMap: QtyMap;
 }
 
-// ── Pricing snapshot (captured at "Book Now" click) ───────────────────────────
+// ── Pricing snapshot — set ONCE at "Book Now", never mutated ──────────────────
 
 export interface PricingSnapshot {
   serviceType: ServiceType;
   showDeducted: boolean;
+  /** Full apartment object from APARTMENT_TYPES — includes squareMeters & numberOfRooms */
   apartment: ApartmentType;
   planKey: string;
   planLabel: string;
+  /** Derived from planKey in useInitBooking — single source, never re-entered */
+  frequency: BookingFrequency;
   selectedAddonNames: string[];
   basePrice: number;
   addonsSummary: AddonsSummary;
   totalPrice: number;
 }
 
-// ── Contact form (step 1) ─────────────────────────────────────────────────────
+// ── Step 1: Contact ───────────────────────────────────────────────────────────
+// → profiles.full_name (firstName + lastName joined on save)
+// → profiles.phone
+// → auth.users.email (Supabase Auth — not a direct DB insert)
 
 export interface ContactInfo {
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
-  /** Optional company name (for business accounts) */
-  company?: string;
 }
 
-// ── Address form (step 2) ─────────────────────────────────────────────────────
+// ── Step 2: Address ───────────────────────────────────────────────────────────
+// → addresses table (all fields)
+// squareMeters / numberOfRooms are pre-filled from PricingSnapshot.apartment
+// and shown as editable fields in StepAddress so the user can correct them.
 
 export interface AddressInfo {
-  street: string;
-  apartment?: string;
+  /** addresses.street_address — TEXT NOT NULL */
+  streetAddress: string;
+  /** addresses.apartment_number — TEXT nullable */
+  apartmentNumber?: string;
+  /** addresses.city — TEXT NOT NULL */
   city: string;
+  /** addresses.postal_code — TEXT NOT NULL */
   postalCode: string;
+  /** addresses.square_meters — INTEGER NOT NULL, pre-filled from pricing.apartment.squareMeters */
+  squareMeters: number;
+  /** addresses.number_of_rooms — INTEGER NOT NULL, pre-filled from pricing.apartment.numberOfRooms */
+  numberOfRooms: number;
+  /** addresses.access_instructions — TEXT nullable */
   accessInstructions?: string;
 }
 
-// ── Schedule (step 3) ────────────────────────────────────────────────────────
+// ── Step 3: Schedule ──────────────────────────────────────────────────────────
+// → bookings.booking_date (DATE)
+// → bookings.time_slot (TIME) — must match availability_slots.start_time
+
+// ── Step 3: Schedule ──────────────────────────────────────────────────────────
 
 export interface ScheduleInfo {
-  /** ISO date string, e.g. "2025-09-15" */
-  preferredDate: string;
-  /** e.g. "08:00", "10:00", "12:00", "14:00" */
-  preferredTime: string;
-  /** Optional alternative date */
-  alternateDate?: string;
+  bookingDate: string;
+  timeSlot: string;
+  slotId: string;
+  slotEndTime: string;
 }
 
-// ── Notes (step 4) ───────────────────────────────────────────────────────────
+// ── Step 4: Notes ─────────────────────────────────────────────────────────────
 
 export interface NotesInfo {
   specialInstructions?: string;
-  /** true = user has a pet that needs to be known about */
   hasPets: boolean;
   petDetails?: string;
 }
 
-// ── Booking step IDs ─────────────────────────────────────────────────────────
+// ── Booking steps ─────────────────────────────────────────────────────────────
 
 export type BookingStep =
   | "contact"
@@ -113,47 +124,30 @@ export const BOOKING_STEPS: BookingStep[] = [
   "review",
 ];
 
-// ── Full booking state ────────────────────────────────────────────────────────
+// ── Store shape ───────────────────────────────────────────────────────────────
 
 export interface BookingState {
-  /** Snapshot from pricing page — set once on "Book Now" */
+  /** Set once on "Book Now" — never mutated during the booking flow */
   pricing: PricingSnapshot | null;
-
-  /** Current active step */
   currentStep: BookingStep;
-
-  /** Step data — filled progressively */
   contact: Partial<ContactInfo>;
   address: Partial<AddressInfo>;
   schedule: Partial<ScheduleInfo>;
   notes: Partial<NotesInfo>;
-
-  /** Submission state */
   isSubmitting: boolean;
   submissionError: string | null;
   confirmedBookingId: string | null;
 }
 
-// ── Store actions ─────────────────────────────────────────────────────────────
-
 export interface BookingActions {
-  /** Called from SummaryBar "Book Now" */
   initBooking: (snapshot: PricingSnapshot) => void;
-
-  /** Navigate between steps */
   goToStep: (step: BookingStep) => void;
   nextStep: () => void;
   prevStep: () => void;
-
-  /** Step-level save handlers */
   saveContact: (data: ContactInfo) => void;
   saveAddress: (data: AddressInfo) => void;
   saveSchedule: (data: ScheduleInfo) => void;
   saveNotes: (data: NotesInfo) => void;
-
-  /** Final submission */
   submitBooking: () => Promise<void>;
-
-  /** Reset everything (after confirmation or on cancel) */
   resetBooking: () => void;
 }

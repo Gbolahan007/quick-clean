@@ -183,6 +183,10 @@
       "apartmentHint": "esim. A 14 tai B 3",
       "postalCode": "Postinumero",
       "city": "Kaupunki",
+      "squareMeters": "Asunnon koko",
+      "squareMetersHint": "Kokonaispinta-ala neliömetreinä",
+      "numberOfRooms": "Huoneiden lukumäärä",
+      "numberOfRoomsHint": "Olohuone mukaan lukien",
       "accessInstructions": "Kulkuohjeet (valinnainen)",
       "accessPlaceholder": "esim. Ovikoodi on 1234, soita kahdesti ovikelloa",
       "accessHint": "Miten tiimi pääsee rakennukseen?",
@@ -195,19 +199,23 @@
     },
 
     "schedule": {
-      "title": "Toivottu päivä ja aika",
+      "title": "Toivottu päivämäärä ja aika",
       "subtitle": "Valitse ensisijainen toiveesi — vahvistamme saatavuuden 24 tunnin kuluessa.",
-      "preferredDate": "Toivottu päivä",
+      "preferredDate": "Toivottu päivämäärä",
       "dateHint": "Aikaisin saatavilla: 2 arkipäivää tästä päivästä",
-      "preferredTime": "Toivottu aika",
-      "timeHint": "Kaikki ajat Helsingin aikaa",
-      "alternateDate": "Vaihtoehtoinen päivä (valinnainen)",
-      "alternateDateHint": "Jos ensisijainen toiveesi ei ole saatavilla",
+      "preferredTime": "Toivottu aikaikkuna",
+      "timeHint": "Kaikki ajat ovat paikallista aikaa (Helsinki)",
       "next": "Jatka →",
       "back": "← Osoite",
+      "selectDateFirst": "Valitse ensin päivämäärä nähdäksesi saatavilla olevat aikaslotit",
+      "noSlotsForDate": "Tälle päivämäärälle ei ole saatavilla aikaslotteja",
+      "slotFull": "Täynnä",
       "errors": {
-        "required": "Valitse päivä ja aika",
-        "dateTooSoon": "Valitse päivä vähintään 2 arkipäivän päähän"
+        "required": "Valitse päivämäärä ja aika",
+        "dateTooSoon": "Valitse päivämäärä, joka on vähintään 2 arkipäivää myöhemmin",
+        "weekendNotAvailable": "Emme toimi viikonloppuisin — valitse arkipäivä",
+        "noSlotsAvailable": "Tälle päivämäärälle ei ole saatavilla slotteja. Kokeile toista päivää.",
+        "slotsFetchFailed": "Aikaslottien lataaminen epäonnistui. Yritä uudelleen."
       }
     },
 
@@ -252,7 +260,8 @@
         "time": "Aika",
         "alternateDate": "Vaihtoehtoinen päivä",
         "instructions": "Ohjeet",
-        "pets": "Lemmikit"
+        "pets": "Lemmikit",
+        "size": "Koko"
       },
       "noNotes": "Ei erityisohjeita",
       "noPets": "Ei lemmikkejä",

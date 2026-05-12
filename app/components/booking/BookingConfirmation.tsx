@@ -1,8 +1,10 @@
 "use client";
 
-import { useBookingStore } from "@/app/store/useBookingStore";
+import React from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+
+import { useBookingStore } from "@/app/store/useBookingStore";
 
 export function BookingConfirmation() {
   const t = useTranslations("booking.confirmation");
@@ -20,10 +22,10 @@ export function BookingConfirmation() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-16 bg-[#f7faf8]">
-      <div className="max-w-md w-full">
-        {/* Icon */}
-        <div className="flex justify-center mb-8">
+    <div className="min-h-screen flex items-center justify-center px-4 py-16 bg-[#f7faf8] ">
+      <div className="max-w-md w-full  mt-16">
+        {/* ── Icon ─────────────────────────────────────────────────────────── */}
+        <div className="flex justify-center mb-8 ">
           <div
             className={[
               "w-20 h-20 rounded-full bg-[#3d6b47] flex items-center justify-center",
@@ -46,7 +48,7 @@ export function BookingConfirmation() {
           </div>
         </div>
 
-        {/* Headline */}
+        {/* ── Headline ─────────────────────────────────────────────────────── */}
         <div className="text-center space-y-2 mb-8">
           <h1 className="text-3xl font-extrabold text-[#0a1628] tracking-tight">
             {t("title")}
@@ -56,7 +58,7 @@ export function BookingConfirmation() {
           </p>
         </div>
 
-        {/* Summary card */}
+        {/* ── Summary card ─────────────────────────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-6">
           <div className="bg-[#0a1628] px-5 py-3.5">
             <p className="text-[11px] font-bold uppercase tracking-widest text-white/50 m-0">
@@ -74,13 +76,15 @@ export function BookingConfirmation() {
                   label={t("fields.service")}
                   value={`${pricing.apartment.emoji} ${pricing.planLabel}`}
                 />
+                {/* ✅ Updated: bookingDate (was: preferredDate) */}
                 <ConfRow
                   label={t("fields.date")}
-                  value={schedule.preferredDate ?? "—"}
+                  value={schedule.bookingDate ?? "—"}
                 />
+                {/* ✅ Updated: timeSlot (was: preferredTime) */}
                 <ConfRow
                   label={t("fields.time")}
-                  value={schedule.preferredTime ?? "—"}
+                  value={schedule.timeSlot ?? "—"}
                 />
                 <div className="border-t border-gray-100 pt-3">
                   <ConfRow
@@ -94,7 +98,7 @@ export function BookingConfirmation() {
           </div>
         </div>
 
-        {/* What's next */}
+        {/* ── What's next ──────────────────────────────────────────────────── */}
         <div className="bg-[#f0f8f3] rounded-2xl p-5 border border-[#c8dcd0] mb-6">
           <p className="text-[12px] font-bold uppercase tracking-widest text-[#7c9885] mb-3">
             {t("nextSteps.title")}
@@ -113,7 +117,7 @@ export function BookingConfirmation() {
           </ol>
         </div>
 
-        {/* Action buttons */}
+        {/* ── Action buttons ───────────────────────────────────────────────── */}
         <div className="flex flex-col gap-3">
           <button
             type="button"
@@ -144,6 +148,8 @@ export function BookingConfirmation() {
     </div>
   );
 }
+
+// ── Local helper ──────────────────────────────────────────────────────────────
 
 function ConfRow({
   label,

@@ -32,7 +32,7 @@ export function StepReview() {
         <p className="text-[13px] text-gray-400 mt-1">{t("subtitle")}</p>
       </div>
 
-      {/* ── Service summary ─────────────────────────────────────────────────── */}
+      {/* ── Service summary ──────────────────────────────────────────────────── */}
       <ReviewSection
         title={t("sections.service")}
         onEdit={() => goToStep("contact")}
@@ -53,7 +53,7 @@ export function StepReview() {
         />
       </ReviewSection>
 
-      {/* ── Contact ─────────────────────────────────────────────────────────── */}
+      {/* ── Contact ──────────────────────────────────────────────────────────── */}
       <ReviewSection
         title={t("sections.contact")}
         onEdit={() => goToStep("contact")}
@@ -64,12 +64,9 @@ export function StepReview() {
         />
         <ReviewRow label={t("fields.email")} value={contact.email ?? "—"} />
         <ReviewRow label={t("fields.phone")} value={contact.phone ?? "—"} />
-        {contact.company && (
-          <ReviewRow label={t("fields.company")} value={contact.company} />
-        )}
       </ReviewSection>
 
-      {/* ── Address ─────────────────────────────────────────────────────────── */}
+      {/* ── Address ──────────────────────────────────────────────────────────── */}
       <ReviewSection
         title={t("sections.address")}
         onEdit={() => goToStep("address")}
@@ -77,14 +74,20 @@ export function StepReview() {
         <ReviewRow
           label={t("fields.address")}
           value={[
-            address.street,
-            address.apartment,
+            address.streetAddress,
+            address.apartmentNumber,
             address.postalCode,
             address.city,
           ]
             .filter(Boolean)
             .join(", ")}
         />
+        {address.squareMeters != null && (
+          <ReviewRow
+            label={t("fields.size")}
+            value={`${address.squareMeters} m² · ${address.numberOfRooms ?? "—"} rooms`}
+          />
+        )}
         {address.accessInstructions && (
           <ReviewRow
             label={t("fields.access")}
@@ -93,28 +96,19 @@ export function StepReview() {
         )}
       </ReviewSection>
 
-      {/* ── Schedule ────────────────────────────────────────────────────────── */}
+      {/* ── Schedule ─────────────────────────────────────────────────────────── */}
       <ReviewSection
         title={t("sections.schedule")}
         onEdit={() => goToStep("schedule")}
       >
         <ReviewRow
           label={t("fields.date")}
-          value={schedule.preferredDate ?? "—"}
+          value={schedule.bookingDate ?? "—"}
         />
-        <ReviewRow
-          label={t("fields.time")}
-          value={schedule.preferredTime ?? "—"}
-        />
-        {schedule.alternateDate && (
-          <ReviewRow
-            label={t("fields.alternateDate")}
-            value={schedule.alternateDate}
-          />
-        )}
+        <ReviewRow label={t("fields.time")} value={schedule.timeSlot ?? "—"} />
       </ReviewSection>
 
-      {/* ── Notes ───────────────────────────────────────────────────────────── */}
+      {/* ── Notes ────────────────────────────────────────────────────────────── */}
       <ReviewSection
         title={t("sections.notes")}
         onEdit={() => goToStep("notes")}
@@ -137,7 +131,7 @@ export function StepReview() {
         />
       </ReviewSection>
 
-      {/* ── Error ───────────────────────────────────────────────────────────── */}
+      {/* ── Error ────────────────────────────────────────────────────────────── */}
       {submissionError && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex gap-3">
           <span className="text-lg shrink-0">⚠️</span>
@@ -145,7 +139,7 @@ export function StepReview() {
         </div>
       )}
 
-      {/* ── Legal note ──────────────────────────────────────────────────────── */}
+      {/* ── Legal note ───────────────────────────────────────────────────────── */}
       <p className="text-[11px] text-gray-400 leading-relaxed">
         {t("legalNote")}
       </p>

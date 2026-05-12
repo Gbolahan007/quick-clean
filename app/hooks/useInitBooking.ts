@@ -1,4 +1,6 @@
 // hooks/useInitBooking.ts
+"use client";
+
 import { useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -7,6 +9,7 @@ import { ADDONS } from "../[locale]/pricing/data/addOns";
 import type {
   ApartmentType,
   AddonsSummary,
+  BookingFrequency,
   PricingSnapshot,
   ServiceType,
 } from "../types/booking";
@@ -20,6 +23,13 @@ interface UseInitBookingParams {
   plans: Record<string, Plan>;
   showDeducted: boolean;
   addonsSummary: AddonsSummary;
+}
+
+function resolveFrequency(planKey: string): BookingFrequency {
+  if (planKey === "weekly") return "weekly";
+  if (planKey === "biweekly") return "biweekly";
+  if (planKey === "monthly") return "monthly";
+  return "one-time";
 }
 
 export function useInitBooking({
@@ -46,7 +56,6 @@ export function useInitBooking({
     const basePrice = getPrice(plan, idx, showDeducted) ?? 0;
     const totalPrice = basePrice + (addonsSummary?.discountedTotal ?? 0);
 
-    // Resolve human-readable addon names + quantities for DB storage
     const selectedAddonNames: string[] = Object.entries(
       addonsSummary?.qtyMap ?? {},
     )
@@ -62,9 +71,12 @@ export function useInitBooking({
     const snapshot: PricingSnapshot = {
       serviceType,
       showDeducted,
-      apartment: apt,
+      apartment: {
+        ...apt,
+      },
       planKey,
       planLabel: t(`plans.${plan.labelKey}`),
+      frequency: resolveFrequency(planKey),
       basePrice,
       addonsSummary: addonsSummary ?? {
         selectedCount: 0,
@@ -73,7 +85,6 @@ export function useInitBooking({
         discountedTotal: 0,
         qtyMap: {},
       },
-      // Addon names stored as a flat array — maps to a text[] or jsonb column in Supabase
       selectedAddonNames,
       totalPrice,
     };

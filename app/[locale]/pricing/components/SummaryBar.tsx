@@ -53,7 +53,6 @@ export function SummaryBar({
   const aptLabel = t(`apartments.${apt.labelKey}`);
   const planLabel = plan ? t(`plans.${plan.labelKey}`) : "—";
 
-  // Resolve selected addon names from qtyMap keys
   const selectedAddonNames: string[] = Object.entries(
     addonsSummary?.qtyMap ?? {},
   )

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { useMemo } from "react";
 import type {
   BookingState,
   BookingActions,
@@ -10,8 +11,8 @@ import type {
   ScheduleInfo,
   NotesInfo,
 } from "../types/booking";
+import type { BookingSubmitPayload } from "../types/api";
 import { BOOKING_STEPS } from "../types/booking";
-import { useMemo } from "react";
 
 // ── Initial state ─────────────────────────────────────────────────────────────
 
@@ -32,19 +33,41 @@ const INITIAL_STATE: BookingState = {
 export const useBookingStore = create<BookingState & BookingActions>()(
   persist(
     (set, get) => ({
-      // ── State ──────────────────────────────────────────────────────────────
       ...INITIAL_STATE,
 
       // ── Init ───────────────────────────────────────────────────────────────
+      // Called from "Book Now" on the pricing page.
+      // Only resets step data if this is a brand-new booking (no pricing yet),
+      // OR if the user is booking a DIFFERENT service than last time.
+      // This prevents wiping mid-flow state on a re-render.
       initBooking: (snapshot: PricingSnapshot) => {
-        set({
-          pricing: snapshot,
-          currentStep: "contact",
-          // Preserve any previously entered contact/address so the user
-          // doesn't have to retype on a second visit.
-          submissionError: null,
-          confirmedBookingId: null,
-        });
+        const current = get();
+        const isNewBooking =
+          !current.pricing ||
+          current.pricing.planKey !== snapshot.planKey ||
+          current.pricing.serviceType !== snapshot.serviceType ||
+          current.pricing.apartment.key !== snapshot.apartment.key;
+
+        if (isNewBooking) {
+          // Fresh booking — wipe step data for the new selection
+          set({
+            pricing: snapshot,
+            currentStep: "contact",
+            contact: {},
+            address: {},
+            schedule: {},
+            notes: {},
+            isSubmitting: false,
+            submissionError: null,
+            confirmedBookingId: null,
+          });
+        } else {
+          // Same booking — just update pricing snapshot, keep form data
+          set({
+            pricing: snapshot,
+            submissionError: null,
+          });
+        }
       },
 
       // ── Navigation ─────────────────────────────────────────────────────────
@@ -97,92 +120,105 @@ export const useBookingStore = create<BookingState & BookingActions>()(
         set({ isSubmitting: true, submissionError: null });
 
         try {
-          // ── Build payload ──────────────────────────────────────────────────
-          const payload = {
-            // Service
-            service_type: pricing.serviceType,
-            plan_key: pricing.planKey,
-            plan_label: pricing.planLabel,
-            show_deducted: pricing.showDeducted,
+          const { submitBookingAction } =
+            await import("@/app/actions/submitBooking");
 
-            // Apartment
-            apartment_key: pricing.apartment.key,
-            apartment_label: pricing.apartment.labelKey,
-            apartment_size: pricing.apartment.size,
-
-            // Prices
-            base_price: pricing.basePrice,
-            addons_summary: pricing.addonsSummary,
-            total_price: pricing.totalPrice,
-
-            // Contact
-            first_name: contact.firstName ?? "",
-            last_name: contact.lastName ?? "",
+          const payload: BookingSubmitPayload = {
+            // ── Customer ───────────────────────────────────────────────────
+            firstName: contact.firstName ?? "",
+            lastName: contact.lastName ?? "",
             email: contact.email ?? "",
             phone: contact.phone ?? "",
-            company: contact.company ?? null,
 
-            // Address
-            street: address.street ?? "",
-            apartment_number: address.apartment ?? null,
+            // ── Address ────────────────────────────────────────────────────
+            streetAddress: address.streetAddress ?? "",
+            apartmentNumber: address.apartmentNumber,
             city: address.city ?? "",
-            postal_code: address.postalCode ?? "",
-            access_instructions: address.accessInstructions ?? null,
+            postalCode: address.postalCode ?? "",
+            squareMeters:
+              address.squareMeters ?? pricing.apartment.squareMeters,
+            numberOfRooms:
+              address.numberOfRooms ?? pricing.apartment.numberOfRooms,
+            accessInstructions: address.accessInstructions,
 
-            // Schedule
-            preferred_date: schedule.preferredDate ?? "",
-            preferred_time: schedule.preferredTime ?? "",
-            alternate_date: schedule.alternateDate ?? null,
+            // ── Schedule ───────────────────────────────────────────────────
+            bookingDate: schedule.bookingDate ?? "",
+            timeSlot: schedule.timeSlot ?? "",
+            slotId: schedule.slotId ?? "",
 
-            // Notes
-            special_instructions: notes.specialInstructions ?? null,
-            has_pets: notes.hasPets ?? false,
-            pet_details: notes.petDetails ?? null,
+            // ── Service snapshot ───────────────────────────────────────────
+            serviceType: pricing.serviceType,
+            planKey: pricing.planKey,
+            planLabel: pricing.planLabel,
+            frequency: pricing.frequency,
+            showDeducted: pricing.showDeducted,
+            basePrice: pricing.basePrice,
+            finalPrice: pricing.totalPrice,
 
-            // Meta
-            submitted_at: new Date().toISOString(),
-            status: "pending",
+            // ── Apartment snapshot ─────────────────────────────────────────
+            apartmentKey: pricing.apartment.key,
+            apartmentLabel: pricing.apartment.labelKey,
+            apartmentSize: pricing.apartment.size,
+
+            // ── Addons snapshot ────────────────────────────────────────────
+            addonsSnapshot: {
+              count: pricing.addonsSummary.selectedCount,
+              rawTotal: pricing.addonsSummary.rawTotal,
+              discount: pricing.addonsSummary.discount,
+              discountedTotal: pricing.addonsSummary.discountedTotal,
+              names: pricing.selectedAddonNames,
+            },
+
+            // ── Notes ─────────────────────────────────────────────────────
+            specialNotes: JSON.stringify({
+              instructions: notes.specialInstructions ?? null,
+              hasPets: notes.hasPets ?? false,
+              petDetails: notes.hasPets ? (notes.petDetails ?? null) : null,
+            }),
           };
 
-          // ── Supabase insert ────────────────────────────────────────────────
-          // Dynamic import keeps supabase out of the initial bundle for
-          // pages that don't need it.
-          const { createClient } = await import("@supabase/supabase-js");
-          const supabase = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-          );
+          const result = await submitBookingAction(payload);
 
-          const { data, error } = await supabase
-            .from("bookings")
-            .insert(payload)
-            .select("id")
-            .single();
+          if (!result.success) {
+            set({ submissionError: result.error, isSubmitting: false });
+            return;
+          }
 
-          if (error) throw error;
+          // ── Success ────────────────────────────────────────────────────────
 
           set({
-            confirmedBookingId: data?.id ?? "confirmed",
+            ...INITIAL_STATE,
+            confirmedBookingId: result.bookingId,
             isSubmitting: false,
           });
+
+          console.log(
+            "[submitBooking] ✓ Success",
+            "bookingId:",
+            result.bookingId,
+            "customerId:",
+            result.customerId,
+          );
         } catch (err) {
-          const message =
-            err instanceof Error
-              ? err.message
-              : "Something went wrong. Please try again.";
-          set({ submissionError: message, isSubmitting: false });
+          set({
+            submissionError:
+              err instanceof Error
+                ? err.message
+                : "Something went wrong. Please try again.",
+            isSubmitting: false,
+          });
         }
       },
 
       // ── Reset ──────────────────────────────────────────────────────────────
+
       resetBooking: () => set(INITIAL_STATE),
     }),
 
-    // ── Persist config ─────────────────────────────────────────────────────
+    // ── Persist config ────────────────────────────────────────────────────────
     {
       name: "booking-store",
       storage: createJSONStorage(() => localStorage),
-
       partialize: (state) => ({
         pricing: state.pricing,
         currentStep: state.currentStep,
@@ -190,31 +226,38 @@ export const useBookingStore = create<BookingState & BookingActions>()(
         address: state.address,
         schedule: state.schedule,
         notes: state.notes,
-        confirmedBookingId: state.confirmedBookingId,
+        // confirmedBookingId intentionally excluded — in-memory only
       }),
     },
   ),
 );
 
-// ── Convenience selectors ─────────────────────────────────────────────────────
+// ── Selectors ─────────────────────────────────────────────────────────────────
 
-/** True when every required field for a step has been completed */
 export function useStepCompletion() {
   const firstName = useBookingStore((s) => s.contact.firstName);
   const lastName = useBookingStore((s) => s.contact.lastName);
   const email = useBookingStore((s) => s.contact.email);
   const phone = useBookingStore((s) => s.contact.phone);
-  const street = useBookingStore((s) => s.address.street);
+  const streetAddress = useBookingStore((s) => s.address.streetAddress);
   const city = useBookingStore((s) => s.address.city);
   const postalCode = useBookingStore((s) => s.address.postalCode);
-  const preferredDate = useBookingStore((s) => s.schedule.preferredDate);
-  const preferredTime = useBookingStore((s) => s.schedule.preferredTime);
+  const squareMeters = useBookingStore((s) => s.address.squareMeters);
+  const numberOfRooms = useBookingStore((s) => s.address.numberOfRooms);
+  const bookingDate = useBookingStore((s) => s.schedule.bookingDate);
+  const timeSlot = useBookingStore((s) => s.schedule.timeSlot);
+  const slotId = useBookingStore((s) => s.schedule.slotId);
 
   return useMemo(
     () => ({
       contact: !!firstName && !!lastName && !!email && !!phone,
-      address: !!street && !!city && !!postalCode,
-      schedule: !!preferredDate && !!preferredTime,
+      address:
+        !!streetAddress &&
+        !!city &&
+        !!postalCode &&
+        !!squareMeters &&
+        !!numberOfRooms,
+      schedule: !!bookingDate && !!timeSlot && !!slotId,
       notes: true,
       review: true,
     }),
@@ -223,16 +266,18 @@ export function useStepCompletion() {
       lastName,
       email,
       phone,
-      street,
+      streetAddress,
       city,
       postalCode,
-      preferredDate,
-      preferredTime,
+      squareMeters,
+      numberOfRooms,
+      bookingDate,
+      timeSlot,
+      slotId,
     ],
   );
 }
 
-/** Current step index (0-based) */
 export function useCurrentStepIndex() {
   return useBookingStore((s) => BOOKING_STEPS.indexOf(s.currentStep));
 }

@@ -1,4 +1,3 @@
-// components/PricingHeader.tsx
 "use client";
 
 import Image from "next/image";

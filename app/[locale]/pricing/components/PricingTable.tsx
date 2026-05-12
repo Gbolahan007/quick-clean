@@ -2,37 +2,9 @@
 
 import React from "react";
 import { useTranslations } from "next-intl";
-import { APARTMENT_TYPES } from "../data/apartmentType";
+import { APARTMENT_TYPES, type ApartmentType } from "../data/apartmentType"; // ← import type
 import { getPrice } from "../data/pricing";
-
-// --- Types ---
-
-interface ApartmentType {
-  key: string;
-  labelKey: string;
-  size: string;
-  emoji: string;
-}
-
-interface Plan {
-  key: string;
-  labelKey: string;
-  badge: string | null;
-  discountKey: string | null;
-  visitInfoKey: string | null;
-  priceType: string;
-  prices: number[];
-  deducted: number[];
-  durations: string[];
-  cleaners?: (string | number)[];
-
-  // maintenance-only
-  visits?: number | null;
-
-  // deep-only
-  visitsCount?: number | null;
-  visitsPerYear?: number | null;
-}
+import type { Plan } from "@/app/types/booking";
 
 interface PricingTableProps {
   plans: Record<string, Plan>;
@@ -48,9 +20,7 @@ interface ColHeadProps {
   align: "left" | "right" | "center";
   px: number;
 }
-/**
- * PricingTable
- */
+
 export function PricingTable({
   plans,
   selectedPlan,

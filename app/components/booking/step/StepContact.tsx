@@ -1,33 +1,34 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
+
 import { useBookingStore } from "@/app/store/useBookingStore";
-import type { ContactInfo } from "../../../types/booking";
 import { Input, StepActions } from "../FormField";
+import { contactSchema, ContactSchema } from "@/app/schema/booking";
 
 export function StepContact() {
   const t = useTranslations("booking.contact");
 
   const contact = useBookingStore((s) => s.contact);
   const saveContact = useBookingStore((s) => s.saveContact);
-  //   const prevStep = useBookingStore((s) => s.prevStep);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ContactInfo>({
+  } = useForm<ContactSchema>({
+    resolver: zodResolver(contactSchema),
     defaultValues: {
       firstName: contact.firstName ?? "",
       lastName: contact.lastName ?? "",
       email: contact.email ?? "",
       phone: contact.phone ?? "",
-      company: contact.company ?? "",
     },
   });
 
-  const onSubmit = (data: ContactInfo) => saveContact(data);
+  const onSubmit = (data: ContactSchema) => saveContact(data);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -45,19 +46,14 @@ export function StepContact() {
             placeholder="Anna"
             required
             error={errors.firstName?.message}
-            {...register("firstName", {
-              required: t("errors.required"),
-              minLength: { value: 2, message: t("errors.minLength", { n: 2 }) },
-            })}
+            {...register("firstName")}
           />
           <Input
             label={t("lastName")}
             placeholder="Korhonen"
             required
             error={errors.lastName?.message}
-            {...register("lastName", {
-              required: t("errors.required"),
-            })}
+            {...register("lastName")}
           />
         </div>
 
@@ -68,13 +64,7 @@ export function StepContact() {
           required
           hint={t("emailHint")}
           error={errors.email?.message}
-          {...register("email", {
-            required: t("errors.required"),
-            pattern: {
-              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: t("errors.invalidEmail"),
-            },
-          })}
+          {...register("email")}
         />
 
         <Input
@@ -84,19 +74,10 @@ export function StepContact() {
           required
           hint={t("phoneHint")}
           error={errors.phone?.message}
-          {...register("phone", {
-            required: t("errors.required"),
-            minLength: { value: 7, message: t("errors.invalidPhone") },
-          })}
+          {...register("phone")}
         />
 
-        <Input
-          label={t("company")}
-          placeholder={t("companyPlaceholder")}
-          hint={t("companyHint")}
-          error={errors.company?.message}
-          {...register("company")}
-        />
+        {/* company removed — profiles table has no company column */}
 
         <StepActions
           onNext={() => handleSubmit(onSubmit)()}

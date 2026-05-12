@@ -1,13 +1,43 @@
-/**
- * Apartment type definitions.
- *
- * `labelKey` maps to  pricing.apartments.<key>  in en.json / fi.json.
- * All display strings are resolved at render time via useTranslations(),
- * so no EN/FI text lives in this file.
- */
-export const APARTMENT_TYPES = [
-  { key: "studio", labelKey: "studio", size: "20–35 m²", emoji: "🏠" },
-  { key: "two", labelKey: "two", size: "40–65 m²", emoji: "🏡" },
-  { key: "three", labelKey: "three", size: "60–85 m²", emoji: "🏘" },
-  { key: "four", labelKey: "four", size: "80–120+ m²", emoji: "🏗" },
+export interface ApartmentType {
+  key: string;
+  labelKey: string;
+  size: string;
+  emoji: string;
+  squareMeters: number;
+  numberOfRooms: number;
+}
+
+export const APARTMENT_TYPES: ApartmentType[] = [
+  {
+    key: "studio",
+    labelKey: "studio",
+    size: "up to 35 m²",
+    emoji: "🏠",
+    squareMeters: 30,
+    numberOfRooms: 1,
+  },
+  {
+    key: "two",
+    labelKey: "two",
+    size: "35–55 m²",
+    emoji: "🏡",
+    squareMeters: 45,
+    numberOfRooms: 2,
+  },
+  {
+    key: "three",
+    labelKey: "three",
+    size: "55–75 m²",
+    emoji: "🏘",
+    squareMeters: 65,
+    numberOfRooms: 3,
+  },
+  {
+    key: "four",
+    labelKey: "four",
+    size: "75–100 m²",
+    emoji: "🏢",
+    squareMeters: 87,
+    numberOfRooms: 4,
+  },
 ];
