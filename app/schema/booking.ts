@@ -1,5 +1,3 @@
-// app/schema/booking.ts — complete file
-
 import { z } from "zod";
 
 // ── Step 1: Contact ───────────────────────────────────────────────────────────
@@ -13,10 +11,7 @@ export const contactSchema = z.object({
 
 export type ContactSchema = z.infer<typeof contactSchema>;
 
-// ── Step 2: Address ───────────────────────────────────────────────────────────
-// squareMeters and numberOfRooms are plain z.number() —
-// conversion from HTML string input is handled in the component
-// via register("field", { setValueAs: (v) => Number(v) })
+// ── Step 2: Address ──────────────────────────────────────────────────────
 
 export const addressSchema = z.object({
   streetAddress: z.string().min(1, "Street address is required"),

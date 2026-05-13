@@ -19,36 +19,6 @@ export default function Footer() {
     <footer className="bg-[#f8f9fa] text-black border-t border-gray-200 tracking-widest">
       {/* Main Footer Content */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-        {/* Top CTA Section */}
-        <div className="flex flex-col md:flex-row items-center justify-between mb-16 pb-8 border-b border-gray-200">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 md:mb-0 text-black">
-            {t("footer.ctaHeadline")}
-          </h2>
-          <Link href="/quote" className="group relative">
-            <div className="w-40 h-40 rounded-full bg-[#7c9885] flex items-center justify-center hover:bg-[#6a8573] transition-all duration-300 hover:scale-105 shadow-lg">
-              <div className="text-center text-white">
-                <p className="text-sm font-medium mb-1">
-                  {t("footer.ctaLine1")}
-                </p>
-                <p className="text-sm font-medium">{t("footer.ctaLine2")}</p>
-                <div className="mt-2">
-                  <svg
-                    className="w-8 h-8 mx-auto"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </Link>
-        </div>
-
         {/* Footer Columns */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Company Info */}

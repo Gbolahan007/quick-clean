@@ -16,11 +16,25 @@ function useScrollDirection() {
     const THRESHOLD = 8;
 
     function onScroll() {
-      const current = window.scrollY;
-      setAtTop(current < 10);
-      if (Math.abs(current - lastScrollY.current) < THRESHOLD) return;
-      setVisible(current < lastScrollY.current);
-      lastScrollY.current = current;
+      const current = Math.max(0, window.scrollY); // clamp negative iOS bounce values
+      const isAtTop = current < 10;
+
+      setAtTop(isAtTop);
+
+      // Always show header when near the top
+      if (isAtTop) {
+        setVisible(true);
+        lastScrollY.current = current;
+        return;
+      }
+
+      const delta = current - lastScrollY.current;
+
+      // Only flip visibility when delta is meaningful, but always advance the ref
+      if (Math.abs(delta) >= THRESHOLD) {
+        setVisible(delta < 0); // scrolling up → show; scrolling down → hide
+        lastScrollY.current = current;
+      }
     }
 
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -202,7 +216,7 @@ function HeaderContent() {
     <header
       className={`
         fixed top-0 left-0 right-0 z-50
-        transition-[transform,box-shadow]  duration-300 ease-in-out
+        transition-[transform,box-shadow] duration-300 ease-in-out
         ${visible ? "translate-y-0" : "-translate-y-full"}
       `}
     >

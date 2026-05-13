@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useTranslations } from "next-intl";
-import { APARTMENT_TYPES, type ApartmentType } from "../data/apartmentType"; // ← import type
+import { APARTMENT_TYPES, type ApartmentType } from "../data/apartmentType";
 import { getPrice } from "../data/pricing";
 import type { Plan } from "@/app/types/booking";
 

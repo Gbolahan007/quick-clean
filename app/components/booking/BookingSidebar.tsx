@@ -27,7 +27,7 @@ export function BookingSidebar() {
   const hasDiscount = addonsSummary.discount > 0;
 
   return (
-    <aside className="bg-white rounded-2xl border border-gray-200 shadow-[0_4px_24px_rgba(10,22,40,0.06)] overflow-hidden sticky top-6">
+    <aside className="bg-white rounded-2xl border border-gray-200 shadow-[0_4px_24px_rgba(10,22,40,0.06)] overflow-hidden sticky top-6 ">
       {/* Header */}
       <div className="bg-[#0a1628] px-5 py-4">
         <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/50 mb-1">
@@ -148,7 +148,7 @@ function Row({
   valueClass?: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4">
+    <div className="flex items-center justify-between gap-4 ">
       <span className="text-[12px] text-gray-400 shrink-0">{label}</span>
       <span className={`text-[13px] font-medium text-right ${valueClass}`}>
         {value}

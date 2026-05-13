@@ -1,5 +1,3 @@
-// types/api.ts
-
 import type { BookingFrequency, ServiceType } from "./booking";
 
 // ── What the server action receives ──────────────────────────────────────────
@@ -21,9 +19,9 @@ export interface BookingSubmitPayload {
   accessInstructions?: string;
 
   // ── Schedule ──────────────────────────────────────────────────────────────
-  bookingDate: string; // "YYYY-MM-DD"
+  bookingDate: string;
   timeSlot: string;
-  slotId: string; // "08:00" | "11:00" | "14:00"
+  slotId: string;
 
   // ── Service / pricing snapshot ────────────────────────────────────────────
   serviceType: ServiceType;
@@ -49,7 +47,7 @@ export interface BookingSubmitPayload {
   };
 
   // ── Notes ─────────────────────────────────────────────────────────────────
-  specialNotes: string; // pre-serialized JSON string
+  specialNotes: string;
 }
 
 // ── What the server action returns ───────────────────────────────────────────

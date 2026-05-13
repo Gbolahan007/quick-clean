@@ -9,12 +9,12 @@ export default function HeroSection() {
   const locale = useLocale();
   const isFinnish = locale === "fi";
 
-  const trustAvatars = [
-    { src: "/face1.jpg", alt: "Happy customer" },
-    { src: "/face2.jpg", alt: "Happy customer" },
-    { src: "/face3.jpg", alt: "Happy customer" },
-    { src: "/face4.jpg", alt: "Happy customer" },
-  ];
+  // const trustAvatars = [
+  //   { src: "/face1.jpg", alt: "Happy customer" },
+  //   { src: "/face2.jpg", alt: "Happy customer" },
+  //   { src: "/face3.jpg", alt: "Happy customer" },
+  //   { src: "/face4.jpg", alt: "Happy customer" },
+  // ];
 
   return (
     <section className="relative min-h-160 lg:min-h-150 flex items-center py-12">
@@ -68,7 +68,7 @@ export default function HeroSection() {
           {/* Trust row — avatars + text */}
           <div className="flex items-center gap-3">
             {/* Stacked avatars */}
-            <div className="flex -space-x-3">
+            {/* <div className="flex -space-x-3">
               {trustAvatars.map((avatar, index) => (
                 <div
                   key={index}
@@ -82,7 +82,7 @@ export default function HeroSection() {
                   />
                 </div>
               ))}
-            </div>
+            </div> */}
 
             {/* Trust text */}
             <p className={`${isFinnish ? "text-xs" : "text-sm"} text-gray-200`}>

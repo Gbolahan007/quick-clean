@@ -40,11 +40,10 @@ export interface AddonsSummary {
 export interface PricingSnapshot {
   serviceType: ServiceType;
   showDeducted: boolean;
-  /** Full apartment object from APARTMENT_TYPES — includes squareMeters & numberOfRooms */
+
   apartment: ApartmentType;
   planKey: string;
   planLabel: string;
-  /** Derived from planKey in useInitBooking — single source, never re-entered */
   frequency: BookingFrequency;
   selectedAddonNames: string[];
   basePrice: number;
@@ -53,9 +52,6 @@ export interface PricingSnapshot {
 }
 
 // ── Step 1: Contact ───────────────────────────────────────────────────────────
-// → profiles.full_name (firstName + lastName joined on save)
-// → profiles.phone
-// → auth.users.email (Supabase Auth — not a direct DB insert)
 
 export interface ContactInfo {
   firstName: string;
@@ -65,30 +61,16 @@ export interface ContactInfo {
 }
 
 // ── Step 2: Address ───────────────────────────────────────────────────────────
-// → addresses table (all fields)
-// squareMeters / numberOfRooms are pre-filled from PricingSnapshot.apartment
-// and shown as editable fields in StepAddress so the user can correct them.
 
 export interface AddressInfo {
-  /** addresses.street_address — TEXT NOT NULL */
   streetAddress: string;
-  /** addresses.apartment_number — TEXT nullable */
   apartmentNumber?: string;
-  /** addresses.city — TEXT NOT NULL */
   city: string;
-  /** addresses.postal_code — TEXT NOT NULL */
   postalCode: string;
-  /** addresses.square_meters — INTEGER NOT NULL, pre-filled from pricing.apartment.squareMeters */
   squareMeters: number;
-  /** addresses.number_of_rooms — INTEGER NOT NULL, pre-filled from pricing.apartment.numberOfRooms */
   numberOfRooms: number;
-  /** addresses.access_instructions — TEXT nullable */
   accessInstructions?: string;
 }
-
-// ── Step 3: Schedule ──────────────────────────────────────────────────────────
-// → bookings.booking_date (DATE)
-// → bookings.time_slot (TIME) — must match availability_slots.start_time
 
 // ── Step 3: Schedule ──────────────────────────────────────────────────────────
 

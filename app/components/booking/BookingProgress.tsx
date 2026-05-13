@@ -36,7 +36,6 @@ export function BookingProgress() {
 
           return (
             <React.Fragment key={step}>
-              {/* Step node */}
               <li className="flex flex-col items-center shrink-0">
                 <button
                   type="button"

@@ -139,7 +139,7 @@ function MobilePricingStrip() {
   return (
     <div
       className={[
-        "lg:hidden sticky bottom-0 z-20",
+        "lg:hidden fixed w-full bottom-0 z-20",
         "bg-[#0a1628] border-t border-white/10",
         "px-5 py-3 flex items-center justify-between gap-4",
       ].join(" ")}
