@@ -30,20 +30,20 @@
   "pricing": {
     "title": "Transparent Pricing",
     "subtitle": "Simple, honest prices. No surprises.",
-
     "serviceToggle": ["Maintenance Cleaning", "Deep Cleaning"],
     "vatToggle": ["Full price (incl. VAT)", "After tax deduction (35%)"],
-
     "chooseApartment": "Select apartment type",
     "choosePlan": "Select frequency",
-
     "apartments": {
       "studio": "Studio (Yksiö)",
       "two": "2 Rooms (Kaksio)",
       "three": "3 Rooms (Kolmio)",
-      "four": "4+ Rooms (Neliö)"
+      "four": "4+ Rooms (Neliö)",
+      "smallOffice": "Small Office (up to 50 m²)",
+      "mediumOffice": "Medium Office (50–100 m²)",
+      "largeOffice": "Large Office (100–200 m²)",
+      "xlOffice": "XL / Open Plan (200+ m²)"
     },
-
     "plans": {
       "weekly": "Weekly",
       "biweekly": "Bi-weekly",
@@ -51,17 +51,20 @@
       "onetime": "One-time",
       "deepMonthly": "Monthly subscription",
       "deepQuarterly": "Quarterly subscription",
-      "deepOnetime": "One-time"
+      "deepOnetime": "One-time",
+      "moveout": "Move-Out Clean",
+      "officeWeekly": "Weekly Office",
+      "officeBiweekly": "Bi-Weekly Office",
+      "officeDeep": "Office Deep Clean"
     },
-
     "visitInfo": {
       "weeklyVisits": "4× / month",
       "biweeklyVisits": "2× / month",
       "monthlyVisits": "1× / month",
       "deepMonthlyVisits": "1 visit/month",
-      "deepQuarterlyVisits": "4 visits/year"
+      "deepQuarterlyVisits": "4 visits/year",
+      "moveoutVisitInfo": "One-time visit"
     },
-
     "apartmentType": "Apartment type",
     "size": "Size",
     "duration": "Duration",
@@ -74,15 +77,12 @@
     "perMonth": "/ month",
     "perVisit": "/ visit",
     "perVisitPerYear": "/ visit · 4×/year",
-
     "mostPopular": "Most Popular",
     "recommended": "Recommended",
     "recommendedShort": "Recommended",
     "noApt": "Please select an apartment type above",
-
     "cleaners15Discount": "15% off one-time price",
     "cleaners10Discount": "10% off one-time price",
-
     "addonsTitle": "Optional Add-ons",
     "addonsSubtitle": "Add extra services to your cleaning visit",
     "addonsNote": "Add-ons are booked alongside a main cleaning service — not as standalone.",
@@ -92,31 +92,325 @@
     "addonsSelected": "add-on(s) selected",
     "perLoad": "per load",
     "loads": "loads",
-
     "addons": {
-      "sauna": { "label": "Sauna cleaning", "note": null },
-      "oven": { "label": "Oven interior", "note": null },
+      "sauna": {
+        "label": "Sauna cleaning",
+        "note": null
+      },
+      "oven": {
+        "label": "Oven interior",
+        "note": null
+      },
       "fridge": {
         "label": "Fridge / freezer interior",
         "note": "Must be empty and defrosted before cleaning."
       },
-      "trash": { "label": "Trash cabinet interior", "note": null },
-      "ironing": { "label": "Ironing (5–7 shirts)", "note": null },
-      "laundry": { "label": "Laundry (per load)", "note": null }
+      "trash": {
+        "label": "Trash cabinet interior",
+        "note": null
+      },
+      "ironing": {
+        "label": "Ironing (5–7 shirts)",
+        "note": null
+      },
+      "laundry": {
+        "label": "Laundry (per load)",
+        "note": null
+      }
     },
-
     "saunaNote": "Recommended for 3-room and 4+ room apartments.",
     "saunaAddonNote": "* Sauna cleaning is a separate add-on service.",
     "disclaimer": "Prices include VAT 25.5%. The household deduction is an estimate — the final amount depends on your personal tax situation.",
-
     "summary": "Booking Summary",
     "livePrice": "Estimated price",
     "bookNow": "Book Now",
-
     "trustBadge1": "Vetted & Insured",
     "trustBadge2": "Same Cleaner",
     "trustBadge3": "Flexible Plans",
-    "trustBadge4": "No Hidden Fees"
+    "trustBadge4": "No Hidden Fees",
+    "moveoutTitle": "Move-Out Cleaning",
+    "moveoutSubtitle": "Inspection-ready standard — meets Finnish landlord & taloyhtiö requirements",
+    "officeTitle": "Office Cleaning",
+    "officeSubtitle": "Professional commercial cleaning tailored to your workspace",
+    "moveout": {
+      "bannerTitle": "One-time inspection-ready clean",
+      "bannerDescription": "Priced per visit. Meets standard Finnish landlord and taloyhtiö handover requirements. Book at least 3 days in advance.",
+      "scopeTitle": "What's included",
+      "scopeIncludedTitle": "Included (inspection-ready)",
+      "scopeIncluded": [
+        "All surfaces cleaned thoroughly",
+        "Walls spot-cleaned, skirting boards, light switches",
+        "Kitchen: inside/outside cabinets, oven, fridge, hob, extractor hood",
+        "Bathroom/WC: tiles, grout, fixtures, mirrors, shower/bathtub",
+        "Floors: vacuumed and mopped throughout, including under furniture",
+        "Windows: interior glass cleaned",
+        "Storage areas: closets, utility room, hallway storage inside and out",
+        "Balcony: swept and wiped down (if applicable)"
+      ],
+      "scopeAddonsTitle": "Available as add-ons",
+      "scopeAddons": [
+        "Sauna cleaning",
+        "Exterior window cleaning",
+        "Heavily soiled oven or fridge (extended deep clean surcharge)",
+        "Carpet deep cleaning",
+        "Mould treatment"
+      ],
+      "scopeNotesTitle": "Important notes",
+      "scopeNotes": [
+        "Neliö move-outs use 2 cleaners (3h + 3h = 6h total) — same cost, half delivery time",
+        "Kolmio move-outs may use 1 or 2 cleaners depending on scheduling",
+        "Book at least 3 days in advance",
+        "Same-day/next-day subject to availability and +20% surcharge",
+        "Meets standard Finnish landlord/taloyhtiö inspection requirements"
+      ]
+    },
+    "office": {
+      "chooseSpace": "Choose your office size",
+      "bannerTitle": "Professional office cleaning",
+      "bannerDescription": "Tailored cleaning plans for small offices to large open-plan spaces. Regular or one-time deep clean.",
+      "featuresTitle": "Why QuickClean for offices",
+      "features": [
+        {
+          "icon": "🔒",
+          "title": "Fully insured",
+          "desc": "All staff background-checked and fully insured"
+        },
+        {
+          "icon": "⏰",
+          "title": "Before or after hours",
+          "desc": "Early morning, evening, or weekend scheduling available"
+        },
+        {
+          "icon": "📋",
+          "title": "Custom checklist",
+          "desc": "Tailored cleaning scope for your specific workspace needs"
+        },
+        {
+          "icon": "♻️",
+          "title": "Eco-friendly",
+          "desc": "Professional-grade eco-certified products used throughout"
+        }
+      ],
+      "calculatorBadge": "Commercial cleaning estimator",
+      "calculatorTitle": "Office Cleaning",
+      "calculatorTitleHighlight": "Price Calculator",
+      "calculatorSubtitle": "Volume-based pricing — more hours per week means a lower hourly rate. Adjust your hours to see live pricing across all three tiers.",
+      "disclaimer": "All prices include VAT 25.5%. Business clients may deduct VAT as a standard operating expense. Monthly estimates are based on committed weekly hours × 4.33 weeks. Final pricing confirmed in writing before contract start. Minimum: 1 month · 2-month cancellation notice.",
+      "hoursLabel": "Weekly cleaning hours",
+      "hoursHint": "Determines your pricing tier automatically",
+      "hoursUnit": "hrs/week",
+      "pricingTiers": "Pricing tiers",
+      "tierActive": "Active",
+      "tier1Label": "Tier 1",
+      "tier2Label": "Tier 2",
+      "tier3Label": "Tier 3",
+      "sizeTitle": "Office size",
+      "sizeHint": "Helps us assign the right team size",
+      "scheduleTitle": "Cleaning schedule",
+      "scheduleHint": "How you'd like hours distributed across the week",
+      "scheduleDaily": "Daily (Mon–Fri)",
+      "schedule3Days": "3 days/week",
+      "schedule2Days": "2 days/week",
+      "scheduleCustom": "Custom",
+      "surchargeLabel": "Evening / weekend cleaning (+15% surcharge)",
+      "surchargeHint": "Applies if any sessions are after 17:00 or on weekends. Negotiable for Tier 3 contracts.",
+      "addonsTitle": "Optional add-ons",
+      "addonsHint": "Estimates shown — confirmed before contract start",
+      "addonQuote": "Quote",
+      "addons": {
+        "window_cleaning": {
+          "label": "Window cleaning (interior/exterior)",
+          "monthlyEst": 80
+        },
+        "carpet_cleaning": {
+          "label": "Carpet deep cleaning",
+          "monthlyEst": 120
+        },
+        "post_event": {
+          "label": "Post-event cleaning",
+          "monthlyEst": 0
+        },
+        "supply_restocking": {
+          "label": "Supply procurement & restocking",
+          "monthlyEst": 60
+        }
+      },
+      "estimateEmpty": "Your estimate appears here",
+      "estimateEmptyHint": "Set your weekly hours to begin",
+      "estimateLive": "Live estimate",
+      "estimateWeeklyCost": "Weekly cost",
+      "estimateMonthly": "Monthly base (×4.2)",
+      "estimateSurcharge": "Evening/weekend surcharge (+15%)",
+      "estimateAddons": "Add-ons (estimate)",
+      "estimateTotal": "Total monthly",
+      "estimateVatNote": "Businesses may deduct VAT as an operating expense. Final pricing confirmed before contract start.",
+      "ctaBarTitle": "Office cleaning estimate",
+      "ctaBarMonthly": "Monthly estimate",
+      "ctaBookContract": "Book this contract →",
+      "ctaUnlockHint": "Enter weekly hours to unlock booking",
+      "scopeTitle": "Standard scope",
+      "notesTitle": "Contract notes",
+      "scopeIncluded": [
+        "Workspace tidying — desks, meeting rooms, common areas",
+        "Floor care — vacuuming and mopping throughout",
+        "Kitchen / break room cleaning and restocking check",
+        "Bathroom / WC cleaning and supply check",
+        "Waste removal and recycling",
+        "Surface dusting and sanitising of high-touch points"
+      ],
+      "contractNotes": [
+        "Hours distributed as agreed (e.g. 10h = 2h × 5 days or 5h × 2 days)",
+        "Tier upgrades apply immediately when hours increase",
+        "Minimum contract: 1 month · 2-month notice for cancellation",
+        "Evening / weekend available at +15% (negotiable Tier 3)"
+      ],
+      "trust": [
+        "✓ Fully insured — all staff background-checked",
+        "✓ Flexible scheduling — morning, evening or split",
+        "✓ Same team assigned where possible",
+        "✓ Final pricing confirmed before contract start"
+      ],
+      "rateTableTitle": "Hourly rates by volume tier",
+      "rateTableNote": "Monthly prices shown are estimates based on the hours/week for your office size. Final pricing confirmed after consultation.",
+      "scopeIncludedTitle": "Standard scope",
+      "scopeAddonsTitle": "Available as add-ons",
+      "scopeAddons": [
+        "Window cleaning (interior / exterior)",
+        "Carpet deep cleaning",
+        "Post-event cleaning",
+        "Supply procurement and restocking"
+      ],
+      "scopeNotesTitle": "Important notes",
+      "scopeNotes": [
+        "Hours distributed across the week as agreed (e.g. 10 hrs = 2h×5 days or 5h×2 days)",
+        "Tier upgrades apply immediately when hours increase",
+        "Tier downgrades apply at the next billing cycle",
+        "Evening and weekend cleaning available at +15% surcharge (negotiable for Tier 3)",
+        "Minimum contract: 1 month with 2-month notice period"
+      ]
+    }
+  },
+  "officeBooking": {
+    "pageTitle": "Office Cleaning Contract",
+    "backToPricing": "Back to office pricing",
+    "steps": {
+      "details": "Office details",
+      "schedule": "Schedule",
+      "addons": "Add-ons",
+      "contact": "Contact",
+      "address": "Office address",
+      "review": "Review & confirm"
+    },
+    "details": {
+      "title": "Tell us about your office",
+      "subtitle": "We'll use this to design the right cleaning plan.",
+      "officeName": "Business / office name",
+      "workspaceType": "Workspace layout",
+      "officeSizeSqm": "Office size (m²)",
+      "sizeSqmHint": "Total floor area of the space to be cleaned",
+      "staffCount": "Number of staff (approx.)",
+      "staffCountHint": "Helps us estimate traffic and scope",
+      "next": "Continue →",
+      "workspaceTypes": {
+        "openPlan": "Open plan",
+        "privateOffices": "Private offices",
+        "coworking": "Co-working space",
+        "mixed": "Mixed layout",
+        "warehouse": "Warehouse / industrial"
+      },
+      "errors": {
+        "officeName": "Office name is required",
+        "workspaceType": "Please select a workspace type",
+        "officeSizeSqm": "Please enter the office size",
+        "staffCount": "Please enter staff count"
+      }
+    },
+    "schedule": {
+      "title": "Design your cleaning schedule",
+      "subtitle": "Choose your weekly hours and which days work best.",
+      "weeklyHours": "Weekly cleaning hours",
+      "weeklyHoursHint": "Total hours of cleaning per week (min. 2h). Determines your pricing tier.",
+      "pricingPreview": "Live pricing estimate",
+      "recurringDays": "Recurring cleaning days",
+      "perDayTimes": "Start time & duration per day",
+      "eveningSurcharge": "Evening / weekend cleaning (+15%)",
+      "eveningSurchargeDesc": "Applies if any sessions are scheduled after 17:00 or on weekends",
+      "next": "Continue →",
+      "back": "← Office details",
+      "errors": {
+        "weeklyHours": "Minimum 2 hours/week required",
+        "atLeastOneDay": "Please select at least one recurring day",
+        "scheduleMismatch": "Total scheduled hours don't match weekly hours"
+      }
+    },
+    "addons": {
+      "title": "Optional add-on services",
+      "subtitle": "Add to your recurring contract or book separately.",
+      "next": "Continue →",
+      "back": "← Cleaning schedule",
+      "items": {
+        "window_cleaning": {
+          "label": "Window cleaning (interior/exterior)",
+          "note": "Quoted separately based on window count"
+        },
+        "carpet_cleaning": {
+          "label": "Carpet deep cleaning",
+          "note": "Recommended quarterly"
+        },
+        "post_event": {
+          "label": "Post-event cleaning",
+          "note": "Booked per event, contact for quote"
+        },
+        "supply_restocking": {
+          "label": "Supply procurement & restocking",
+          "note": "We source and restock your consumables"
+        }
+      }
+    },
+    "review": {
+      "title": "Review your office cleaning contract",
+      "subtitle": "Confirm the details before we set up your recurring subscription.",
+      "sections": {
+        "office": "Office details",
+        "schedule": "Cleaning schedule",
+        "addons": "Add-ons",
+        "contact": "Contact",
+        "address": "Office address",
+        "pricing": "Pricing summary"
+      },
+      "fields": {
+        "officeName": "Office",
+        "workspaceType": "Layout",
+        "officeSizeSqm": "Size",
+        "staffCount": "Staff",
+        "weeklyHours": "Weekly hours",
+        "pricingTier": "Tier",
+        "hourlyRate": "Rate",
+        "weeklyCost": "Weekly cost",
+        "monthlyCost": "Monthly estimate",
+        "surcharge": "Evening/weekend surcharge",
+        "addons": "Add-on services",
+        "total": "Total monthly"
+      },
+      "contractNote": "This sets up a recurring monthly subscription. Minimum contract: 1 month. 2-month notice period for cancellation.",
+      "confirm": "Confirm contract & proceed to payment ✓"
+    },
+    "confirmation": {
+      "title": "Contract confirmed! 🎉",
+      "subtitle": "Your office cleaning contract has been set up.",
+      "bookingRef": "Contract reference",
+      "nextSteps": {
+        "title": "What happens next",
+        "items": [
+          "Our team will contact you within 24 hours to confirm the start date.",
+          "You'll receive a detailed schedule confirmation by email.",
+          "Your first cleaning session will be scheduled within 14 days.",
+          "After the first session, you'll receive a setup satisfaction check."
+        ]
+      },
+      "bookAnother": "Book another contract",
+      "goHome": "Go to homepage"
+    }
   },
 
   "booking": {
@@ -366,7 +660,7 @@
     },
     "cards": {
       "homeCare": {
-        "title": "Home Care",
+        "title": "Home Cleaning",
         "description": "Regular home care that keeps your space fresh and comfortable — week after week.",
         "features": [
           "Weekly, bi-weekly, or monthly plans",
@@ -530,7 +824,7 @@
     "viewAll": "View All Services",
 
     "maintenance": {
-      "name": "Home Care",
+      "name": "Home Cleaning",
       "description": "Regular cleaning of kitchen, bathroom, and living areas"
     },
     "deepClean": {

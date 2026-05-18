@@ -30,23 +30,23 @@
   "pricing": {
     "title": "Läpinäkyvä hinnoittelu",
     "subtitle": "Yksinkertaiset, rehelliset hinnat. Ei yllätyksiä.",
-
     "serviceToggle": ["Ylläpitosiivous", "Syväsiivous"],
     "vatToggle": [
       "Kokonaishinta (sis. ALV)",
       "Kotitalousvähennyksen jälkeen (35%)"
     ],
-
     "chooseApartment": "Valitse asuntotyyppi",
     "choosePlan": "Valitse tiheys",
-
     "apartments": {
       "studio": "Yksiö (Studio)",
       "two": "Kaksio (2 huonetta)",
       "three": "Kolmio (3 huonetta)",
-      "four": "Neliö (4+ huonetta)"
+      "four": "Neliö (4+ huonetta)",
+      "smallOffice": "Pieni toimisto (enintään 50 m²)",
+      "mediumOffice": "Keskikokoinen toimisto (50–100 m²)",
+      "largeOffice": "Suuri toimisto (100–200 m²)",
+      "xlOffice": "XL / Avotoimisto (200+ m²)"
     },
-
     "plans": {
       "weekly": "Viikoittain",
       "biweekly": "Joka toinen viikko",
@@ -54,17 +54,20 @@
       "onetime": "Kertasiivous",
       "deepMonthly": "Kuukausittainen tilaus",
       "deepQuarterly": "Neljännesvuosittainen tilaus",
-      "deepOnetime": "Kertasiivous"
+      "deepOnetime": "Kertasiivous",
+      "moveout": "Muuttosiivous",
+      "officeWeekly": "Viikoittainen toimisto",
+      "officeBiweekly": "Joka toinen viikko",
+      "officeDeep": "Toimiston syväsiivous"
     },
-
     "visitInfo": {
       "weeklyVisits": "4× / kk",
       "biweeklyVisits": "2× / kk",
       "monthlyVisits": "1× / kk",
       "deepMonthlyVisits": "1 käynti/kk",
-      "deepQuarterlyVisits": "4 käyntiä/vuosi"
+      "deepQuarterlyVisits": "4 käyntiä/vuosi",
+      "moveoutVisitInfo": "Kertaluonteinen käynti"
     },
-
     "apartmentType": "Asuntotyyppi",
     "size": "Koko",
     "duration": "Kesto",
@@ -77,15 +80,12 @@
     "perMonth": "/ kk",
     "perVisit": "/ käynti",
     "perVisitPerYear": "/ käynti · 4×/vuosi",
-
     "mostPopular": "Suosituin",
     "recommended": "Suositeltava",
     "recommendedShort": "Suositellaan",
     "noApt": "Valitse ensin asuntotyyppi yllä",
-
     "cleaners15Discount": "15% alennus kertahinnasta",
     "cleaners10Discount": "10% alennus kertahinnasta",
-
     "addonsTitle": "Lisäpalvelut",
     "addonsSubtitle": "Lisää lisäpalveluja siivouskerraasi",
     "addonsNote": "Lisäpalvelut varataan pääsiivouspalvelun yhteydessä — ei itsenäisinä palveluina.",
@@ -95,31 +95,325 @@
     "addonsSelected": "lisäpalvelu(a) valittu",
     "perLoad": "per kuorma",
     "loads": "kuormaa",
-
     "addons": {
-      "sauna": { "label": "Saunan siivous", "note": null },
-      "oven": { "label": "Uunin sisäpuoli", "note": null },
+      "sauna": {
+        "label": "Saunan siivous",
+        "note": null
+      },
+      "oven": {
+        "label": "Uunin sisäpuoli",
+        "note": null
+      },
       "fridge": {
         "label": "Jääkaapin sisäpuoli",
         "note": "Täytyy olla tyhjä ja sulatettu ennen siivousta."
       },
-      "trash": { "label": "Roskakaapin sisäpuoli", "note": null },
-      "ironing": { "label": "Silittely (5–7 paitaa)", "note": null },
-      "laundry": { "label": "Pyykkipalvelu (per kuorma)", "note": null }
+      "trash": {
+        "label": "Roskakaapin sisäpuoli",
+        "note": null
+      },
+      "ironing": {
+        "label": "Silittely (5–7 paitaa)",
+        "note": null
+      },
+      "laundry": {
+        "label": "Pyykkipalvelu (per kuorma)",
+        "note": null
+      }
     },
-
     "saunaNote": "Suositellaan 3 ja 4+ huoneen asuntoihin.",
     "saunaAddonNote": "* Saunan siivous on erillinen lisäpalvelu.",
     "disclaimer": "Hinnat sisältävät ALV 25.5%. Kotitalousvähennys on arvio — lopullinen summa riippuu henkilökohtaisesta verotuksestasi.",
-
     "summary": "Varausyhteenveto",
     "livePrice": "Arvioitu hinta",
     "bookNow": "Varaa Nyt",
-
     "trustBadge1": "Tarkastettu & Vakuutettu",
     "trustBadge2": "Sama Siivooja",
     "trustBadge3": "Joustavat Suunnitelmat",
-    "trustBadge4": "Ei Piilomaksuja"
+    "trustBadge4": "Ei Piilomaksuja",
+    "moveoutTitle": "Muuttosiivous",
+    "moveoutSubtitle": "Tarkastuskelpoinen standardi — täyttää suomalaisten vuokranantajien ja taloyhtiöiden vaatimukset",
+    "officeTitle": "Toimistosiivous",
+    "officeSubtitle": "Ammattimainen toimitilasiivous räätälöitynä työtilallenne",
+    "moveout": {
+      "bannerTitle": "Kertaluonteinen tarkastuskelpoinen siivous",
+      "bannerDescription": "Hinnoiteltu käyntikohtaisesti. Täyttää suomalaisten vuokranantajien ja taloyhtiöiden vaatimukset. Varaa vähintään 3 päivää etukäteen.",
+      "scopeTitle": "Mitä sisältyy",
+      "scopeIncludedTitle": "Sisältyy (tarkastuskelpoinen)",
+      "scopeIncluded": [
+        "Kaikki pinnat puhdistetaan perusteellisesti",
+        "Seinät pistepuhdistetaan, jalkalista, valokytkimet",
+        "Keittiö: kaapit sisältä/ulkoa, uuni, jääkaappi, liesi, liesituuletin",
+        "Kylpyhuone/WC: kaakelit, saumat, kalusteet, peilit, suihku/amme",
+        "Lattiat: imuroidaan ja mopoidaan koko asunto, myös huonekalujen alta",
+        "Ikkunat: sisäpuolen lasi puhdistetaan",
+        "Säilytystilat: kaapit, kodinhoitohuone, eteisen säilytys sisältä ja ulkoa",
+        "Parveke: lakaistaan ja pyyhitään (mikäli soveltuu)"
+      ],
+      "scopeAddonsTitle": "Saatavilla lisäpalveluina",
+      "scopeAddons": [
+        "Saunan siivous",
+        "Ulkopuolinen ikkunanpesu",
+        "Erittäin likainen uuni tai jääkaappi (lisämaksu)",
+        "Mattojen syväpuhdistus",
+        "Homeenkäsittely"
+      ],
+      "scopeNotesTitle": "Tärkeät huomiot",
+      "scopeNotes": [
+        "Neliön muuttosiivous käyttää 2 siivoojaa (3h + 3h = 6h yhteensä) — sama hinta, puolet toimitusajasta",
+        "Kolmion muuttosiivous voi käyttää 1 tai 2 siivoojaa aikataulutuksesta riippuen",
+        "Varaa vähintään 3 päivää etukäteen",
+        "Saman päivän/seuraavan päivän tilaukset saatavuuden mukaan ja +20% lisämaksu",
+        "Täyttää suomalaisten vuokranantajien/taloyhtiöiden tarkastusvaatimukset"
+      ]
+    },
+    "office": {
+      "chooseSpace": "Valitse toimistosi koko",
+      "bannerTitle": "Ammattimainen toimistosiivous",
+      "bannerDescription": "Räätälöidyt siivoussuunnitelmat pienistä toimistoista suuriin avotiloihin. Säännöllinen tai kertaluonteinen syväsiivous.",
+      "featuresTitle": "Miksi QuickClean toimistoille",
+      "features": [
+        {
+          "icon": "🔒",
+          "title": "Täysin vakuutettu",
+          "desc": "Kaikki henkilöt taustoitettu ja täysin vakuutettu"
+        },
+        {
+          "icon": "⏰",
+          "title": "Ennen tai jälkeen aukioloaikoja",
+          "desc": "Aamuvarhainen, ilta- tai viikonloppuaikataulutus saatavilla"
+        },
+        {
+          "icon": "📋",
+          "title": "Mukautettu tarkistuslista",
+          "desc": "Räätälöity siivouslaajuus juuri teidän tilojenne tarpeisiin"
+        },
+        {
+          "icon": "♻️",
+          "title": "Ympäristöystävällinen",
+          "desc": "Ammattikäyttöön tarkoitettuja ekosertifoituja tuotteita käytetään"
+        }
+      ],
+      "calculatorBadge": "Kaupallinen siivousarvio",
+      "calculatorTitle": "Toimistosiivous",
+      "calculatorTitleHighlight": "Hinnanlaskuri",
+      "calculatorSubtitle": "Volyymipohjainen hinnoittelu — enemmän tunteja viikossa tarkoittaa alhaisempaa tuntihinintaa. Säädä tuntejasi nähdäksesi reaaliaikaisen hinnan kaikilla kolmella tasolla.",
+      "disclaimer": "Kaikki hinnat sisältävät ALV 25,5%. Yritysasiakkaat voivat vähentää ALV:n normaalina liikekuluna. Kuukausiestimaatit perustuvat sitoutuneisiin viikkotunteihin × 4,33 viikkoa. Lopullinen hinnoittelu vahvistetaan kirjallisesti ennen sopimuksen alkua. Vähintään: 1 kuukausi · 2 kuukauden irtisanomisaika.",
+      "hoursLabel": "Viikoittaiset siivoustunnit",
+      "hoursHint": "Määrittää hinnoittelutasosi automaattisesti",
+      "hoursUnit": "t/viikko",
+      "pricingTiers": "Hinnoittelutasot",
+      "tierActive": "Aktiivinen",
+      "tier1Label": "Taso 1",
+      "tier2Label": "Taso 2",
+      "tier3Label": "Taso 3",
+      "sizeTitle": "Toimiston koko",
+      "sizeHint": "Auttaa meitä osoittamaan oikean tiimin koon",
+      "scheduleTitle": "Siivousaikataulu",
+      "scheduleHint": "Miten haluaisit tunnit jakautuvan viikolle",
+      "scheduleDaily": "Päivittäin (Ma–Pe)",
+      "schedule3Days": "3 päivää/viikko",
+      "schedule2Days": "2 päivää/viikko",
+      "scheduleCustom": "Mukautettu",
+      "surchargeLabel": "Ilta- / viikonloppusiivous (+15% lisämaksu)",
+      "surchargeHint": "Soveltuu, jos jotkin istunnot ovat klo 17:00 jälkeen tai viikonloppuisin. Neuvoteltavissa Taso 3 -sopimuksille.",
+      "addonsTitle": "Valinnaiset lisäpalvelut",
+      "addonsHint": "Estimaatit näytetään — vahvistetaan ennen sopimuksen alkua",
+      "addonQuote": "Tarjous",
+      "addons": {
+        "window_cleaning": {
+          "label": "Ikkunanpesu (sisä-/ulkopuoli)",
+          "monthlyEst": 80
+        },
+        "carpet_cleaning": {
+          "label": "Mattojen syväpuhdistus",
+          "monthlyEst": 120
+        },
+        "post_event": {
+          "label": "Tapahtuman jälkeinen siivous",
+          "monthlyEst": 0
+        },
+        "supply_restocking": {
+          "label": "Tarvikkeiden hankinta ja täydennys",
+          "monthlyEst": 60
+        }
+      },
+      "estimateEmpty": "Arvio näkyy tässä",
+      "estimateEmptyHint": "Aseta viikkotunnit aloittaaksesi",
+      "estimateLive": "Reaaliaikainen arvio",
+      "estimateWeeklyCost": "Viikkokustannus",
+      "estimateMonthly": "Kuukausipohja (×4,33)",
+      "estimateSurcharge": "Ilta-/viikonloppulisä (+15%)",
+      "estimateAddons": "Lisäpalvelut (estimaatti)",
+      "estimateTotal": "Yhteensä kuukaudessa",
+      "estimateVatNote": "Yritykset voivat vähentää ALV:n liikekuluna. Lopullinen hinnoittelu vahvistetaan ennen sopimuksen alkua.",
+      "ctaBarTitle": "Toimistosiivousarvio",
+      "ctaBarMonthly": "Kuukausiestimaatti",
+      "ctaBookContract": "Varaa tämä sopimus →",
+      "ctaUnlockHint": "Syötä viikkotunnit avataksesi varauksen",
+      "scopeTitle": "Vakiolaajuus",
+      "notesTitle": "Sopimushuomiot",
+      "scopeIncluded": [
+        "Työtilan siistiminen — pöydät, neuvotteluhuoneet, yhteiset tilat",
+        "Lattiahoito — imurointi ja moppaus läpi tilojen",
+        "Keittiön / taukotilan puhdistus ja tarvikkeiden tarkistus",
+        "Kylpyhuone / WC:n puhdistus ja tarvikkeiden tarkistus",
+        "Jätteiden poisto ja kierrätys",
+        "Pintojen pölyäminen ja usein kosketeltavien kohtien desinfiointi"
+      ],
+      "contractNotes": [
+        "Tunnit jaetaan sovitusti (esim. 10t = 2t × 5 päivää tai 5t × 2 päivää)",
+        "Tason korotukset astuvat voimaan heti tuntimäärän kasvaessa",
+        "Vähimmäissopimus: 1 kuukausi · 2 kuukauden irtisanomisaika",
+        "Ilta- / viikonloppusiivous saatavilla +15%:lla (neuvoteltavissa Taso 3)"
+      ],
+      "trust": [
+        "✓ Täysin vakuutettu — kaikki henkilöt taustoitettu",
+        "✓ Joustava aikataulutus — aamu, ilta tai jaettu",
+        "✓ Sama tiimi osoitetaan aina kun mahdollista",
+        "✓ Lopullinen hinnoittelu vahvistetaan ennen sopimuksen alkua"
+      ],
+      "rateTableTitle": "Tuntihinnat volyymitasoittain",
+      "rateTableNote": "Näytetyt kuukausihinnat ovat arvioita toimistosi koon mukaisten tuntien perusteella. Lopullinen hinnoittelu vahvistetaan konsultaation jälkeen.",
+      "scopeIncludedTitle": "Vakiolaajuus",
+      "scopeAddonsTitle": "Saatavilla lisäpalveluina",
+      "scopeAddons": [
+        "Ikkunanpesu (sisä-/ulkopuoli)",
+        "Mattojen syväpuhdistus",
+        "Tapahtuman jälkeinen siivous",
+        "Tarvikkeiden hankinta ja täydennys"
+      ],
+      "scopeNotesTitle": "Tärkeät huomiot",
+      "scopeNotes": [
+        "Tunnit jaetaan viikon aikana sovitulla tavalla (esim. 10 t = 2t × 5 päivää tai 5t × 2 päivää)",
+        "Tason korotukset astuvat voimaan heti tuntimäärän kasvaessa",
+        "Tason alennukset astuvat voimaan seuraavalla laskutusjaksolla",
+        "Ilta- ja viikonloppusiivous saatavilla +15% lisämaksulla (neuvoteltavissa Taso 3 -sopimuksille)",
+        "Vähimmäissopimus: 1 kuukausi 2 kuukauden irtisanomisajalla"
+      ]
+    }
+  },
+  "officeBooking": {
+    "pageTitle": "Toimistosiivoussopimus",
+    "backToPricing": "Takaisin toimistohinnoitteluun",
+    "steps": {
+      "details": "Toimiston tiedot",
+      "schedule": "Aikataulu",
+      "addons": "Lisäpalvelut",
+      "contact": "Yhteystiedot",
+      "address": "Toimiston osoite",
+      "review": "Tarkistus & vahvistus"
+    },
+    "details": {
+      "title": "Kerro meille toimistostasi",
+      "subtitle": "Käytämme näitä tietoja oikean siivoussuunnitelman suunnittelemiseen.",
+      "officeName": "Yrityksen / toimiston nimi",
+      "workspaceType": "Työtilan asettelu",
+      "officeSizeSqm": "Toimiston koko (m²)",
+      "sizeSqmHint": "Siivottavan tilan kokonaispinta-ala",
+      "staffCount": "Henkilöstön lukumäärä (noin)",
+      "staffCountHint": "Auttaa meitä arvioimaan liikenteen ja laajuuden",
+      "next": "Jatka →",
+      "workspaceTypes": {
+        "openPlan": "Avotoimisto",
+        "privateOffices": "Yksityiset toimistot",
+        "coworking": "Yhteiskäyttötila",
+        "mixed": "Sekalainen asettelu",
+        "warehouse": "Varasto / teollisuus"
+      },
+      "errors": {
+        "officeName": "Toimiston nimi on pakollinen",
+        "workspaceType": "Valitse työtilan tyyppi",
+        "officeSizeSqm": "Anna toimiston koko",
+        "staffCount": "Anna henkilöstömäärä"
+      }
+    },
+    "schedule": {
+      "title": "Suunnittele siivousaikataulu",
+      "subtitle": "Valitse viikkotuntisi ja mitkä päivät sopivat parhaiten.",
+      "weeklyHours": "Viikoittaiset siivoustunnit",
+      "weeklyHoursHint": "Siivoustunnit viikossa yhteensä (min. 2h). Määrittää hinnoittelutasosi.",
+      "pricingPreview": "Reaaliaikainen hinta-arvio",
+      "recurringDays": "Toistuvat siivouspäivät",
+      "perDayTimes": "Aloitusaika ja kesto per päivä",
+      "eveningSurcharge": "Ilta- / viikonloppusiivous (+15%)",
+      "eveningSurchargeDesc": "Soveltuu, jos jokin istunto on aikataulutettu klo 17:00 jälkeen tai viikonloppuisin",
+      "next": "Jatka →",
+      "back": "← Toimiston tiedot",
+      "errors": {
+        "weeklyHours": "Vähintään 2 tuntia viikossa vaaditaan",
+        "atLeastOneDay": "Valitse vähintään yksi toistuva päivä",
+        "scheduleMismatch": "Aikataulutettujen tuntien yhteismäärä ei vastaa viikkotunteja"
+      }
+    },
+    "addons": {
+      "title": "Valinnaiset lisäpalvelut",
+      "subtitle": "Lisää toistuvaan sopimukseen tai varaa erikseen.",
+      "next": "Jatka →",
+      "back": "← Siivousaikataulu",
+      "items": {
+        "window_cleaning": {
+          "label": "Ikkunanpesu (sisä-/ulkopuoli)",
+          "note": "Tarjotaan erikseen ikkunamäärän mukaan"
+        },
+        "carpet_cleaning": {
+          "label": "Mattojen syväpuhdistus",
+          "note": "Suositellaan neljännesvuosittain"
+        },
+        "post_event": {
+          "label": "Tapahtuman jälkeinen siivous",
+          "note": "Varataan per tapahtuma, ota yhteyttä tarjousta varten"
+        },
+        "supply_restocking": {
+          "label": "Tarvikkeiden hankinta ja täydennys",
+          "note": "Hankimme ja täydennämme kulutustarvikkeesi"
+        }
+      }
+    },
+    "review": {
+      "title": "Tarkista toimistosiivoussopimuksesi",
+      "subtitle": "Vahvista tiedot ennen toistuvan tilauksen perustamista.",
+      "sections": {
+        "office": "Toimiston tiedot",
+        "schedule": "Siivousaikataulu",
+        "addons": "Lisäpalvelut",
+        "contact": "Yhteystiedot",
+        "address": "Toimiston osoite",
+        "pricing": "Hinnoitteluyhteenveto"
+      },
+      "fields": {
+        "officeName": "Toimisto",
+        "workspaceType": "Asettelu",
+        "officeSizeSqm": "Koko",
+        "staffCount": "Henkilöstö",
+        "weeklyHours": "Viikkotunnit",
+        "pricingTier": "Taso",
+        "hourlyRate": "Tuntihinta",
+        "weeklyCost": "Viikkokustannus",
+        "monthlyCost": "Kuukausiarvio",
+        "surcharge": "Ilta-/viikonloppulisä",
+        "addons": "Lisäpalvelut",
+        "total": "Yhteensä kuukaudessa"
+      },
+      "contractNote": "Tämä perustaa toistuvan kuukausitilauksen. Vähimmäissopimus: 1 kuukausi. Irtisanomisaika: 2 kuukautta.",
+      "confirm": "Vahvista sopimus & siirry maksuun ✓"
+    },
+    "confirmation": {
+      "title": "Sopimus vahvistettu! 🎉",
+      "subtitle": "Toimistosiivoussopimuksesi on perustettu.",
+      "bookingRef": "Sopimusnumero",
+      "nextSteps": {
+        "title": "Mitä tapahtuu seuraavaksi",
+        "items": [
+          "Tiimimme ottaa sinuun yhteyttä 24 tunnin kuluessa vahvistaakseen aloituspäivämäärän.",
+          "Saat yksityiskohtaisen aikatauluvahvistuksen sähköpostitse.",
+          "Ensimmäinen siivousistunto aikataulutetaan 14 päivän sisällä.",
+          "Ensimmäisen istunnon jälkeen saat käynnistystyytyväisyystarkistuksen."
+        ]
+      },
+      "bookAnother": "Varaa uusi sopimus",
+      "goHome": "Siirry etusivulle"
+    }
   },
 
   "booking": {

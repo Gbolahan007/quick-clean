@@ -2,7 +2,7 @@ import type { ApartmentType } from "../[locale]/pricing/data/apartmentType";
 
 export type { ApartmentType };
 
-export type ServiceType = "maintenance" | "deep";
+export type ServiceType = "maintenance" | "deep" | "moveout" | "office";
 export type BookingFrequency = "one-time" | "weekly" | "biweekly" | "monthly";
 
 // ── Plan ──────────────────────────────────────────────────────────────────────

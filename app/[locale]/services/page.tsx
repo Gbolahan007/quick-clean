@@ -148,11 +148,11 @@ export default function ServicesPage() {
               href="/services/renovation"
             />
             <ServiceCard icon="⚓" serviceKey="yacht" href="/services/yacht" />
-            <ServiceCard
+            {/* <ServiceCard
               icon="💎"
               serviceKey="luxury"
               href="/services/luxury"
-            />
+            /> */}
           </div>
         </div>
       </section>

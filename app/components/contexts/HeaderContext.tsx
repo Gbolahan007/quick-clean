@@ -6,10 +6,12 @@ interface HeaderContextType {
   mobileMenuOpen: boolean;
   companyDropdownOpen: boolean;
   servicesDropdownOpen: boolean;
+  pricingDropdownOpen: boolean;
   languageDropdownOpen: boolean;
   setMobileMenuOpen: (open: boolean) => void;
   setCompanyDropdownOpen: (open: boolean) => void;
   setServicesDropdownOpen: (open: boolean) => void;
+  setPricingDropdownOpen: (open: boolean) => void;
   setLanguageDropdownOpen: (open: boolean) => void;
   toggleMobileMenu: () => void;
   closeMobileMenu: () => void;
@@ -22,6 +24,7 @@ export function HeaderProvider({ children }: { children: ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false);
   const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
+  const [pricingDropdownOpen, setPricingDropdownOpen] = useState(false);
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
 
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
@@ -30,6 +33,7 @@ export function HeaderProvider({ children }: { children: ReactNode }) {
   const closeAllDropdowns = () => {
     setCompanyDropdownOpen(false);
     setServicesDropdownOpen(false);
+    setPricingDropdownOpen(false);
     setLanguageDropdownOpen(false);
   };
 
@@ -39,10 +43,12 @@ export function HeaderProvider({ children }: { children: ReactNode }) {
         mobileMenuOpen,
         companyDropdownOpen,
         servicesDropdownOpen,
+        pricingDropdownOpen,
         languageDropdownOpen,
         setMobileMenuOpen,
         setCompanyDropdownOpen,
         setServicesDropdownOpen,
+        setPricingDropdownOpen,
         setLanguageDropdownOpen,
         toggleMobileMenu,
         closeMobileMenu,

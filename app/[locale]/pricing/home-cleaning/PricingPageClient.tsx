@@ -3,15 +3,15 @@
 
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { usePricingState } from "./hooks/usePricingState";
-import { aptIndex, calcAddonTotals } from "./data/pricing";
-import { PricingHeader } from "./components/PricingHeader";
-import { ApartmentSelector } from "./components/ApartmentSelector";
-import { PlanGrid } from "./components/PlanGrid";
-import { PricingTable } from "./components/PricingTable";
-import { SummaryBar } from "./components/SummaryBar";
-import { PricingStoreProvider } from "./components/PricingStoreProvider";
-import { AddonsSection } from "./components/AddonsSection";
+import { usePricingState } from "../hooks/usePricingState";
+import { aptIndex, calcAddonTotals } from "../data/pricing";
+import { PricingHeader } from "../components/PricingHeader";
+import { ApartmentSelector } from "../components/ApartmentSelector";
+import { PlanGrid } from "../components/PlanGrid";
+import { PricingTable } from "../components/PricingTable";
+import { SummaryBar } from "../components/SummaryBar";
+import { PricingStoreProvider } from "../components/PricingStoreProvider";
+import { AddonsSection } from "../components/AddonsSection";
 
 type Props = {
   localeProp: "en" | "fi";

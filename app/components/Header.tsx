@@ -30,9 +30,8 @@ function useScrollDirection() {
 
       const delta = current - lastScrollY.current;
 
-      // Only flip visibility when delta is meaningful, but always advance the ref
       if (Math.abs(delta) >= THRESHOLD) {
-        setVisible(delta < 0); // scrolling up → show; scrolling down → hide
+        setVisible(delta < 0);
         lastScrollY.current = current;
       }
     }
@@ -61,7 +60,7 @@ function Dropdown({
     <div className="relative" onMouseEnter={onOpen} onMouseLeave={onClose}>
       <button
         onClick={onOpen}
-        className="flex items-center space-x-1 text-gray-700 hover:text-[#7c9885] font-medium transition-colors py-2 "
+        className="flex items-center space-x-1 text-gray-700 hover:text-[#7c9885] font-medium transition-colors py-2"
       >
         <span>{label}</span>
         <ChevronDown
@@ -193,9 +192,11 @@ function HeaderContent() {
     mobileMenuOpen,
     companyDropdownOpen,
     servicesDropdownOpen,
+    pricingDropdownOpen,
     languageDropdownOpen,
     setCompanyDropdownOpen,
     setServicesDropdownOpen,
+    setPricingDropdownOpen,
     setLanguageDropdownOpen,
     toggleMobileMenu,
     closeMobileMenu,
@@ -210,6 +211,7 @@ function HeaderContent() {
     closeMobileMenu();
     setCompanyDropdownOpen(false);
     setServicesDropdownOpen(false);
+    setPricingDropdownOpen(false);
   };
 
   return (
@@ -220,21 +222,22 @@ function HeaderContent() {
         ${visible ? "translate-y-0" : "-translate-y-full"}
       `}
     >
-      <nav className="mx-auto max-w-7xl sm:px-6 lg:px-8 ">
+      <nav className="mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div
           className={`
-          flex h-20 items-center justify-between whitespace-nowrap
-           lg:rounded-2xl lg:mx-0 lg:shadow-none
-          bg-white rounded-2xl mx-3 mt-3 px-4 shadow-md 
-          ${!atTop ? "lg:shadow-sm" : ""}
-        `}
+            flex h-20 items-center justify-between whitespace-nowrap
+            lg:rounded-2xl lg:mx-0 lg:shadow-none
+            bg-white rounded-2xl mx-3 mt-3 px-4 shadow-md
+            ${!atTop ? "lg:shadow-sm" : ""}
+          `}
         >
           <Logo />
 
           {/* Desktop Nav */}
           <div
-            className={`hidden lg:flex lg:items-center  ${isFinnish ? "lg:space-x-4" : "lg:space-x-8"}`}
+            className={`hidden lg:flex lg:items-center ${isFinnish ? "lg:space-x-4" : "lg:space-x-8"}`}
           >
+            {/* About dropdown */}
             <Dropdown
               label={t("nav.about")}
               isOpen={companyDropdownOpen}
@@ -243,7 +246,7 @@ function HeaderContent() {
             >
               <Link
                 href="/about"
-                className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors "
+                className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors"
               >
                 {t("nav.about")}
               </Link>
@@ -254,6 +257,8 @@ function HeaderContent() {
                 Our Story
               </Link>
             </Dropdown>
+
+            {/* Services dropdown */}
             <Dropdown
               label={t("nav.services")}
               isOpen={servicesDropdownOpen}
@@ -262,7 +267,7 @@ function HeaderContent() {
             >
               <Link
                 href="/services/home-care"
-                className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors "
+                className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors"
               >
                 {t("services.maintenance.name")}
               </Link>
@@ -285,19 +290,40 @@ function HeaderContent() {
                 {t("services.viewAll")}
               </Link>
             </Dropdown>
-            ;
-            <Link
-              href="/pricing"
-              className="text-gray-700 hover:text-[#7c9885] font-medium transition-colors"
+
+            {/* Pricing dropdown */}
+            <Dropdown
+              label={t("nav.pricing")}
+              isOpen={pricingDropdownOpen}
+              onOpen={() => setPricingDropdownOpen(true)}
+              onClose={() => setPricingDropdownOpen(false)}
             >
-              {t("nav.pricing")}
-            </Link>
-            <Link
+              <Link
+                href="/pricing/home-cleaning"
+                className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors"
+              >
+                {t("services.cards.homeCare.title")}
+              </Link>
+              <Link
+                href="/pricing/office-cleaning"
+                className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors"
+              >
+                {t("services.cards.office.title")}
+              </Link>
+              <Link
+                href="/pricing/move-out-cleaning"
+                className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors"
+              >
+                {t("services.cards.moveOut.title")}
+              </Link>
+            </Dropdown>
+
+            {/* <Link
               href="/contact"
               className="text-gray-700 hover:text-[#7c9885] font-medium transition-colors"
             >
               {t("nav.quote")}
-            </Link>
+            </Link> */}
           </div>
 
           {/* Desktop Right */}
@@ -321,7 +347,6 @@ function HeaderContent() {
                 >
                   {t("nav.login")}
                 </Link>
-
                 <Link
                   href="/signup"
                   className={`${isFinnish ? "px-4 py-2 text-sm" : "px-5 py-2.5"} text-[#7c9885] rounded-full 
@@ -365,6 +390,7 @@ function HeaderContent() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden py-4 px-3 mt-2 bg-white rounded-2xl shadow-md mx-3 space-y-4 border-t border-gray-100">
+            {/* About */}
             <div>
               <button
                 onClick={() => setCompanyDropdownOpen(!companyDropdownOpen)}
@@ -395,6 +421,7 @@ function HeaderContent() {
               )}
             </div>
 
+            {/* Services */}
             <div>
               <button
                 onClick={() => setServicesDropdownOpen(!servicesDropdownOpen)}
@@ -439,13 +466,44 @@ function HeaderContent() {
               )}
             </div>
 
-            <Link
-              href="/pricing"
-              className="block py-2 text-gray-700 font-medium hover:text-[#7c9885]"
-              onClick={handleMobileClick}
-            >
-              {t("nav.pricing")}
-            </Link>
+            {/* Pricing — mobile */}
+            <div>
+              <button
+                onClick={() => setPricingDropdownOpen(!pricingDropdownOpen)}
+                className="flex items-center justify-between w-full py-2 text-gray-700 font-medium"
+              >
+                <span>{t("nav.pricing")}</span>
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform ${pricingDropdownOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+              {pricingDropdownOpen && (
+                <div className="pl-4 space-y-2 mt-2">
+                  <Link
+                    href="/pricing/home-cleaning"
+                    className="block py-2 text-gray-600 hover:text-[#7c9885]"
+                    onClick={handleMobileClick}
+                  >
+                    {t("services.cards.homeCare.title")}
+                  </Link>
+                  <Link
+                    href="/pricing/office-cleaning"
+                    className="block py-2 text-gray-600 hover:text-[#7c9885]"
+                    onClick={handleMobileClick}
+                  >
+                    {t("services.cards.office.title")}
+                  </Link>
+                  <Link
+                    href="/pricing/move-out-cleaning"
+                    className="block py-2 text-gray-600 hover:text-[#7c9885]"
+                    onClick={handleMobileClick}
+                  >
+                    {t("services.cards.moveOut.title")}
+                  </Link>
+                </div>
+              )}
+            </div>
+
             <Link
               href="/contact"
               className="block py-2 text-gray-700 font-medium hover:text-[#7c9885]"

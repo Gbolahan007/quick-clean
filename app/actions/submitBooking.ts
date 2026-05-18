@@ -15,6 +15,8 @@ function getServiceClient() {
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
+// Maps EN addon display names → booking_extras.extra_type values.
+// Quantity suffix is stripped before lookup: "Oven cleaning ×2" → "Oven cleaning"
 const ADDON_TYPE_MAP: Record<string, string> = {
   "Window cleaning": "windows",
   "Oven cleaning": "oven",
@@ -49,8 +51,9 @@ export async function submitBookingAction(
       .eq("email", data.email)
       .maybeSingle();
 
-    if (lookupError)
+    if (lookupError) {
       throw new Error(`Customer lookup failed: ${lookupError.message}`);
+    }
 
     if (existing) {
       customerId = existing.id;
@@ -72,8 +75,9 @@ export async function submitBookingAction(
         .select("id")
         .single();
 
-      if (createError)
+      if (createError) {
         throw new Error(`Customer creation failed: ${createError.message}`);
+      }
       customerId = created.id;
     }
 
@@ -96,8 +100,9 @@ export async function submitBookingAction(
       .select("id")
       .single();
 
-    if (addressError)
+    if (addressError) {
       throw new Error(`Address insertion failed: ${addressError.message}`);
+    }
 
     // ── 4. Server-side slot re-validation (race-condition safe) ───────────
     // NEVER trust client availability checks — always re-validate server-side.
@@ -188,6 +193,7 @@ export async function submitBookingAction(
     );
 
     // ── 5. Resolve service_id ──────────────────────────────────────────────
+
     const { data: serviceRecord, error: serviceError } = await supabase
       .from("services")
       .select("id, slug, name_en")
@@ -196,19 +202,36 @@ export async function submitBookingAction(
       .single();
 
     if (serviceError || !serviceRecord) {
+      // Debug: surface what slugs are actually in the DB
       const { data: allServices } = await supabase
         .from("services")
         .select("id, slug, name_en, is_active");
+
       console.error(
-        "[submitBookingAction] Service lookup failed. DB has:",
-        allServices,
+        "[submitBookingAction] Service lookup failed.",
+        "\n  Looking for slug:",
+        data.serviceType,
+        "\n  Services in DB:",
+        JSON.stringify(allServices, null, 2),
+        "\n  Supabase error:",
+        serviceError?.message ?? "none",
       );
-      throw new Error(`Service not found for slug: "${data.serviceType}"`);
+
+      throw new Error(
+        `Service not found for slug: "${data.serviceType}". ` +
+          `Available: ${allServices?.map((s) => s.slug).join(", ") ?? "none — table may be empty"}`,
+      );
     }
 
-    console.log("[submitBookingAction] Service:", serviceRecord.name_en);
+    console.log(
+      "[submitBookingAction] Service:",
+      serviceRecord.name_en,
+      "→",
+      serviceRecord.id,
+    );
 
     // ── 6. Resolve subscription_plan_id ───────────────────────────────────
+
     let subscriptionPlanId: string | null = null;
 
     if (data.frequency !== "one-time") {
@@ -220,7 +243,10 @@ export async function submitBookingAction(
         .maybeSingle();
 
       subscriptionPlanId = planRecord?.id ?? null;
-      console.log("[submitBookingAction] Plan:", planRecord?.name ?? "none");
+      console.log(
+        "[submitBookingAction] Plan:",
+        planRecord?.name ?? "none (one-time)",
+      );
     }
 
     // ── 7. Insert booking ──────────────────────────────────────────────────
@@ -232,7 +258,7 @@ export async function submitBookingAction(
         address_id: addressRecord.id,
         subscription_plan_id: subscriptionPlanId,
 
-        // Schedule — use slotStartTime from DB (authoritative)
+        // Schedule — use slotStartTime from DB (server-authoritative)
         booking_date: data.bookingDate,
         time_slot: slotStartTime,
 
@@ -245,39 +271,40 @@ export async function submitBookingAction(
         final_price: data.finalPrice,
         base_price: data.basePrice,
 
-        // Service snapshot
         service_type: data.serviceType,
         plan_key: data.planKey,
         plan_label: data.planLabel,
         show_deducted: data.showDeducted,
 
-        // Apartment snapshot
         apartment_key: data.apartmentKey,
         apartment_label: data.apartmentLabel,
         apartment_size: data.apartmentSize,
 
-        // Addons snapshot
         addons_snapshot: data.addonsSnapshot,
 
-        // Notes
         special_notes: data.specialNotes,
       })
       .select("id")
       .single();
 
-    if (bookingError)
+    if (bookingError) {
       throw new Error(`Booking insertion failed: ${bookingError.message}`);
+    }
 
     console.log("[submitBookingAction] Booking created:", booking.id);
 
     // ── 8. Insert booking_extras ───────────────────────────────────────────
+
     if (data.addonsSnapshot.count > 0 && data.addonsSnapshot.names.length > 0) {
       const extrasRows = data.addonsSnapshot.names
         .map((name) => {
           const baseName = name.replace(/\s×\d+$/, "").trim();
           const extraType = ADDON_TYPE_MAP[baseName];
           if (!extraType) {
-            console.warn("[submitBookingAction] Unknown addon:", baseName);
+            console.warn(
+              "[submitBookingAction] Unrecognised addon name:",
+              baseName,
+            );
             return null;
           }
           return { booking_id: booking.id, extra_type: extraType, price: 0 };
@@ -294,11 +321,17 @@ export async function submitBookingAction(
             "[submitBookingAction] booking_extras warning:",
             extrasError.message,
           );
+        } else {
+          console.log(
+            "[submitBookingAction] booking_extras inserted:",
+            extrasRows.length,
+            "rows",
+          );
         }
       }
     }
 
-    // ── 9. Return ──────────────────────────────────────────────────────────
+    // ── 9. Return success ──────────────────────────────────────────────────
     return {
       success: true,
       bookingId: booking.id,

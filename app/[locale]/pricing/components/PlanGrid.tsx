@@ -44,7 +44,7 @@ interface PlanGridProps {
   serviceType: ServiceType;
 }
 
-type ServiceType = "maintenance" | "deep";
+type ServiceType = "maintenance" | "deep" | "moveout" | "office";
 
 // --- Chip Component ---
 

@@ -3,15 +3,18 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { APARTMENT_TYPES, type ApartmentType } from "../data/apartmentType";
+import { OFFICE_SPACE_TYPES } from "../data/officeSpaceTypes";
 import { getPrice } from "../data/pricing";
 import type { Plan } from "@/app/types/booking";
+
+type ServiceType = "maintenance" | "deep" | "moveout" | "office";
 
 interface PricingTableProps {
   plans: Record<string, Plan>;
   selectedPlan: string | null;
   selectedApt: ApartmentType | null;
   showDeducted: boolean;
-  serviceType: "maintenance" | "deep";
+  serviceType: ServiceType;
   onSelectApt: (apt: ApartmentType) => void;
 }
 
@@ -31,16 +34,29 @@ export function PricingTable({
 }: PricingTableProps) {
   const t = useTranslations("pricing");
 
+  // ── Guards ──────────────────────────────────────────────────────────────────
   if (!selectedApt || !selectedPlan) return null;
 
   const plan = plans[selectedPlan];
+  // Guard against stale localStorage keys or mismatched plan sets
+  if (!plan) return null;
+
+  // ── Config ──────────────────────────────────────────────────────────────────
+  const isOffice = serviceType === "office";
   const isMaintenance = serviceType === "maintenance";
-  const showCleaners = Boolean(plan?.cleaners);
-  const showVisits = isMaintenance && Boolean(plan?.visits);
+
+  // Office uses its own space type list; all other services use apartment types
+  const rowTypes: ApartmentType[] = isOffice
+    ? OFFICE_SPACE_TYPES
+    : APARTMENT_TYPES;
+
+  const showCleaners = Boolean(plan.cleaners);
+  const showVisits = isMaintenance && Boolean(plan.visits);
 
   const priceHeader =
-    plan?.priceType === "monthly" ? t("pricePerMonth") : t("pricePerVisit");
-  const planLabel = t(`plans.${plan?.labelKey}`);
+    plan.priceType === "monthly" ? t("pricePerMonth") : t("pricePerVisit");
+
+  const planLabel = t(`plans.${plan.labelKey}`);
   const aptLabel = t(`apartments.${selectedApt.labelKey}`);
 
   return (
@@ -54,7 +70,7 @@ export function PricingTable({
           boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
         }}
       >
-        {/* Table header bar */}
+        {/* ── Table header bar ─────────────────────────────────────────────── */}
         <div
           style={{
             padding: "18px 22px",
@@ -82,7 +98,7 @@ export function PricingTable({
           </span>
         </div>
 
-        {/* Scrollable table */}
+        {/* ── Scrollable table ─────────────────────────────────────────────── */}
         <div style={{ overflowX: "auto" }}>
           <table
             style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}
@@ -94,8 +110,9 @@ export function PricingTable({
                   borderBottom: "1px solid #f0f0f0",
                 }}
               >
+                {/* Column header label adapts: "Apartment type" vs "Office size" */}
                 <ColHead align="left" px={20}>
-                  {t("apartmentType")}
+                  {isOffice ? t("office.chooseSpace") : t("apartmentType")}
                 </ColHead>
                 <ColHead align="left" px={12}>
                   {t("size")}
@@ -120,7 +137,7 @@ export function PricingTable({
             </thead>
 
             <tbody>
-              {APARTMENT_TYPES.map((apt, i) => {
+              {rowTypes.map((apt, i) => {
                 const price = getPrice(plan, i, showDeducted);
                 const isCurrent = apt.key === selectedApt.key;
                 const rowBg = isCurrent
@@ -149,8 +166,9 @@ export function PricingTable({
                       {isCurrent && <span style={{ marginRight: 6 }}>▶</span>}
                       {t(`apartments.${apt.labelKey}`)}
                     </td>
+
                     <td style={mutedCell}>{apt.size}</td>
-                    <td style={mutedCell}>{plan?.durations[i]}</td>
+                    <td style={mutedCell}>{plan.durations[i]}</td>
 
                     {showCleaners && plan.cleaners && (
                       <td style={mutedCell}>
@@ -172,7 +190,7 @@ export function PricingTable({
                         color: "#0a1628",
                       }}
                     >
-                      €{price}
+                      {price !== null ? `€${price}` : "—"}
                     </td>
                   </tr>
                 );
@@ -182,14 +200,19 @@ export function PricingTable({
         </div>
       </div>
 
-      <p style={{ fontSize: 12, color: "rgba(10,22,40,0.35)", marginTop: 10 }}>
-        {t("saunaAddonNote")}
-      </p>
+      {/* Footnote — hidden for office (sauna note isn't relevant) */}
+      {!isOffice && (
+        <p
+          style={{ fontSize: 12, color: "rgba(10,22,40,0.35)", marginTop: 10 }}
+        >
+          {t("saunaAddonNote")}
+        </p>
+      )}
     </div>
   );
 }
 
-// ─── Local helpers ────────────────────────────────────────────────────────────
+// ── Local helpers ─────────────────────────────────────────────────────────────
 
 function ColHead({ children, align, px }: ColHeadProps) {
   return (

@@ -2,21 +2,20 @@
 
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
 import { PillToggle } from "./PillToggle";
 
 type PricingHeaderProps = {
   locale: "en" | "fi";
-  serviceType: "maintenance" | "deep";
+  serviceType: "maintenance" | "deep" | "moveout" | "office";
   showDeducted: boolean;
   onLocale: () => void;
   onServiceChange: (index: number) => void;
   onVatChange: (index: number) => void;
 };
 
-// ─── TrustBar ─────────────────────────────────────────────────────────────────
 function TrustBar() {
   const t = useTranslations("pricing");
-
   const icons = ["✦", "◈", "⬡", "◇"];
   const keys = [
     "trustBadge1",
@@ -40,7 +39,6 @@ function TrustBar() {
   );
 }
 
-// ─── PricingHeader ────────────────────────────────────────────────────────────
 export function PricingHeader({
   serviceType,
   showDeducted,
@@ -48,6 +46,9 @@ export function PricingHeader({
   onVatChange,
 }: PricingHeaderProps) {
   const t = useTranslations("pricing");
+  const pathname = usePathname();
+
+  const isOfficePage = pathname.endsWith("/pricing/office-cleaning");
 
   return (
     <div className="relative overflow-hidden pb-12">
@@ -65,29 +66,27 @@ export function PricingHeader({
 
       {/* Content */}
       <div className="relative z-10 mx-auto max-w-225 px-5 pt-24 text-center">
-        {/* Title */}
         <h1 className="mb-2 text-4xl font-black leading-tight tracking-[-1px] text-white md:text-5xl">
           {t("title")}
         </h1>
 
-        {/* Subtitle */}
         <p className="mb-7 text-base text-white/85">{t("subtitle")}</p>
 
-        {/* Toggles */}
-        <div className="flex flex-col items-center gap-3">
-          <PillToggle
-            options={[t("serviceToggle.0"), t("serviceToggle.1")]}
-            selected={serviceType === "maintenance" ? 0 : 1}
-            onChange={onServiceChange}
-          />
-
-          <PillToggle
-            options={[t("vatToggle.0"), t("vatToggle.1")]}
-            selected={showDeducted ? 1 : 0}
-            onChange={onVatChange}
-            small
-          />
-        </div>
+        {!isOfficePage && (
+          <div className="flex flex-col items-center gap-3">
+            <PillToggle
+              options={[t("serviceToggle.0"), t("serviceToggle.1")]}
+              selected={serviceType === "maintenance" ? 0 : 1}
+              onChange={onServiceChange}
+            />
+            <PillToggle
+              options={[t("vatToggle.0"), t("vatToggle.1")]}
+              selected={showDeducted ? 1 : 0}
+              onChange={onVatChange}
+              small
+            />
+          </div>
+        )}
 
         <TrustBar />
       </div>
