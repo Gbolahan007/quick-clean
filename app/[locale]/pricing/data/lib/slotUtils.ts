@@ -20,9 +20,6 @@ export function formatTime(dbTime: string): string {
   return dbTime.slice(0, 5);
 }
 
-/**
- * Returns ISO date string for today + daysAhead days (local time).
- */
 export function isoDateOffset(daysAhead: number): string {
   const d = new Date();
   d.setDate(d.getDate() + daysAhead);

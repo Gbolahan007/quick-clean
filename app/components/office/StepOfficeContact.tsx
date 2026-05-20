@@ -1,6 +1,3 @@
-// app/components/office/StepOfficeContact.tsx
-// Identical UI to StepContact but reads/writes useOfficeBookingStore,
-// not useBookingStore — so office booking state stays isolated.
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";

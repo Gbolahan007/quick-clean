@@ -1,9 +1,4 @@
 "use server";
-// actions/submitOfficeBooking.ts
-// Server action for office booking — extends existing submitBookingAction pattern.
-// Reuses: customers, addresses tables.
-// Extends: bookings table (office columns).
-// New: office_schedule_rules table.
 
 import { createClient } from "@supabase/supabase-js";
 import { officeBookingSubmitSchema } from "../schema/officeBooking";
@@ -106,7 +101,7 @@ export async function submitOfficeBookingAction(
         city: data.city,
         postal_code: data.postalCode,
         square_meters: data.officeSizeSqm,
-        number_of_rooms: Math.ceil(data.officeSizeSqm / 25), // estimated rooms
+        number_of_rooms: Math.ceil(data.officeSizeSqm / 25),
         access_instructions: data.accessInstructions ?? null,
         is_default: true,
       })
@@ -131,8 +126,7 @@ export async function submitOfficeBookingAction(
     }
 
     // ── 6. Duplicate office booking guard ──────────────────────────────────
-    // Office bookings are recurring contracts — prevent double-contracting
-    // the same customer for the same service at the same address.
+
     const { data: duplicate } = await supabase
       .from("bookings")
       .select("id")
@@ -152,15 +146,12 @@ export async function submitOfficeBookingAction(
     }
 
     // ── 7. Determine first booking_date ────────────────────────────────────
-    // Use the first scheduled day starting at least 14 days out.
-    // This gives the team time to confirm before the first visit.
+
     const firstBookingDate = getFirstScheduledDate(data.recurringRules);
     const defaultStartTime = data.recurringRules[0]?.startTime ?? "08:00";
 
     // ── 8. Insert booking ──────────────────────────────────────────────────
-    // Only writes columns that exist in the schema.
-    // Skipped for MVP: workspace_type, staff_count, pricing_tier
-    // Add those columns to the schema migration before writing them here.
+
     const serverMonthly = serverPricing.finalMonthly + data.addonsMonthlyTotal;
     const serverBasePrice = serverPricing.monthlyCost;
 
@@ -171,7 +162,7 @@ export async function submitOfficeBookingAction(
         customer_id: customerId,
         service_id: serviceRecord.id,
         address_id: addressRecord.id,
-        subscription_plan_id: null, // Stripe subscription created separately
+        subscription_plan_id: null,
 
         // ── Scheduling ─────────────────────────────────────────────────────
         booking_date: firstBookingDate,
@@ -190,11 +181,11 @@ export async function submitOfficeBookingAction(
         service_type: "office",
         plan_key: data.planKey,
         plan_label: data.planLabel,
-        show_deducted: false, // no household deduction for office
+        show_deducted: false,
 
         // ── Apartment snapshot (repurposed for office context) ─────────────
         apartment_key: "office",
-        apartment_label: `${data.officeSizeSqm} m²`, // size as the label
+        apartment_label: `${data.officeSizeSqm} m²`,
         apartment_size: `${data.officeSizeSqm} m²`,
 
         // ── Addons snapshot ────────────────────────────────────────────────

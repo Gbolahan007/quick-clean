@@ -5,7 +5,7 @@ import { PricingHeader } from "../components/PricingHeader";
 import { PricingStoreProvider } from "../components/PricingStoreProvider";
 import { useOfficePricingState } from "../hooks/useOfficePricingState";
 import { TierIndicator } from "@/app/components/office/TierIndicator";
-import { OfficeSizeSelector } from "@/app/components/office/OfficeSizeSelector";
+// import { OfficeSizeSelector } from "@/app/components/office/OfficeSizeSelector";
 import { ScheduleSelector } from "@/app/components/office/ScheduleSelector";
 import { SurchargeToggle } from "@/app/components/office/SurchargeToggle";
 import { AddonsSelector } from "@/app/components/office/AddonsSelector";
@@ -30,7 +30,7 @@ function OfficePricingPageInner({ localeProp }: Props) {
     addonsTotal,
     pricing,
     handleHoursChange,
-    setSelectedSpace,
+    // setSelectedSpace,
     setSchedule,
     setHasSurcharge,
     toggleAddon,
@@ -85,12 +85,12 @@ function OfficePricingPageInner({ localeProp }: Props) {
               <TierIndicator activeTier={pricing?.tier ?? "tier1"} />
             </Card>
 
-            <Card>
+            {/* <Card>
               <OfficeSizeSelector
                 selected={selectedSpace}
                 onSelect={setSelectedSpace}
               />
-            </Card>
+            </Card> */}
 
             <Card>
               <ScheduleSelector selected={schedule} onSelect={setSchedule} />

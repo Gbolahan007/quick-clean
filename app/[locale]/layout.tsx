@@ -6,7 +6,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import { notFound } from "next/navigation";
-import Footer from "../components/Footer";
+import { GlobalFooterWrapper } from "../components/GlobalFooterWrapper";
 import Header from "../components/Header";
 import "./globals.css";
 
@@ -110,7 +110,7 @@ export default async function RootLayout({
           <div className={`${monserrat.className} `}>
             <Header />
             {children}
-            <Footer />
+            <GlobalFooterWrapper />
           </div>
         </NextIntlClientProvider>
       </body>

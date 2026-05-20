@@ -1,4 +1,3 @@
-// hooks/usePricingState.ts
 "use client";
 
 import { usePricingSelectors } from "./usePricingStore";

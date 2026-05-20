@@ -461,6 +461,7 @@
       "companyPlaceholder": "Esimerkki Oy",
       "companyHint": "Jätä tyhjäksi henkilökohtaisille varauksille",
       "next": "Jatka →",
+      "back": "← Takaisin",
       "errors": {
         "required": "Tämä kenttä on pakollinen",
         "minLength": "Vähintään {n} merkkiä",

@@ -265,7 +265,7 @@ export function OfficeBookingPageClient({ localeProp }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8faf9] ">
+    <div className="min-h-screen  bg-[#f8faf9] ">
       {/* Top bar */}
       <div className="border-b border-gray-200 bg-white px-5 py-4 pt-28">
         <div className="mx-auto max-w-5xl flex items-center gap-4">

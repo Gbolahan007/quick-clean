@@ -458,6 +458,7 @@
       "companyPlaceholder": "Acme Oy",
       "companyHint": "Leave empty for personal bookings",
       "next": "Continue →",
+      "back": "← Back",
       "errors": {
         "required": "This field is required",
         "minLength": "Must be at least {n} characters",

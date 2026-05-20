@@ -1,4 +1,3 @@
-// hooks/useAddonState.ts
 "use client";
 
 import { useMemo, useEffect, useCallback } from "react";
@@ -17,15 +16,6 @@ type AddonSummary = {
 
 type OnChange = (summary: AddonSummary) => void;
 
-/**
- * useAddonState — Zustand-backed version.
- *
- * The public API (qtyMap, toggle, decrement, increment, summary) is
- * identical to the original hook so AddonsSection needs no changes.
- *
- * qtyMap now lives in the Zustand store (persisted) instead of local
- * useState, so add-on selections survive refresh and navigation.
- */
 export function useAddonState(showDeducted: boolean, onChange?: OnChange) {
   const addonQtyMap = usePricingStore((s) => s.addonQtyMap);
   const setAddonQtyMap = usePricingStore((s) => s.setAddonQtyMap);
@@ -39,7 +29,6 @@ export function useAddonState(showDeducted: boolean, onChange?: OnChange) {
     [addonQtyMap, showDeducted],
   );
 
-  // Notify parent whenever totals change (mirrors original behaviour)
   useEffect(() => {
     onChange?.(summary);
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -96,7 +96,7 @@ export function useOfficePricingState({
       confirmedBookingId: null,
     });
 
-    router.push(`/${locale}/office-cleaning`);
+    router.push(`/${locale}/pricing/office-cleaning-booking`);
   }, [pricing, weeklyHours, hasSurcharge, selectedSpace, locale, router]);
 
   return {
