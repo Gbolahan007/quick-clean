@@ -36,10 +36,7 @@ export const useBookingStore = create<BookingState & BookingActions>()(
       ...INITIAL_STATE,
 
       // ── Init ───────────────────────────────────────────────────────────────
-      // Called from "Book Now" on the pricing page.
-      // Only resets step data if this is a brand-new booking (no pricing yet),
-      // OR if the user is booking a DIFFERENT service than last time.
-      // This prevents wiping mid-flow state on a re-render.
+
       initBooking: (snapshot: PricingSnapshot) => {
         const current = get();
         const isNewBooking =

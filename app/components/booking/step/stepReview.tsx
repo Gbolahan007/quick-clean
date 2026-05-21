@@ -24,7 +24,7 @@ export function StepReview() {
   if (!pricing) return null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 border-4">
       <div>
         <h2 className="text-xl font-extrabold text-[#0a1628] tracking-tight">
           {t("title")}
