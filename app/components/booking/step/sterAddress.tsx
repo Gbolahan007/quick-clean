@@ -29,16 +29,12 @@ export function StepAddress() {
       apartmentNumber: address.apartmentNumber ?? "",
       city: address.city ?? "",
       postalCode: address.postalCode ?? "",
-      // Pre-fill from saved address first, fall back to pricing snapshot.
-      // z.preprocess handles string → number conversion so no valueAsNumber needed.
       squareMeters: address.squareMeters ?? pricing?.apartment.squareMeters,
       numberOfRooms: address.numberOfRooms ?? pricing?.apartment.numberOfRooms,
       accessInstructions: address.accessInstructions ?? "",
     },
   });
 
-  // Re-run reset once pricing hydrates from localStorage (Zustand persist).
-  // Ensures fields are populated even if the store wasn't ready on first render.
   useEffect(() => {
     if (!pricing) return;
 
@@ -47,13 +43,10 @@ export function StepAddress() {
       apartmentNumber: address.apartmentNumber ?? "",
       city: address.city ?? "",
       postalCode: address.postalCode ?? "",
-      // Saved address value takes priority over pricing snapshot
       squareMeters: address.squareMeters ?? pricing.apartment.squareMeters,
       numberOfRooms: address.numberOfRooms ?? pricing.apartment.numberOfRooms,
       accessInstructions: address.accessInstructions ?? "",
     });
-    // Only run when pricing first becomes available — not on every address change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pricing?.apartment.key]);
 
   const onSubmit = (data: AddressSchema) => saveAddress(data);
@@ -76,11 +69,11 @@ export function StepAddress() {
           {...register("streetAddress")}
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
           <Input
             label={t("apartment")}
             placeholder="A 14"
-            hint={t("apartmentHint")}
+            // hint={t("apartmentHint")}
             error={errors.apartmentNumber?.message}
             {...register("apartmentNumber")}
           />
@@ -101,25 +94,26 @@ export function StepAddress() {
           {...register("city")}
         />
 
-        {/* Pre-filled from apartment selection — user can correct if needed */}
+        {/* Pre-filled from apartment selection — read-only so the user
+            can't accidentally change values that were set during pricing. */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label={t("squareMeters")}
             type="number"
-            placeholder={String(pricing?.apartment.squareMeters ?? 65)}
-            required
             hint={t("squareMetersHint")}
             error={errors.squareMeters?.message}
-            {...register("squareMeters")}
+            readOnly
+            className="bg-gray-50 text-gray-500 cursor-not-allowed"
+            {...register("squareMeters", { valueAsNumber: true })}
           />
           <Input
             label={t("numberOfRooms")}
             type="number"
-            placeholder={String(pricing?.apartment.numberOfRooms ?? 3)}
-            required
             hint={t("numberOfRoomsHint")}
             error={errors.numberOfRooms?.message}
-            {...register("numberOfRooms")}
+            readOnly
+            className="bg-gray-50 text-gray-500 cursor-not-allowed"
+            {...register("numberOfRooms", { valueAsNumber: true })}
           />
         </div>
 

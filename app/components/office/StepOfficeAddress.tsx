@@ -1,7 +1,3 @@
-// app/components/office/StepOfficeAddress.tsx
-// Same UI as StepAddress but reads/writes useOfficeBookingStore.
-// squareMeters pre-fills from officeSizeSqm selected in StepOfficeDetails.
-// numberOfRooms is estimated (officeSizeSqm / 25) — user can correct.
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
