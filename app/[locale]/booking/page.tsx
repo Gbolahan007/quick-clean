@@ -37,7 +37,7 @@ export default function BookingPage({ params }: BookingPageProps) {
 
   useEffect(() => {
     if (!pricing && !confirmedBookingId) {
-      router.replace(`/${locale}/pricing`);
+      router.replace(`/${locale}`);
     }
   }, [pricing, confirmedBookingId, router, locale]);
 
@@ -64,7 +64,7 @@ export default function BookingPage({ params }: BookingPageProps) {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4 ">
           <button
             type="button"
-            onClick={() => router.push(`/${locale}/pricing`)}
+            onClick={() => router.back()}
             className={[
               "flex cursor-pointer items-center gap-2 text-sm text-gray-500",
               "hover:text-[#0a1628] transition-colors",

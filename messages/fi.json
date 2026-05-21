@@ -291,8 +291,56 @@
         "Ilta- ja viikonloppusiivous saatavilla +15% lisämaksulla (neuvoteltavissa Taso 3 -sopimuksille)",
         "Vähimmäissopimus: 1 kuukausi 2 kuukauden irtisanomisajalla"
       ]
+    },
+    "index": {
+      "hero": {
+        "eyebrow": "Selkeä, rehellinen hinnoittelu",
+        "title": "Siistit tilat,\nselkeät hinnat.",
+        "subtitle": "Valitse palvelu, joka sopii tilaasi. Jokaiseen pakettiin kuuluu tarkastetut ammattilaiset, joustava aikataulutus ja ei piilomaksuja."
+      },
+      "services": {
+        "homeCleaning": {
+          "title": "Kodinsiivous",
+          "description": "Toistuva hoito, joka pitää kotisi raikkaana ja mukavana — viikosta toiseen.",
+          "startingFrom": "Alkaen €89 / käynti",
+          "features": [
+            "Viikoittain, joka toinen viikko tai kuukausittain",
+            "Sama siivooja aina kun mahdollista",
+            "Kotitalousvähennysoikeus"
+          ],
+          "cta": "Katso hinnat"
+        },
+        "officeCleaning": {
+          "title": "Toimistosiivous",
+          "description": "Volyymipohjainen toistuvat sopimukset erikokoisille toimitiloille.",
+          "startingFrom": "Alkaen €49 / tunti",
+          "features": [
+            "Tasohinnoittelu — enemmän tunteja, alempi hinta",
+            "Joustava aikataulutus",
+            "Vähintään 1 kuukauden sopimus"
+          ],
+          "cta": "Katso hinnat"
+        },
+        "moveOutCleaning": {
+          "title": "Muuttosiivous",
+          "description": "Kertaluonteinen tarkastuskelpoinen siivous suomalaisille vuokranantajavaatimuksille.",
+          "startingFrom": "Alkaen €158 / käynti",
+          "features": [
+            "Tarkastuskelpoinen standardi",
+            "Kotitalousvähennysoikeus",
+            "Varaa 3 päivää etukäteen"
+          ],
+          "cta": "Katso hinnat"
+        }
+      },
+      "trust": {
+        "secure": "Turvallinen varaus",
+        "verified": "Tarkastetut ammattilaiset",
+        "flexible": "Joustava aikataulutus"
+      }
     }
   },
+
   "officeBooking": {
     "pageTitle": "Toimistosiivoussopimus",
     "backToPricing": "Takaisin toimistohinnoitteluun",
@@ -1049,5 +1097,61 @@
     "rights": "Kaikki oikeudet pidätetään.",
     "privacy": "Tietosuojaseloste",
     "terms": "Käyttöehdot"
+  },
+  "about": {
+    "hero": {
+      "title": "Tarina QuickCleanin takana",
+      "subtitle": "Puhtaan kodin ei pitäisi olla näin vaikea löytää.",
+      "cta": "Katso suunnitelmat ja hinnat"
+    },
+    "story": {
+      "eyebrow": "Miten kaikki alkoi",
+      "paragraphs": [
+        "Kun muutin Suomeen loppuvuodesta 2023, aloitin puhtaus- ja kiinteistöpalvelualan tutkinnon TAKKissa Tampereella. Opiskelun ja osa-aikatyön välissä huomasin nopeasti tutun ongelman — aikaa oman asunnon kunnolliseen siivoamiseen ei yksinkertaisesti ollut.",
+        "Ihmiselle, joka arvostaa järjestystä ja puhtautta, se oli henkisesti kuormittavaa. Ajattelin: en voi olla ainoa, joka kamppailee tämän kanssa.",
+        "Aloin kysellä ympäriltäni. Kiireiset ammattilaiset, lapsiperheet, kahden työssäkäyvän taloudet — sama tarina toistui kerta toisensa jälkeen. Ihmiset halusivat apua, mutta vaihtoehdot eivät olleet hyviä. Suurin osa Tampereen siivousyrityksistä käsittelee kotisiivousta sivupalveluna.",
+        "Näin aukon, jolla oli väliä. Ei pelkästään liiketoimintamahdollisuus — vaan todellinen, arkinen ongelma, joka ansaitsi kunnollisen ratkaisun. Niin QuickClean syntyi."
+      ]
+    },
+    "principles": {
+      "eyebrow": "Rakennettu kolmen periaatteen varaan",
+      "items": [
+        {
+          "title": "Sama siivooja joka kerta.",
+          "body": "Sinun ei pitäisi joutua selittämään kotiasi eri ihmiselle joka käynnillä. Asiakkaamme saavat oman vakituisen siivoojan, joka oppii tuntemaan tilasi, toiveesi ja vaatimuksesi. Johdonmukaisuus ei ole lisäetu — se on perusta."
+        },
+        {
+          "title": "Ammattimaisesti koulutettu, asianmukaisesti tuettu.",
+          "body": "Jokainen siivoojamme on koulutettu yhteistyökumppaneidemme TAKKin ja Tredun kautta. He ovat tarkistettuja, vakuutettuja ja työskentelevät reiluissa olosuhteissa asianmukaisella tuella. Kun sanomme ammattimainen, tarkoitamme sitä sen täydessä merkityksessä."
+        },
+        {
+          "title": "Paikallisesti juurtunut, paikallisesti sitoutunut.",
+          "body": "Palkkaamme Tampereella. Koulutamme Tampereella. Palvelemme Tampereella. Tämä ei ole franchising tai alusta, joka yhdistää sinut tuntemattomiin työntekijöihin. Se on paikallinen palvelu, jonka on rakentanut täällä asuva ihminen, täällä asuville ihmisille."
+        }
+      ]
+    },
+    "founder": {
+      "eyebrow": "Tutustu perustajaan",
+      "name": "Jubril Olalekan",
+      "role": "Perustaja, QuickClean",
+      "bio": "Olen puhtaus- ja kiinteistöpalvelualan ammattilainen, kouluttautunut TAKKissa Tampereella. Ennen QuickCleanin perustamista työskentelin alalla ruohonjuuritasolta — en toimistolta käsin, vaan välineet kädessä. Tuo näkökulma muovaa kaikkea yrityksen toiminnassa: miten koulutamme, miten kohtelemme tiimiämme ja miten toteutamme palvelun.",
+      "mission": "Perustin QuickCleanin, koska uskon, että jokainen ansaitsee puhtaan kodin ilman sen ylläpitämisen stressiä. Ja uskon, että palvelun tarjoavat ihmiset ansaitsevat reilut ja ammattimaiset työolot.",
+      "contact": "Jos sinulla on kysyttävää palvelustamme, minut tavoittaa aina osoitteesta",
+      "email": "hello@quickclean.fi",
+      "imageAlt": "Jubril Olalekan, QuickCleanin perustaja"
+    },
+    "tampere": {
+      "eyebrow": "Tehty Tampereella",
+      "body": "QuickClean on tamperelainen yritys. Siivoojamme asuvat täällä. Koulutuskumppanimme — TAKK ja Tredu — ovat täällä. Kotitaloudet ja yritykset, joita palvelemme, ovat täällä. Rakennamme jotain tälle yhteisölle, ja aiomme olla täällä pitkään."
+    },
+    "cta": {
+      "title": "Katso, miltä rauhallisempi koti näyttää.",
+      "button": "Katso suunnitelmat ja hinnat"
+    },
+    "trust": {
+      "secure": "Turvallinen varaus",
+      "verified": "Tarkastetut ammattilaiset",
+      "flexible": "Joustava aikataulutus"
+    }
   }
 }

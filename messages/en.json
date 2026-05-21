@@ -239,7 +239,7 @@
       "estimateEmptyHint": "Set your weekly hours to begin",
       "estimateLive": "Live estimate",
       "estimateWeeklyCost": "Weekly cost",
-      "estimateMonthly": "Monthly base (×4.2)",
+      "estimateMonthly": "Monthly base (×4.33)",
       "estimateSurcharge": "Evening/weekend surcharge (+15%)",
       "estimateAddons": "Add-ons (estimate)",
       "estimateTotal": "Total monthly",
@@ -288,8 +288,56 @@
         "Evening and weekend cleaning available at +15% surcharge (negotiable for Tier 3)",
         "Minimum contract: 1 month with 2-month notice period"
       ]
+    },
+    "index": {
+      "hero": {
+        "eyebrow": "Simple, honest pricing",
+        "title": "Clean spaces,\nclear prices.",
+        "subtitle": "Choose the service that fits your space. Every plan includes vetted professionals, flexible scheduling, and no hidden fees."
+      },
+      "services": {
+        "homeCleaning": {
+          "title": "Home Cleaning",
+          "description": "Recurring care that keeps your home fresh and comfortable — week after week.",
+          "startingFrom": "From €89 / visit",
+          "features": [
+            "Weekly, bi-weekly or monthly",
+            "Same cleaner when possible",
+            "Household tax deduction eligible"
+          ],
+          "cta": "See pricing"
+        },
+        "officeCleaning": {
+          "title": "Office Cleaning",
+          "description": "Volume-based recurring contracts for workspaces of any size.",
+          "startingFrom": "From €49 / hour",
+          "features": [
+            "Tier pricing — more hours, lower rate",
+            "Flexible scheduling",
+            "Minimum 1-month contract"
+          ],
+          "cta": "See pricing"
+        },
+        "moveOutCleaning": {
+          "title": "Move-Out Cleaning",
+          "description": "One-time inspection-ready clean meeting Finnish landlord requirements.",
+          "startingFrom": "From €158 / visit",
+          "features": [
+            "Inspection-ready standard",
+            "Household tax deduction eligible",
+            "Book 3 days in advance"
+          ],
+          "cta": "See pricing"
+        }
+      },
+      "trust": {
+        "secure": "Secure booking",
+        "verified": "Verified professionals",
+        "flexible": "Flexible scheduling"
+      }
     }
   },
+
   "officeBooking": {
     "pageTitle": "Office Cleaning Contract",
     "backToPricing": "Back to office pricing",
@@ -1050,5 +1098,62 @@
     "rights": "All rights reserved.",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service"
+  },
+
+  "about": {
+    "hero": {
+      "title": "The story behind QuickClean",
+      "subtitle": "A cleaner home shouldn't be this hard to find.",
+      "cta": "View plans & pricing"
+    },
+    "story": {
+      "eyebrow": "How it started",
+      "paragraphs": [
+        "When I moved to Finland in late 2023, I enrolled in the cleaning and property maintenance programme at TAKK in Tampere. Between coursework and a part-time job, I quickly found myself in a familiar trap — too busy to properly take care of my own apartment.",
+        "For someone who genuinely values a clean, organised home, it was mentally draining. I kept thinking: I can't be the only one dealing with this.",
+        "So I started asking around. Busy professionals, working families with young kids, dual-income households — the same story came up again and again. People wanted help, but the options weren't great. Most cleaning companies in the Tampere area treat home cleaning as a secondary service. Their real focus is large commercial contracts.",
+        "I saw a gap that mattered. Not just a business opportunity — a real, everyday problem that deserved a proper solution. That's how QuickClean started."
+      ]
+    },
+    "principles": {
+      "eyebrow": "Built on three principles",
+      "items": [
+        {
+          "title": "The same cleaner, every time.",
+          "body": "You shouldn't have to explain your home to a different person each visit. Our customers are matched with a dedicated cleaner who learns your space, your preferences, and your standards. Consistency isn't a bonus — it's the foundation."
+        },
+        {
+          "title": "Professionally trained, properly supported.",
+          "body": "Every cleaner on our team is trained through our partner institutions, TAKK and Tredu. They are vetted, insured, and work under fair conditions with proper support. When we say professional, we mean it in the fullest sense."
+        },
+        {
+          "title": "Locally rooted, locally committed.",
+          "body": "We hire locally. We train locally. We serve the city where we are located. This isn't a franchise or a platform connecting you to anonymous workers. It's a local service, built for locals."
+        }
+      ]
+    },
+    "founder": {
+      "eyebrow": "Meet the founder",
+      "name": "Jubril Olalekan",
+      "role": "Founder, QuickClean",
+      "bio": "I'm a cleaning and property maintenance professional, trained at TAKK in Tampere. Before starting QuickClean, I worked in the industry from the ground up — not from a desk, but with the equipment in hand. That perspective shapes everything about how this company operates: how we train, how we treat our team, and how we deliver the service.",
+      "mission": "I started QuickClean because I believe everyone deserves a clean home without the stress of maintaining it alone. And I believe the people who provide that service deserve to work in fair, professional conditions.",
+      "contact": "If you have questions about our service, I'm always reachable at",
+      "email": "hello@quickclean.fi",
+      "imageAlt": "Jubril Olalekan, Founder of QuickClean"
+    },
+    "tampere": {
+      "eyebrow": "Made in Tampere",
+      "body": "QuickClean is a Tampere company. Our cleaners live here. Our training partners — TAKK and Tredu — are here. The households and businesses we serve are here. We're building something for this community, and we plan to be here for a long time."
+    },
+    "cta": {
+      "title": "See what a calmer home looks like.",
+      "button": "View plans & pricing"
+    },
+    "trust": {
+      "secure": "Secure booking",
+      "verified": "Verified professionals",
+      "flexible": "Flexible scheduling"
+    }
   }
 }

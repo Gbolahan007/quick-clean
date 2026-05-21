@@ -53,7 +53,7 @@ export default function TrustSection() {
           {/* Left: Image */}
           <div className="relative h-96 lg:h-112.5 rounded-2xl overflow-hidden shadow-lg order-2 lg:order-1">
             <Image
-              src="/cleaning9.JPG"
+              src="/cleaning2.JPG"
               alt="Clean folded towels and plant"
               fill
               className="object-cover"

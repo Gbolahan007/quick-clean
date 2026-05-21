@@ -38,8 +38,6 @@ function PricingPageInner({ localeProp }: Props) {
     handleVatChange,
   } = usePricingState(localeProp);
 
-  // Derive the AddonsSummary shape that SummaryBar and AddonsSection expect.
-  // This is computed here (not stored) so it's always fresh and in sync.
   const addonsSummary = useMemo(
     () => ({
       ...calcAddonTotals(addonQtyMap, showDeducted),
@@ -48,8 +46,6 @@ function PricingPageInner({ localeProp }: Props) {
     [addonQtyMap, showDeducted],
   );
 
-  // AddonsSection calls onChange(summary) — we extract the qtyMap and
-  // persist only that back into the store (totals are always re-derived).
   const handleAddonsChange = (summary: typeof addonsSummary) => {
     setAddonQtyMap(summary.qtyMap);
   };

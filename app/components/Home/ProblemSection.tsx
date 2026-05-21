@@ -1,26 +1,24 @@
-"use client";
-
 import { useTranslations } from "next-intl";
 import { Briefcase, Calendar, Brain } from "lucide-react";
 
 export default function ProblemSection() {
-  const t = useTranslations("landing.problem");
+  const t = useTranslations("landing");
 
   const painPoints = [
     {
       icon: Briefcase,
-      title: t("workdays.title"),
-      subtitle: t("workdays.subtitle"),
+      title: t("problem.workdays.title"),
+      subtitle: t("problem.workdays.subtitle"),
     },
     {
       icon: Calendar,
-      title: t("weekends.title"),
-      subtitle: t("weekends.subtitle"),
+      title: t("problem.weekends.title"),
+      subtitle: t("problem.weekends.subtitle"),
     },
     {
       icon: Brain,
-      title: t("mental.title"),
-      subtitle: t("mental.subtitle"),
+      title: t("problem.mental.title"),
+      subtitle: t("problem.mental.subtitle"),
     },
   ];
 
@@ -30,7 +28,7 @@ export default function ProblemSection() {
         {/* Headline */}
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-black mb-6 leading-tight">
-            {t("headline")}
+            {t("problem.headline")}
           </h2>
         </div>
 
@@ -43,27 +41,29 @@ export default function ProblemSection() {
                 key={index}
                 className="flex flex-col items-center text-center"
               >
-                {/* Icon */}
                 <div className="mb-4">
                   <Icon className="h-12 w-12 text-black" strokeWidth={1.5} />
                 </div>
-
-                {/* Title */}
                 <h3 className="text-lg font-bold text-black mb-2">
                   {point.title}
                 </h3>
-
-                {/* Subtitle */}
                 <p className="text-base text-black">{point.subtitle}</p>
               </div>
             );
           })}
         </div>
 
+        {/* Positive pivot — benefits.4 */}
+        <div className="text-center mb-8">
+          <p className="inline-block text-lg font-semibold text-black border-b-2 border-black pb-1">
+            {t("transformation.benefits.4")}
+          </p>
+        </div>
+
         {/* Bottom Text */}
         <div className="text-center">
           <p className="text-lg text-black leading-relaxed max-w-3xl mx-auto">
-            {t("conclusion")}
+            {t("problem.conclusion")}
           </p>
         </div>
       </div>

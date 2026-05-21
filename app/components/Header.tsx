@@ -360,7 +360,7 @@ function HeaderContent() {
               </>
             )}
             <Link
-              href="/book"
+              href="/pricing"
               className={`${isFinnish ? "px-5 py-2.5 text-sm" : "px-6 py-3"} bg-[#7c9885] text-white rounded-full hover:bg-[#435247] font-semibold shadow-md hover:shadow-lg transition-all`}
             >
               {t("nav.cta")}
@@ -504,13 +504,13 @@ function HeaderContent() {
               )}
             </div>
 
-            <Link
+            {/* <Link
               href="/contact"
               className="block py-2 text-gray-700 font-medium hover:text-[#7c9885]"
               onClick={handleMobileClick}
             >
               {t("nav.quote")}
-            </Link>
+            </Link> */}
 
             <MobileLanguagePill locale={locale} onSwitch={switchLocale} />
 
@@ -542,7 +542,7 @@ function HeaderContent() {
                 </>
               )}
               <Link
-                href="/book"
+                href="/pricing"
                 className="block w-full px-4 py-3 text-center bg-[#7c9885] text-white rounded-lg font-semibold shadow-md hover:bg-[#435247] transition-all"
                 onClick={handleMobileClick}
               >

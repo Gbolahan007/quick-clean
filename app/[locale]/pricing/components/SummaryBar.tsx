@@ -61,7 +61,6 @@ export function SummaryBar({
       const addon = ADDONS.find((a) => a.key === key);
       if (!addon) return null;
       const label = t(`addons.${addon.labelKey}.label`);
-      // For per-load addons (e.g. laundry), append the quantity
       return qty > 1 ? `${label} ×${qty}` : label;
     })
     .filter(Boolean) as string[];

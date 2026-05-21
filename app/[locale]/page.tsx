@@ -13,12 +13,12 @@ export default function HomePage() {
     <main>
       <HeroSection />
       <ProblemSection />
-      <TransformationSection />
+      {/* <TransformationSection /> */}
       <HowItWorksSection />
-      <TrustSection />
       <SubscriptionSection />
+      <TrustSection />
       <ServicesOverviewSection />
-      <TestimonialsSection />
+      {/* <TestimonialsSection /> */}
       <FinalCtaSection />
     </main>
   );
