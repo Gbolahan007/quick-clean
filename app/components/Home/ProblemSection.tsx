@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { Briefcase, Calendar, Brain } from "lucide-react";
+import { Briefcase, Calendar, Brain, Sofa } from "lucide-react";
 
 export default function ProblemSection() {
   const t = useTranslations("landing");
@@ -20,6 +20,11 @@ export default function ProblemSection() {
       title: t("problem.mental.title"),
       subtitle: t("problem.mental.subtitle"),
     },
+    {
+      icon: Sofa,
+      title: t("problem.calm.title"),
+      subtitle: t("problem.calm.subtitle"),
+    },
   ];
 
   return (
@@ -32,8 +37,8 @@ export default function ProblemSection() {
           </h2>
         </div>
 
-        {/* Three Column Grid */}
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
+        {/* Four Column Grid */}
+        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12">
           {painPoints.map((point, index) => {
             const Icon = point.icon;
             return (
@@ -47,18 +52,20 @@ export default function ProblemSection() {
                 <h3 className="text-lg font-bold text-black mb-2">
                   {point.title}
                 </h3>
-                <p className="text-base text-black">{point.subtitle}</p>
+                {point.subtitle && (
+                  <p className="text-base text-black">{point.subtitle}</p>
+                )}
               </div>
             );
           })}
         </div>
 
         {/* Positive pivot — benefits.4 */}
-        <div className="text-center mb-8">
+        {/* <div className="text-center mb-8">
           <p className="inline-block text-lg font-semibold text-black border-b-2 border-black pb-1">
             {t("transformation.benefits.4")}
           </p>
-        </div>
+        </div> */}
 
         {/* Bottom Text */}
         <div className="text-center">

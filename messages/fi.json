@@ -897,6 +897,7 @@
       "ctaSecondary": "Miten se toimii",
       "trustText": "Kiireisten kotitalouksien luottama palvelu Tampereella"
     },
+
     "problem": {
       "headline": "Aikasi ei saisi hävitä kotitöihin.",
       "workdays": {
@@ -911,8 +912,13 @@
         "title": "Henkinen kuorma ei",
         "subtitle": "koskaan oikein sammukaan."
       },
+      "calm": {
+        "title": "Nauti rauhallisesta,",
+        "subtitle": "järjestyksessä olevasta kodista joka päivä."
+      },
       "conclusion": "Kotisi pitäisi auttaa sinua rentoutumaan — ei muistuttaa sinua odottavasta tehtävästä."
     },
+
     "transformation": {
       "headline": "Kuvittele tulevasi kotiin, jossa kaikki on 'jo tehty.'",
       "intro": "Puhdas, rauhallinen koti muuttaa koko viikkosi tunnelman.",
