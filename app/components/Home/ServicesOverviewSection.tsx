@@ -14,24 +14,28 @@ export default function ServicesShowcaseSection() {
       title: t("services.regular"),
       image: "/cleaning1.JPG",
       description: t("serviceDescriptions.regular"),
+      href: "/services/home-care",
     },
     {
       id: "deep",
       title: t("services.deep"),
       image: "/cleaning5.jpeg",
       description: t("serviceDescriptions.deep"),
+      href: "/services/deep-clean",
     },
     {
       id: "office",
       title: t("services.office"),
       image: "/cleaning8.JPG",
       description: t("serviceDescriptions.office"),
+      href: "/services/office",
     },
     {
       id: "moveOut",
       title: t("services.moveOut"),
       image: "/cleaning10.JPG",
       description: t("serviceDescriptions.moveOut"),
+      href: "/services/move-out",
     },
   ];
 
@@ -53,7 +57,7 @@ export default function ServicesShowcaseSection() {
           {services.map((service) => (
             <Link
               key={service.id}
-              href="/services"
+              href={service.href}
               className="group relative h-100 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
             >
               {/* Background Image */}

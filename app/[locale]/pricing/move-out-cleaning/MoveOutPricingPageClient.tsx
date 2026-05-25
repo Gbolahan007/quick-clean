@@ -129,25 +129,21 @@ function MoveOutPricingPageInner({ localeProp }: Props) {
   const currentAptIdx = selectedApt ? aptIndex(selectedApt.key) : null;
 
   return (
-    <div className="min-h-screen bg-[#f8faf9] font-sans">
-      {/* Header — reuses existing component, serviceType drives the title */}
+    <div className="min-h-screen bg-[#f8faf9] font-sans ">
       <PricingHeader
         locale={locale}
         serviceType="moveout"
         showDeducted={showDeducted}
         onLocale={toggleLocale}
-        onServiceChange={() => {}} // move-out page doesn't toggle service type
+        onServiceChange={() => {}}
         onVatChange={handleVatChange}
       />
 
-      <div className="mx-auto max-w-225 px-5 pb-36">
-        {/* Info banner */}
+      <div className="mx-auto max-w-225 px-5 pb-36 ">
         <MoveOutInfoBanner />
 
-        {/* Apartment Selector — fully reused */}
         <ApartmentSelector selected={selectedApt} onSelect={setSelectedApt} />
 
-        {/* Plan Grid — single plan, no frequency toggle */}
         <PlanGrid
           plans={MOVE_OUT_PLANS}
           aptIdx={currentAptIdx}
@@ -157,7 +153,6 @@ function MoveOutPricingPageInner({ localeProp }: Props) {
           serviceType="moveout"
         />
 
-        {/* Pricing Table — fully reused */}
         <PricingTable
           plans={MOVE_OUT_PLANS}
           selectedPlan={selectedPlan}

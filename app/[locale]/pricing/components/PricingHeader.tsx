@@ -49,10 +49,11 @@ export function PricingHeader({
   const pathname = usePathname();
 
   const isOfficePage = pathname.endsWith("/pricing/office-cleaning");
+  const isMoveOutPage = pathname.endsWith("/pricing/move-out-cleaning");
 
   return (
     <div className="relative overflow-hidden pb-12">
-      {/* Background Image */}
+      {/* Background image */}
       <div className="absolute inset-0 z-0">
         <Image
           src="/pricing.jpg"
@@ -72,13 +73,24 @@ export function PricingHeader({
 
         <p className="mb-7 text-base text-white/85">{t("subtitle")}</p>
 
-        {!isOfficePage && (
+        {!isOfficePage && !isMoveOutPage && (
           <div className="flex flex-col items-center gap-3">
             <PillToggle
               options={[t("serviceToggle.0"), t("serviceToggle.1")]}
               selected={serviceType === "maintenance" ? 0 : 1}
               onChange={onServiceChange}
             />
+            <PillToggle
+              options={[t("vatToggle.0"), t("vatToggle.1")]}
+              selected={showDeducted ? 1 : 0}
+              onChange={onVatChange}
+              small
+            />
+          </div>
+        )}
+
+        {isMoveOutPage && (
+          <div className="flex flex-col items-center gap-3">
             <PillToggle
               options={[t("vatToggle.0"), t("vatToggle.1")]}
               selected={showDeducted ? 1 : 0}

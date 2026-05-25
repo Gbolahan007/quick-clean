@@ -87,7 +87,7 @@ export function AddonsSection({
               <button
                 type="button"
                 onClick={() => toggle(addon.key, !!addon.perLoad)}
-                className={`flex h-[22px] w-[22px] shrink-0 cursor-pointer items-center justify-center rounded-md border-2 transition-all ${
+                className={`flex h-5.5 w-5.5 shrink-0 cursor-pointer items-center justify-center rounded-md border-2 transition-all ${
                   isOn
                     ? "border-[#7c9885] bg-[#7c9885]"
                     : "border-gray-300 bg-white"

@@ -15,8 +15,6 @@ function getServiceClient() {
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
-// Maps EN addon display names → booking_extras.extra_type values.
-// Quantity suffix is stripped before lookup: "Oven cleaning ×2" → "Oven cleaning"
 const ADDON_TYPE_MAP: Record<string, string> = {
   "Window cleaning": "windows",
   "Oven cleaning": "oven",

@@ -59,7 +59,7 @@ function ServiceCard({
     >
       {/* Accent line */}
       <div
-        className="absolute top-0 left-7 right-7 h-0.5 rounded-b-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        className="absolute  top-0 left-7 right-7 h-0.5 rounded-b-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{ background: accent }}
         aria-hidden
       />

@@ -1,4 +1,3 @@
-// components/PillToggle.tsx
 "use client";
 
 type PillToggleProps = {
@@ -15,7 +14,7 @@ export function PillToggle({
   small = false,
 }: PillToggleProps) {
   return (
-    <div className="inline-flex w-full rounded-full border border-[#7c9885]/30 bg-[#f0f5f2] p-1 md:w-auto">
+    <div className="inline-flex w-full rounded-full border border-[#7c9885]/30 bg-[#f0f5f2] p-1  md:w-auto">
       {options.map((label, i) => {
         const isActive = selected === i;
 
@@ -25,7 +24,7 @@ export function PillToggle({
             type="button"
             onClick={() => onChange(i)}
             className={[
-              "min-w-0 flex-1 rounded-full font-semibold transition-all duration-200 whitespace-normal leading-snug md:flex-none md:whitespace-nowrap",
+              "min-w-0 flex-1 rounded-full font-semibold transition-all duration-200 cursor-pointer whitespace-normal leading-snug md:flex-none md:whitespace-nowrap",
               small ? "px-3.5 py-1.5 text-[13px]" : "px-5 py-2.5 text-sm",
               isActive
                 ? "bg-[#7c9885] text-white shadow-[0_1px_4px_rgba(0,0,0,0.15)]"
