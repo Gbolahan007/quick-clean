@@ -28,7 +28,7 @@ export function BookingConfirmation() {
         <div className="flex justify-center mb-8 ">
           <div
             className={[
-              "w-20 h-20 rounded-full bg-[#3d6b47] flex items-center justify-center",
+              "w-20  h-20 rounded-full bg-[#3d6b47] flex items-center justify-center",
               "shadow-[0_0_0_12px_rgba(124,152,133,0.15)]",
             ].join(" ")}
           >

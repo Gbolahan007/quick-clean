@@ -107,7 +107,7 @@ export default function BookingPage({ params }: BookingPageProps) {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 ">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8 items-start">
           <div
             className={[
@@ -119,7 +119,7 @@ export default function BookingPage({ params }: BookingPageProps) {
             <ActiveStep />
           </div>
 
-          <div className="hidden lg:block">
+          <div className="hidden lg:block ">
             <BookingSidebar />
           </div>
         </div>
