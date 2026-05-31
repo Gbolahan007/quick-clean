@@ -48,6 +48,7 @@ export interface BookingSubmitPayload {
 
   // ── Notes ─────────────────────────────────────────────────────────────────
   specialNotes: string;
+  locale?: "en" | "fi";
 }
 
 // ── What the server action returns ───────────────────────────────────────────

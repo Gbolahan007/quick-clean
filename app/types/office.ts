@@ -198,6 +198,8 @@ export interface OfficeBookingSubmitPayload {
   planLabel: string;
   finalPrice: number; // = monthlyEstimate (recurring) or one-time amount
   basePrice: number; // = weeklyHours × hourlyRate × 4.33
+
+  locale?: "en" | "fi";
 }
 
 // ── Server action response ────────────────────────────────────────────────────

@@ -55,6 +55,7 @@ export const bookingSubmitSchema = z.object({
 
   // Notes
   specialNotes: z.string(),
+  locale: z.enum(["en", "fi"]).optional(),
 });
 
 export type BookingSubmitSchema = z.infer<typeof bookingSubmitSchema>;

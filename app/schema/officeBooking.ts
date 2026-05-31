@@ -115,6 +115,8 @@ export const officeBookingSubmitSchema = z.object({
   planLabel: z.string().min(1),
   finalPrice: z.number().positive(),
   basePrice: z.number().positive(),
+
+  locale: z.enum(["en", "fi"]).optional(),
 });
 
 export type OfficeBookingSubmitSchema = z.infer<

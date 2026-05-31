@@ -8,6 +8,8 @@ import {
 } from "../../app/[locale]/pricing/data/lib/officePricing";
 import type { OfficeBookingResult } from "../types/office";
 import type { OfficeBookingSubmitPayload } from "../types/office";
+import { buildOfficeEmailData } from "../lib/email/buildBookingEmailData";
+import { sendBookingEmails } from "../lib/email/emailServices";
 
 function getServiceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -34,13 +36,11 @@ export async function submitOfficeBookingAction(
 
   try {
     // ── 2. Authoritative pricing recalculation ─────────────────────────────
-    // NEVER trust client-calculated prices — always recalculate server-side.
     const serverPricing = calculateOfficePricing(
       data.weeklyHoursInput,
       data.eveningWeekendSurcharge,
     );
 
-    // Validate schedule hours match declared weekly hours
     const scheduleValidation = validateScheduleHours(
       data.weeklyHours,
       data.recurringRules,
@@ -83,7 +83,6 @@ export async function submitOfficeBookingAction(
         })
         .select("id")
         .single();
-
       if (createError)
         throw new Error(`Customer creation: ${createError.message}`);
       customerId = created.id;
@@ -126,7 +125,6 @@ export async function submitOfficeBookingAction(
     }
 
     // ── 6. Duplicate office booking guard ──────────────────────────────────
-
     const { data: duplicate } = await supabase
       .from("bookings")
       .select("id")
@@ -146,12 +144,10 @@ export async function submitOfficeBookingAction(
     }
 
     // ── 7. Determine first booking_date ────────────────────────────────────
-
     const firstBookingDate = getFirstScheduledDate(data.recurringRules);
     const defaultStartTime = data.recurringRules[0]?.startTime ?? "08:00";
 
     // ── 8. Insert booking ──────────────────────────────────────────────────
-
     const serverMonthly = serverPricing.finalMonthly + data.addonsMonthlyTotal;
     const serverBasePrice = serverPricing.monthlyCost;
 
@@ -171,7 +167,7 @@ export async function submitOfficeBookingAction(
         // ── Status ─────────────────────────────────────────────────────────
         status: "pending",
         payment_status: "pending",
-        frequency: "weekly", // office contracts are always weekly recurring
+        frequency: "weekly",
 
         // ── Pricing ────────────────────────────────────────────────────────
         final_price: serverMonthly,
@@ -201,10 +197,6 @@ export async function submitOfficeBookingAction(
         special_notes: data.specialNotes,
 
         // ── Office-specific columns ────────────────────────────────────────
-        // These 7 columns exist in the schema. Skipped columns
-        // (workspace_type, staff_count, pricing_tier) are NOT written here
-        // because they don't exist in the schema yet. Add the ALTER TABLE
-        // migration first if you need them.
         office_name: data.officeName,
         office_size_sqm: data.officeSizeSqm,
         weekly_hours: serverPricing.weeklyHours,
@@ -213,7 +205,7 @@ export async function submitOfficeBookingAction(
         evening_weekend_surcharge: data.eveningWeekendSurcharge,
         monthly_estimate: serverMonthly,
       })
-      .select("id")
+      .select("id, created_at") // ← added created_at for email timestamp
       .single();
 
     if (bookingError)
@@ -222,7 +214,6 @@ export async function submitOfficeBookingAction(
     console.log("[submitOfficeBookingAction] Booking created:", booking.id);
 
     // ── 9. Insert office_schedule_rules ────────────────────────────────────
-    // One row per recurring day — the contract schedule.
     const scheduleRows = data.recurringRules.map((rule) => ({
       booking_id: booking.id,
       day_of_week: rule.dayOfWeek,
@@ -236,7 +227,6 @@ export async function submitOfficeBookingAction(
       .insert(scheduleRows);
 
     if (scheduleError) {
-      // Non-fatal but important — log for ops team to fix manually
       console.error(
         "[submitOfficeBookingAction] Schedule rules error:",
         scheduleError.message,
@@ -248,7 +238,49 @@ export async function submitOfficeBookingAction(
       );
     }
 
-    // ── 10. TODO: Create Stripe recurring subscription ─────────────────────
+    // ── 10. Send emails (non-blocking) ─────────────────────────────────────
+    // Fires after successful DB write + schedule rules.
+    // Uses .then() intentionally — email failure must never roll back a booking.
+    sendBookingEmails(
+      buildOfficeEmailData({
+        bookingId: booking.id,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        streetAddress: data.streetAddress,
+        apartmentNumber: data.apartmentNumber,
+        postalCode: data.postalCode,
+        city: data.city,
+        officeName: data.officeName,
+        officeSizeSqm: data.officeSizeSqm,
+        weeklyHours: serverPricing.weeklyHours,
+        hourlyRate: serverPricing.hourlyRate,
+        pricingTier: serverPricing.tier,
+        monthlyEstimate: serverMonthly,
+        firstBookingDate,
+        defaultStartTime,
+        eveningWeekendSurcharge: data.eveningWeekendSurcharge,
+        specialNotes: data.specialNotes,
+        planLabel: data.planLabel,
+        selectedAddons: data.selectedAddons,
+        locale: (data.locale as "en" | "fi") ?? "en",
+        createdAt: booking.created_at,
+      }),
+    ).then((results) => {
+      if (!results.customer.success)
+        console.error(
+          `[submitOfficeBookingAction] Customer email failed [${booking.id}]:`,
+          results.customer.error,
+        );
+      if (!results.admin.success)
+        console.error(
+          `[submitOfficeBookingAction] Admin email failed [${booking.id}]:`,
+          results.admin.error,
+        );
+    });
+
+    // ── 11. TODO: Create Stripe recurring subscription ─────────────────────
     // When Stripe is wired:
     //   const stripeSession = await createStripeSubscription({
     //     customerId,
@@ -265,12 +297,8 @@ export async function submitOfficeBookingAction(
     //
     //   return { success: true, bookingId: booking.id, customerId, stripeSessionUrl: stripeSession.url };
 
-    // ── 11. Return ─────────────────────────────────────────────────────────
-    return {
-      success: true,
-      bookingId: booking.id,
-      customerId,
-    };
+    // ── 12. Return ─────────────────────────────────────────────────────────
+    return { success: true, bookingId: booking.id, customerId };
   } catch (err) {
     console.error("[submitOfficeBookingAction] Fatal:", err);
     return {
@@ -282,21 +310,15 @@ export async function submitOfficeBookingAction(
 }
 
 // ── Helper: first scheduled date ──────────────────────────────────────────────
-// Returns the next occurrence of the first scheduled day, at least 14 days out.
 function getFirstScheduledDate(rules: { dayOfWeek: number }[]): string {
   if (rules.length === 0) {
     const d = new Date();
     d.setDate(d.getDate() + 14);
     return d.toISOString().slice(0, 10);
   }
-
   const targetDay = rules[0].dayOfWeek;
   const d = new Date();
   d.setDate(d.getDate() + 14);
-
-  while (d.getDay() !== targetDay) {
-    d.setDate(d.getDate() + 1);
-  }
-
+  while (d.getDay() !== targetDay) d.setDate(d.getDate() + 1);
   return d.toISOString().slice(0, 10);
 }

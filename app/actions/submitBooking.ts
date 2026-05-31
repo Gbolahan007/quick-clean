@@ -3,15 +3,13 @@
 import { createClient } from "@supabase/supabase-js";
 import { BookingSubmitPayload, BookingSubmitResult } from "../types/api";
 import { bookingSubmitSchema } from "../schema/bookingSubmit";
+import { buildResidentialEmailData } from "../lib/email/buildBookingEmailData";
+import { sendBookingEmails } from "../lib/email/emailServices";
 
 function getServiceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!url || !key) {
-    throw new Error("Missing Supabase env vars");
-  }
-
+  if (!url || !key) throw new Error("Missing Supabase env vars");
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
@@ -49,9 +47,8 @@ export async function submitBookingAction(
       .eq("email", data.email)
       .maybeSingle();
 
-    if (lookupError) {
+    if (lookupError)
       throw new Error(`Customer lookup failed: ${lookupError.message}`);
-    }
 
     if (existing) {
       customerId = existing.id;
@@ -72,10 +69,8 @@ export async function submitBookingAction(
         })
         .select("id")
         .single();
-
-      if (createError) {
+      if (createError)
         throw new Error(`Customer creation failed: ${createError.message}`);
-      }
       customerId = created.id;
     }
 
@@ -98,14 +93,11 @@ export async function submitBookingAction(
       .select("id")
       .single();
 
-    if (addressError) {
+    if (addressError)
       throw new Error(`Address insertion failed: ${addressError.message}`);
-    }
 
-    // ── 4. Server-side slot re-validation (race-condition safe) ───────────
-    // NEVER trust client availability checks — always re-validate server-side.
+    // ── 4. Server-side slot re-validation ─────────────────────────────────
 
-    // 4a. Slot exists and is enabled
     const { data: slotRecord, error: slotLookupError } = await supabase
       .from("availability_slots")
       .select(
@@ -122,7 +114,6 @@ export async function submitBookingAction(
         code: "SLOT_NOT_FOUND",
       };
     }
-
     if (!slotRecord.is_available) {
       return {
         success: false,
@@ -131,7 +122,6 @@ export async function submitBookingAction(
       };
     }
 
-    // 4b. Date matches slot's day_of_week — prevents client tampering
     const selectedDayOfWeek = new Date(data.bookingDate + "T12:00:00").getDay();
     if (selectedDayOfWeek !== slotRecord.day_of_week) {
       return {
@@ -141,10 +131,8 @@ export async function submitBookingAction(
       };
     }
 
-    // 4c. Use start_time from DB (not from client) — authoritative value
     const slotStartTime = slotRecord.start_time.slice(0, 5); // "08:00:00" → "08:00"
 
-    // 4d. Count live bookings for this exact date + time slot
     const { count: currentBookings, error: countError } = await supabase
       .from("bookings")
       .select("id", { count: "exact", head: true })
@@ -152,11 +140,9 @@ export async function submitBookingAction(
       .eq("time_slot", slotStartTime)
       .neq("status", "cancelled");
 
-    if (countError) {
+    if (countError)
       throw new Error(`Slot count check failed: ${countError.message}`);
-    }
 
-    // 4e. Reject if at capacity
     if ((currentBookings ?? 0) >= slotRecord.max_bookings) {
       return {
         success: false,
@@ -165,7 +151,6 @@ export async function submitBookingAction(
       };
     }
 
-    // 4f. Duplicate booking guard
     const { data: duplicate } = await supabase
       .from("bookings")
       .select("id")
@@ -191,7 +176,6 @@ export async function submitBookingAction(
     );
 
     // ── 5. Resolve service_id ──────────────────────────────────────────────
-
     const { data: serviceRecord, error: serviceError } = await supabase
       .from("services")
       .select("id, slug, name_en")
@@ -200,11 +184,9 @@ export async function submitBookingAction(
       .single();
 
     if (serviceError || !serviceRecord) {
-      // Debug: surface what slugs are actually in the DB
       const { data: allServices } = await supabase
         .from("services")
         .select("id, slug, name_en, is_active");
-
       console.error(
         "[submitBookingAction] Service lookup failed.",
         "\n  Looking for slug:",
@@ -214,7 +196,6 @@ export async function submitBookingAction(
         "\n  Supabase error:",
         serviceError?.message ?? "none",
       );
-
       throw new Error(
         `Service not found for slug: "${data.serviceType}". ` +
           `Available: ${allServices?.map((s) => s.slug).join(", ") ?? "none — table may be empty"}`,
@@ -229,7 +210,6 @@ export async function submitBookingAction(
     );
 
     // ── 6. Resolve subscription_plan_id ───────────────────────────────────
-
     let subscriptionPlanId: string | null = null;
 
     if (data.frequency !== "one-time") {
@@ -239,7 +219,6 @@ export async function submitBookingAction(
         .eq("frequency", data.frequency)
         .eq("is_active", true)
         .maybeSingle();
-
       subscriptionPlanId = planRecord?.id ?? null;
       console.log(
         "[submitBookingAction] Plan:",
@@ -255,44 +234,32 @@ export async function submitBookingAction(
         service_id: serviceRecord.id,
         address_id: addressRecord.id,
         subscription_plan_id: subscriptionPlanId,
-
-        // Schedule — use slotStartTime from DB (server-authoritative)
         booking_date: data.bookingDate,
         time_slot: slotStartTime,
-
-        // Status
         status: "pending",
         payment_status: "pending",
-
-        // Frequency & pricing
         frequency: data.frequency,
         final_price: data.finalPrice,
         base_price: data.basePrice,
-
         service_type: data.serviceType,
         plan_key: data.planKey,
         plan_label: data.planLabel,
         show_deducted: data.showDeducted,
-
         apartment_key: data.apartmentKey,
         apartment_label: data.apartmentLabel,
         apartment_size: data.apartmentSize,
-
         addons_snapshot: data.addonsSnapshot,
-
         special_notes: data.specialNotes,
       })
-      .select("id")
+      .select("id, created_at") // ← added created_at for email timestamp
       .single();
 
-    if (bookingError) {
+    if (bookingError)
       throw new Error(`Booking insertion failed: ${bookingError.message}`);
-    }
 
     console.log("[submitBookingAction] Booking created:", booking.id);
 
     // ── 8. Insert booking_extras ───────────────────────────────────────────
-
     if (data.addonsSnapshot.count > 0 && data.addonsSnapshot.names.length > 0) {
       const extrasRows = data.addonsSnapshot.names
         .map((name) => {
@@ -329,12 +296,49 @@ export async function submitBookingAction(
       }
     }
 
-    // ── 9. Return success ──────────────────────────────────────────────────
-    return {
-      success: true,
-      bookingId: booking.id,
-      customerId,
-    };
+    // ── 9. Send emails (non-blocking) ──────────────────────────────────────
+    // Always fires AFTER successful DB write.
+    // Uses .then() intentionally — email failure must never roll back a booking.
+    sendBookingEmails(
+      buildResidentialEmailData({
+        bookingId: booking.id,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        streetAddress: data.streetAddress,
+        apartmentNumber: data.apartmentNumber,
+        postalCode: data.postalCode,
+        city: data.city,
+        serviceType: data.serviceType,
+        planKey: data.planKey,
+        planLabel: data.planLabel,
+        bookingDate: data.bookingDate,
+        timeSlot: slotStartTime,
+        specialNotes: data.specialNotes,
+        paymentMethod: "invoice",
+        finalPrice: data.finalPrice,
+        showDeducted: data.showDeducted,
+        apartmentKey: data.apartmentKey,
+        frequency: data.frequency,
+        locale: (data.locale as "en" | "fi") ?? "en",
+        createdAt: booking.created_at,
+      }),
+    ).then((results) => {
+      if (!results.customer.success)
+        console.error(
+          `[submitBookingAction] Customer email failed [${booking.id}]:`,
+          results.customer.error,
+        );
+      if (!results.admin.success)
+        console.error(
+          `[submitBookingAction] Admin email failed [${booking.id}]:`,
+          results.admin.error,
+        );
+    });
+
+    // ── 10. Return success ─────────────────────────────────────────────────
+    return { success: true, bookingId: booking.id, customerId };
   } catch (err) {
     console.error("[submitBookingAction] Fatal:", err);
     return {
