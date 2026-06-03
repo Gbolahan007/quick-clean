@@ -112,7 +112,7 @@ export function StepSchedule() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      <div className="space-y-5">
+      <div className="space-y-5 ">
         <div>
           <h2 className="text-xl font-extrabold text-[#0a1628] tracking-tight">
             {t("title")}
@@ -133,7 +133,7 @@ export function StepSchedule() {
         />
 
         {/* Time slot picker */}
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5 ">
           <p className="text-[13px] font-semibold text-[#0a1628]">
             {t("preferredTime")}
             <span className="text-[#7c9885] ml-0.5" aria-hidden>

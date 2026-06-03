@@ -17,14 +17,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const errId = error ? `${fieldId}-error` : undefined;
 
     return (
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 ">
         <label
           htmlFor={fieldId}
-          className="text-[13px] font-semibold text-[#0a1628]"
+          className="text-[13px]   font-semibold text-[#0a1628]"
         >
           {label}
           {props.required && (
-            <span className="text-[#7c9885] ml-0.5" aria-hidden>
+            <span className="text-[#7c9885]  ml-0.5" aria-hidden>
               *
             </span>
           )}
@@ -44,10 +44,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           }
           aria-invalid={!!error}
           className={[
-            "w-full px-4 py-3 rounded-xl border text-sm text-[#0a1628]",
+            "w-full px-4 py-3 rounded-xl border text-l text-[#0a1628]",
             "placeholder:text-gray-300 transition-all duration-150",
             "focus:outline-none focus:ring-2 focus:ring-[#7c9885]/40 focus:border-[#7c9885]",
-            "disabled:bg-gray-50 disabled:cursor-not-allowed",
+            "disabled:bg-gray-50 disabled:cursor-not-allowed ",
             error
               ? "border-red-400 bg-red-50/40"
               : "border-gray-200 bg-white hover:border-gray-300",
@@ -86,10 +86,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const errId = error ? `${fieldId}-error` : undefined;
 
     return (
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 ">
         <label
           htmlFor={fieldId}
-          className="text-[13px] font-semibold text-[#0a1628]"
+          className="text-[13px]  font-semibold text-[#0a1628]"
         >
           {label}
           {props.required && (
@@ -114,7 +114,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           aria-invalid={!!error}
           rows={4}
           className={[
-            "w-full px-4 py-3 rounded-xl border text-sm text-[#0a1628] resize-none",
+            "w-full px-4 py-3  rounded-xl border text-sm text-[#0a1628] resize-none",
             "placeholder:text-gray-300 transition-all duration-150",
             "focus:outline-none focus:ring-2 focus:ring-[#7c9885]/40 focus:border-[#7c9885]",
             error
