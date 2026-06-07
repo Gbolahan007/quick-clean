@@ -1,11 +1,23 @@
+// app/lib/email/emailServices.ts
+// ─────────────────────────────────────────────────────────────────────────────
+// Central email service. All transactional emails go through here.
+// Used by server actions and webhook handlers.
+//
+// CHANGES FROM PREVIOUS VERSION:
+//   - getFromAddress() and getAdminAddress() now THROW if env vars are missing
+//     instead of silently falling back to an unverified domain.
+//     A missing EMAIL_FROM caused Resend 422 validation errors in production.
+//   - paymentEmails.ts functions re-exported here so callers import from one place.
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { Resend } from "resend";
-import { buildCustomerConfirmationEmail } from "../email/templates/customerConfirmation";
-import { buildAdminNotificationEmail } from "../email/templates/adminNotification";
+import { buildCustomerConfirmationEmail } from "./templates/customerConfirmation";
+import { buildAdminNotificationEmail } from "./templates/adminNotification";
 import type {
   BookingEmailData,
   BookingEmailResults,
   EmailResult,
-} from "../email/types";
+} from "./types";
 
 // ── Singleton Resend client ───────────────────────────────────────────────────
 
@@ -20,12 +32,29 @@ function getResend(): Resend {
   return _resend;
 }
 
-function getFromAddress(): string {
-  return process.env.EMAIL_FROM ?? "QuickClean <no-reply@quickclean.fi>";
+// ── Address helpers (throw on missing — no silent fallback) ───────────────────
+// A missing or empty env var previously caused Resend 422 errors because the
+// fallback domain (quickclean.fi) wasn't verified in Resend.
+// During development: use EMAIL_FROM=onboarding@resend.dev
+
+export function getFromAddress(): string {
+  const from = process.env.EMAIL_FROM;
+  if (!from)
+    throw new Error(
+      "EMAIL_FROM env var is not set. " +
+        "For development use: EMAIL_FROM=onboarding@resend.dev",
+    );
+  return from;
 }
 
-function getAdminAddress(): string {
-  return process.env.EMAIL_ADMIN ?? "hello@quickclean.fi";
+export function getAdminAddress(): string {
+  const admin = process.env.EMAIL_ADMIN;
+  if (!admin)
+    throw new Error(
+      "EMAIL_ADMIN env var is not set. " +
+        "Set it to the address that should receive admin notifications.",
+    );
+  return admin;
 }
 
 // ── Individual senders ────────────────────────────────────────────────────────
@@ -92,6 +121,9 @@ async function sendAdminNotification(
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
+// Sends customer confirmation + admin notification in parallel.
+// Neither failure throws — errors are returned and logged.
+// Use .then() in server actions so email never blocks or rolls back a booking.
 
 export async function sendBookingEmails(
   data: BookingEmailData,
@@ -129,3 +161,10 @@ export async function sendBookingEmails(
 
   return { customer: customerResult, admin: adminResult };
 }
+
+// ── Payment event emails ──────────────────────────────────────────────────────
+// Re-exported from paymentEmails.ts so callers only need one import.
+export {
+  sendPaymentFailedEmail,
+  sendSubscriptionEndedEmail,
+} from "./paymentEmails";

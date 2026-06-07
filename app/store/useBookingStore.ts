@@ -14,8 +14,6 @@ import type {
 import type { BookingSubmitPayload } from "../types/api";
 import { BOOKING_STEPS } from "../types/booking";
 
-// ── Initial state ─────────────────────────────────────────────────────────────
-
 const INITIAL_STATE: BookingState = {
   pricing: null,
   currentStep: "contact",
@@ -28,14 +26,10 @@ const INITIAL_STATE: BookingState = {
   confirmedBookingId: null,
 };
 
-// ── Store ─────────────────────────────────────────────────────────────────────
-
 export const useBookingStore = create<BookingState & BookingActions>()(
   persist(
     (set, get) => ({
       ...INITIAL_STATE,
-
-      // ── Init ───────────────────────────────────────────────────────────────
 
       initBooking: (snapshot: PricingSnapshot) => {
         const current = get();
@@ -46,7 +40,6 @@ export const useBookingStore = create<BookingState & BookingActions>()(
           current.pricing.apartment.key !== snapshot.apartment.key;
 
         if (isNewBooking) {
-          // Fresh booking — wipe step data for the new selection
           set({
             pricing: snapshot,
             currentStep: "contact",
@@ -59,15 +52,10 @@ export const useBookingStore = create<BookingState & BookingActions>()(
             confirmedBookingId: null,
           });
         } else {
-          // Same booking — just update pricing snapshot, keep form data
-          set({
-            pricing: snapshot,
-            submissionError: null,
-          });
+          set({ pricing: snapshot, submissionError: null });
         }
       },
 
-      // ── Navigation ─────────────────────────────────────────────────────────
       goToStep: (step: BookingStep) => set({ currentStep: step }),
 
       nextStep: () => {
@@ -84,7 +72,6 @@ export const useBookingStore = create<BookingState & BookingActions>()(
         if (prev) set({ currentStep: prev });
       },
 
-      // ── Step saves ─────────────────────────────────────────────────────────
       saveContact: (data: ContactInfo) => {
         set({ contact: data });
         get().nextStep();
@@ -105,7 +92,6 @@ export const useBookingStore = create<BookingState & BookingActions>()(
         get().nextStep();
       },
 
-      // ── Submit ─────────────────────────────────────────────────────────────
       submitBooking: async () => {
         const { pricing, contact, address, schedule, notes } = get();
 
@@ -121,13 +107,10 @@ export const useBookingStore = create<BookingState & BookingActions>()(
             await import("@/app/actions/submitBooking");
 
           const payload: BookingSubmitPayload = {
-            // ── Customer ───────────────────────────────────────────────────
             firstName: contact.firstName ?? "",
             lastName: contact.lastName ?? "",
             email: contact.email ?? "",
             phone: contact.phone ?? "",
-
-            // ── Address ────────────────────────────────────────────────────
             streetAddress: address.streetAddress ?? "",
             apartmentNumber: address.apartmentNumber,
             city: address.city ?? "",
@@ -137,13 +120,9 @@ export const useBookingStore = create<BookingState & BookingActions>()(
             numberOfRooms:
               address.numberOfRooms ?? pricing.apartment.numberOfRooms,
             accessInstructions: address.accessInstructions,
-
-            // ── Schedule ───────────────────────────────────────────────────
             bookingDate: schedule.bookingDate ?? "",
             timeSlot: schedule.timeSlot ?? "",
             slotId: schedule.slotId ?? "",
-
-            // ── Service snapshot ───────────────────────────────────────────
             serviceType: pricing.serviceType,
             planKey: pricing.planKey,
             planLabel: pricing.planLabel,
@@ -151,13 +130,9 @@ export const useBookingStore = create<BookingState & BookingActions>()(
             showDeducted: pricing.showDeducted,
             basePrice: pricing.basePrice,
             finalPrice: pricing.totalPrice,
-
-            // ── Apartment snapshot ─────────────────────────────────────────
             apartmentKey: pricing.apartment.key,
             apartmentLabel: pricing.apartment.labelKey,
             apartmentSize: pricing.apartment.size,
-
-            // ── Addons snapshot ────────────────────────────────────────────
             addonsSnapshot: {
               count: pricing.addonsSummary.selectedCount,
               rawTotal: pricing.addonsSummary.rawTotal,
@@ -165,8 +140,6 @@ export const useBookingStore = create<BookingState & BookingActions>()(
               discountedTotal: pricing.addonsSummary.discountedTotal,
               names: pricing.selectedAddonNames,
             },
-
-            // ── Notes ─────────────────────────────────────────────────────
             specialNotes: JSON.stringify({
               instructions: notes.specialInstructions ?? null,
               hasPets: notes.hasPets ?? false,
@@ -181,21 +154,16 @@ export const useBookingStore = create<BookingState & BookingActions>()(
             return;
           }
 
-          // ── Success ────────────────────────────────────────────────────────
-
-          set({
-            ...INITIAL_STATE,
-            confirmedBookingId: result.bookingId,
-            isSubmitting: false,
-          });
+          // ── Redirect to Stripe Checkout
+          set({ ...INITIAL_STATE });
 
           console.log(
-            "[submitBooking] ✓ Success",
+            "[submitBooking] ✓ Redirecting to Stripe Checkout",
             "bookingId:",
             result.bookingId,
-            "customerId:",
-            result.customerId,
           );
+
+          window.location.href = result.checkoutUrl;
         } catch (err) {
           set({
             submissionError:
@@ -207,12 +175,9 @@ export const useBookingStore = create<BookingState & BookingActions>()(
         }
       },
 
-      // ── Reset ──────────────────────────────────────────────────────────────
-
       resetBooking: () => set(INITIAL_STATE),
     }),
 
-    // ── Persist config ────────────────────────────────────────────────────────
     {
       name: "booking-store",
       storage: createJSONStorage(() => localStorage),
@@ -223,13 +188,10 @@ export const useBookingStore = create<BookingState & BookingActions>()(
         address: state.address,
         schedule: state.schedule,
         notes: state.notes,
-        // confirmedBookingId intentionally excluded — in-memory only
       }),
     },
   ),
 );
-
-// ── Selectors ─────────────────────────────────────────────────────────────────
 
 export function useStepCompletion() {
   const firstName = useBookingStore((s) => s.contact.firstName);

@@ -1,10 +1,41 @@
 "use server";
+// app/actions/submitBooking.ts
+// ─────────────────────────────────────────────────────────────────────────────
+// Residential booking server action.
+//
+// STRIPE INTEGRATION (added):
+//   After the booking row is created, we:
+//     1. Create/reuse a Stripe Customer (stored on customers.stripe_customer_id)
+//     2. Create a Stripe Checkout Session
+//     3. Store stripe_checkout_session_id + stripe_price_id + visits_per_month
+//     4. Return checkoutUrl for the client to redirect to
+//
+//   EMAIL CHANGE:
+//     Confirmation email is NO LONGER sent here.
+//     It fires from the checkout.session.completed webhook handler instead,
+//     because the customer has not paid yet at this point.
+//     The booking is still "pending" until the webhook confirms it.
+//
+// ORDER GUARANTEE:
+//   DB booking is always created BEFORE any Stripe call.
+//   If Stripe session creation fails, the booking stays pending
+//   and no orphaned Stripe objects are created.
+// ─────────────────────────────────────────────────────────────────────────────
 
 import { createClient } from "@supabase/supabase-js";
-import { BookingSubmitPayload, BookingSubmitResult } from "../types/api";
 import { bookingSubmitSchema } from "../schema/bookingSubmit";
-import { buildResidentialEmailData } from "../lib/email/buildBookingEmailData";
-import { sendBookingEmails } from "../lib/email/emailServices";
+import { BookingSubmitPayload } from "../types/api";
+import { createCheckoutSession } from "./createCheckoutSession";
+
+// Updated result type includes checkoutUrl
+export type BookingSubmitResult =
+  | {
+      success: true;
+      bookingId: string;
+      customerId: string;
+      checkoutUrl: string;
+    }
+  | { success: false; error: string; code: string };
 
 function getServiceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -16,9 +47,14 @@ function getServiceClient() {
 const ADDON_TYPE_MAP: Record<string, string> = {
   "Window cleaning": "windows",
   "Oven cleaning": "oven",
+  "Oven interior": "oven_interior",
   "Fridge cleaning": "fridge",
   "Deep clean": "deep_clean",
   "High dusting": "high_dust",
+  "Trash cabinet interior": "trash_cabinet",
+  "Sauna cleaning": "sauna",
+  Ironing: "ironing",
+  Laundry: "laundry",
 };
 
 export async function submitBookingAction(
@@ -97,7 +133,6 @@ export async function submitBookingAction(
       throw new Error(`Address insertion failed: ${addressError.message}`);
 
     // ── 4. Server-side slot re-validation ─────────────────────────────────
-
     const { data: slotRecord, error: slotLookupError } = await supabase
       .from("availability_slots")
       .select(
@@ -131,7 +166,7 @@ export async function submitBookingAction(
       };
     }
 
-    const slotStartTime = slotRecord.start_time.slice(0, 5); // "08:00:00" → "08:00"
+    const slotStartTime = slotRecord.start_time.slice(0, 5);
 
     const { count: currentBookings, error: countError } = await supabase
       .from("bookings")
@@ -198,7 +233,7 @@ export async function submitBookingAction(
       );
       throw new Error(
         `Service not found for slug: "${data.serviceType}". ` +
-          `Available: ${allServices?.map((s) => s.slug).join(", ") ?? "none — table may be empty"}`,
+          `Available: ${allServices?.map((s) => s.slug).join(", ") ?? "none"}`,
       );
     }
 
@@ -227,6 +262,8 @@ export async function submitBookingAction(
     }
 
     // ── 7. Insert booking ──────────────────────────────────────────────────
+    // status = "pending" intentionally — it becomes "confirmed" only after
+    // the checkout.session.completed webhook fires (payment confirmed).
     const { data: booking, error: bookingError } = await supabase
       .from("bookings")
       .insert({
@@ -251,7 +288,7 @@ export async function submitBookingAction(
         addons_snapshot: data.addonsSnapshot,
         special_notes: data.specialNotes,
       })
-      .select("id, created_at") // ← added created_at for email timestamp
+      .select("id, created_at")
       .single();
 
     if (bookingError)
@@ -280,7 +317,6 @@ export async function submitBookingAction(
         const { error: extrasError } = await supabase
           .from("booking_extras")
           .insert(extrasRows);
-
         if (extrasError) {
           console.warn(
             "[submitBookingAction] booking_extras warning:",
@@ -296,49 +332,51 @@ export async function submitBookingAction(
       }
     }
 
-    // ── 9. Send emails (non-blocking) ──────────────────────────────────────
-    // Always fires AFTER successful DB write.
-    // Uses .then() intentionally — email failure must never roll back a booking.
-    sendBookingEmails(
-      buildResidentialEmailData({
-        bookingId: booking.id,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phone: data.phone,
-        streetAddress: data.streetAddress,
-        apartmentNumber: data.apartmentNumber,
-        postalCode: data.postalCode,
-        city: data.city,
-        serviceType: data.serviceType,
-        planKey: data.planKey,
-        planLabel: data.planLabel,
-        bookingDate: data.bookingDate,
-        timeSlot: slotStartTime,
-        specialNotes: data.specialNotes,
-        paymentMethod: "invoice",
-        finalPrice: data.finalPrice,
-        showDeducted: data.showDeducted,
-        apartmentKey: data.apartmentKey,
-        frequency: data.frequency,
-        locale: (data.locale as "en" | "fi") ?? "en",
-        createdAt: booking.created_at,
-      }),
-    ).then((results) => {
-      if (!results.customer.success)
-        console.error(
-          `[submitBookingAction] Customer email failed [${booking.id}]:`,
-          results.customer.error,
-        );
-      if (!results.admin.success)
-        console.error(
-          `[submitBookingAction] Admin email failed [${booking.id}]:`,
-          results.admin.error,
-        );
+    // ── 9. Create Stripe Checkout Session ─────────────────────────────────
+    // DB booking exists first (step 7). Now we create the Stripe session.
+    // If this fails, the booking stays pending — no orphaned Stripe objects.
+    //
+    // NOTE: Email is NOT sent here. Confirmation email fires from the
+    // checkout.session.completed webhook after the customer actually pays.
+    const checkoutResult = await createCheckoutSession({
+      bookingId: booking.id,
+      customerId,
+      customerEmail: data.email,
+      serviceType: data.serviceType,
+      frequency: data.frequency,
+      apartmentKey: data.apartmentKey,
+      locale: (data.locale as "en" | "fi") ?? "en",
+      successPath: "/booking/success",
+      cancelPath: "/booking/cancelled",
+      addonsTotal: data.addonsSnapshot.discountedTotal,
+      addonNames: data.addonsSnapshot.names,
     });
 
-    // ── 10. Return success ─────────────────────────────────────────────────
-    return { success: true, bookingId: booking.id, customerId };
+    if (!checkoutResult.success) {
+      // Checkout session creation failed. The booking remains pending.
+      // Customer can retry. No orphaned Stripe objects exist.
+      console.error(
+        `[submitBookingAction] Stripe checkout failed for booking ${booking.id}:`,
+        checkoutResult.error,
+      );
+      return {
+        success: false,
+        error: checkoutResult.error,
+        code: checkoutResult.code,
+      };
+    }
+
+    console.log(
+      `[submitBookingAction] Checkout session created: ${checkoutResult.sessionId} → ${booking.id}`,
+    );
+
+    // ── 10. Return checkout URL for client redirect ────────────────────────
+    return {
+      success: true,
+      bookingId: booking.id,
+      customerId,
+      checkoutUrl: checkoutResult.checkoutUrl,
+    };
   } catch (err) {
     console.error("[submitBookingAction] Fatal:", err);
     return {
