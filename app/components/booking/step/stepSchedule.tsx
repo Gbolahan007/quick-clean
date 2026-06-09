@@ -112,7 +112,7 @@ export function StepSchedule() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      <div className="space-y-5 ">
+      <div className="space-y-5">
         <div>
           <h2 className="text-xl font-extrabold text-[#0a1628] tracking-tight">
             {t("title")}

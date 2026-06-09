@@ -89,3 +89,27 @@ body {
 .animate-float-2 {
   animation: float-2 2.6s ease-in-out infinite;
 }
+
+/* Force all inputs to respect box-sizing — fixes Safari overflow */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+  box-sizing: border-box;
+  width: 100%;
+  /* Enough right padding to show Safari's native calendar icon */
+  padding-right: 0.75rem;
+}
+
+/* Prevent the webkit date input inner elements from overflowing */
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+  min-width: 0;
+}
+
+/* Ensure the calendar picker indicator is visible and positioned correctly */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  margin-left: auto;
+  flex-shrink: 0;
+}

@@ -44,10 +44,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           }
           aria-invalid={!!error}
           className={[
-            "w-full px-4 py-3 rounded-xl border text-l text-[#0a1628]",
+            "w-full px-4 py-3 rounded-xl border text-sm text-[#0a1628] box-border min-w-0",
             "placeholder:text-gray-300 transition-all duration-150",
             "focus:outline-none focus:ring-2 focus:ring-[#7c9885]/40 focus:border-[#7c9885]",
-            "disabled:bg-gray-50 disabled:cursor-not-allowed ",
+            "disabled:bg-gray-50 disabled:cursor-not-allowed [&[type=date]]:pr-3",
             error
               ? "border-red-400 bg-red-50/40"
               : "border-gray-200 bg-white hover:border-gray-300",
@@ -316,7 +316,7 @@ export function StepActions({
   isLoading = false,
 }: StepActionsProps) {
   return (
-    <div className="flex items-center justify-between gap-4 mb-4">
+    <div className="flex items-center justify-between gap-4 pt-1">
       {onBack ? (
         <button
           type="button"
@@ -344,7 +344,7 @@ export function StepActions({
           "shadow-[0_2px_8px_rgba(124,152,133,0.4)]",
           "transition-all duration-150 focus-visible:outline-none",
           "focus-visible:ring-2 focus-visible:ring-[#7c9885]/60 focus-visible:ring-offset-2",
-          "disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none cursor-pointer ",
+          "disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none cursor-pointer",
         ].join(" ")}
       >
         {isLoading ? (
