@@ -38,14 +38,12 @@ export function PricingTable({
   if (!selectedApt || !selectedPlan) return null;
 
   const plan = plans[selectedPlan];
-  // Guard against stale localStorage keys or mismatched plan sets
   if (!plan) return null;
 
   // ── Config ──────────────────────────────────────────────────────────────────
   const isOffice = serviceType === "office";
   const isMaintenance = serviceType === "maintenance";
 
-  // Office uses its own space type list; all other services use apartment types
   const rowTypes: ApartmentType[] = isOffice
     ? OFFICE_SPACE_TYPES
     : APARTMENT_TYPES;
@@ -235,6 +233,7 @@ function ColHead({ children, align, px }: ColHeadProps) {
 const mutedCell: React.CSSProperties = {
   padding: "13px 12px",
   color: "rgba(10,22,40,0.55)",
+  whiteSpace: "nowrap",
 };
 
 const twoCleanerBadge: React.CSSProperties = {
