@@ -316,7 +316,7 @@ export function StepActions({
   isLoading = false,
 }: StepActionsProps) {
   return (
-    <div className="flex items-center justify-between gap-4 pt-2">
+    <div className="flex items-center justify-between gap-4 mb-4">
       {onBack ? (
         <button
           type="button"
@@ -339,7 +339,7 @@ export function StepActions({
         onClick={onNext}
         disabled={nextDisabled || isLoading}
         className={[
-          "px-7 py-3 rounded-xl mb-4 text-sm font-bold text-white",
+          "px-7 py-3 rounded-xl text-sm font-bold text-white",
           "bg-[#7c9885] hover:bg-[#6a8873] active:bg-[#5c7a65]",
           "shadow-[0_2px_8px_rgba(124,152,133,0.4)]",
           "transition-all duration-150 focus-visible:outline-none",
