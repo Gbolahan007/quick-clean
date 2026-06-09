@@ -47,10 +47,17 @@ const SUBSCRIPTION_FREQUENCIES = new Set([
   "monthly",
   "deepMonthly",
   "deepQuarterly",
+  "quarterly",
 ]);
 
 function resolveMode(frequency: string): CheckoutMode {
   return SUBSCRIPTION_FREQUENCIES.has(frequency) ? "subscription" : "payment";
+}
+
+// Quarterly plans bill every 3 months (interval_count=3 in Stripe).
+// All other subscription plans bill every 1 month (interval_count=1).
+function resolveIntervalCount(frequency: string): number {
+  return frequency === "deepQuarterly" || frequency === "quarterly" ? 3 : 1;
 }
 
 // ── Env var name builder ──────────────────────────────────────────────────────
@@ -145,8 +152,9 @@ export function resolveStripePrice(
   }
 
   const mode = resolveMode(frequency);
+  const intervalCount = resolveIntervalCount(frequency);
 
-  return { priceId, mode };
+  return { priceId, mode, intervalCount };
 }
 
 // ── Visits per month resolver ─────────────────────────────────────────────────
@@ -164,9 +172,11 @@ export function resolveVisitsPerMonth(frequency: string): number | null {
       return 1;
     case "deepMonthly":
       return 1;
+    // Quarterly: 1 visit every 3 months — not per month.
+    // Store NULL and use visits_per_year=4 logic in scheduling instead.
     case "deepQuarterly":
     case "quarterly":
-      return 1;
+      return null;
     // One-time: no recurring visits
     case "one-time":
     case "deepOnetime":

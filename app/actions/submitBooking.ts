@@ -46,15 +46,25 @@ function getServiceClient() {
 
 const ADDON_TYPE_MAP: Record<string, string> = {
   "Window cleaning": "windows",
+
   "Oven cleaning": "oven",
   "Oven interior": "oven_interior",
+
   "Fridge cleaning": "fridge",
+  "Fridge / freezer interior": "fridge",
+
   "Deep clean": "deep_clean",
   "High dusting": "high_dust",
+
   "Trash cabinet interior": "trash_cabinet",
+
   "Sauna cleaning": "sauna",
+
   Ironing: "ironing",
+  "Ironing (5–7 shirts)": "ironing",
+
   Laundry: "laundry",
+  "Laundry (per load)": "laundry",
 };
 
 export async function submitBookingAction(

@@ -154,8 +154,17 @@ export const useBookingStore = create<BookingState & BookingActions>()(
             return;
           }
 
-          // ── Redirect to Stripe Checkout
+          // ── Redirect to Stripe Checkout ──────────────────────────────────
+          // Reset in-memory state AND purge the persisted localStorage entry.
+          // set() alone only clears Zustand memory — on the next page load,
+          // the persist middleware rehydrates from localStorage and the old
+          // form data (pricing, contact, address, schedule) comes back.
+          // Removing the storage key prevents that completely.
           set({ ...INITIAL_STATE });
+          try {
+            localStorage.removeItem("booking-store");
+            localStorage.removeItem("pricing-selections");
+          } catch {}
 
           console.log(
             "[submitBooking] ✓ Redirecting to Stripe Checkout",
@@ -175,7 +184,13 @@ export const useBookingStore = create<BookingState & BookingActions>()(
         }
       },
 
-      resetBooking: () => set(INITIAL_STATE),
+      resetBooking: () => {
+        set(INITIAL_STATE);
+        try {
+          localStorage.removeItem("booking-store");
+          localStorage.removeItem("pricing-selections");
+        } catch {}
+      },
     }),
 
     {

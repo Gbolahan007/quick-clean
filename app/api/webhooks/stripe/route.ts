@@ -1,3 +1,4 @@
+// app/api/webhooks/stripe/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
@@ -8,7 +9,11 @@ import {
 } from "@/app/lib/email/emailServices";
 
 // ── Typed Supabase client ─────────────────────────────────────────────────────
-
+// Using `any` for the schema type avoids the "never" overload errors that
+// occur when Supabase cannot infer the table types from an untyped client.
+// If you have generated types (supabase gen types), import and use them here:
+//   import type { Database } from "@/types/supabase";
+//   createClient<Database>(url, key)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TypedSupabase = SupabaseClient<any>;
 
@@ -189,27 +194,128 @@ async function handleInvoicePaid(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const inv = invoice as any;
 
+  // Stripe API dahlia (v18): subscription moved to invoice.parent.subscription_details.subscription
+  // Confirmed from debug log: inv.subscription is null, inv.parent.subscription_details.subscription has the ID.
+  // Support both the old location (inv.subscription) and the new location for forward compatibility.
   const rawSub = inv.subscription as string | { id: string } | null | undefined;
-  const subscriptionId = typeof rawSub === "string" ? rawSub : rawSub?.id;
+  const subFromLegacy =
+    typeof rawSub === "string" ? rawSub : (rawSub?.id ?? null);
 
-  if (!subscriptionId) return; // not a subscription invoice
+  const subFromParent =
+    (inv.parent?.subscription_details?.subscription as
+      | string
+      | null
+      | undefined) ?? null;
 
-  const booking = await findBookingBySubscription(supabase, subscriptionId);
-  if (!booking) {
+  const subscriptionId = subFromLegacy ?? subFromParent;
+
+  if (!subscriptionId) {
     console.warn(
-      `[webhook] No booking found for subscription ${subscriptionId}`,
+      "[webhook] invoice.paid: no subscription ID found in invoice — skipping",
     );
     return;
   }
 
-  const periodStart = invoice.period_start
-    ? new Date(invoice.period_start * 1000).toISOString()
-    : null;
-  const periodEnd = invoice.period_end
-    ? new Date(invoice.period_end * 1000).toISOString()
-    : null;
+  console.log(
+    `[webhook] invoice.paid: subscriptionId resolved → ${subscriptionId}`,
+  );
 
-  const isFirstPayment = invoice.billing_reason === "subscription_create";
+  // ── Primary lookup: by stripe_subscription_id ─────────────────────────────
+  let booking = await findBookingBySubscription(supabase, subscriptionId);
+
+  // ── Fallback lookup: by booking_id in subscription metadata ───────────────
+  // Race condition: invoice.paid can fire before checkout.session.completed
+  // finishes processing, meaning stripe_subscription_id may not yet be written
+  // to the booking row. Fall back to booking_id stored in Stripe subscription
+  // metadata (written during createCheckoutSession → subscription_data.metadata).
+  if (!booking) {
+    console.warn(
+      `[webhook] invoice.paid: no booking by subscription ${subscriptionId}, trying metadata fallback`,
+    );
+    try {
+      const stripe = getStripe();
+      const sub = await stripe.subscriptions.retrieve(subscriptionId);
+      const bookingId = sub.metadata?.booking_id;
+      if (bookingId) {
+        const { data } = await supabase
+          .from("bookings")
+          .select("id, customer_id, visits_per_month, frequency")
+          .eq("id", bookingId)
+          .single();
+        if (data) {
+          booking = data as {
+            id: string;
+            customer_id: string;
+            visits_per_month: number | null;
+            frequency: string;
+          };
+          // Patch the subscription_id so future lookups work without fallback
+          await supabase
+            .from("bookings")
+            .update({ stripe_subscription_id: subscriptionId })
+            .eq("id", bookingId);
+          console.log(
+            `[webhook] invoice.paid: booking ${bookingId} found via metadata, subscription_id patched`,
+          );
+        }
+      }
+    } catch (err) {
+      console.error("[webhook] invoice.paid metadata fallback error:", err);
+    }
+  }
+
+  if (!booking) {
+    console.warn(
+      `[webhook] invoice.paid: booking not found for subscription ${subscriptionId} — skipping`,
+    );
+    return;
+  }
+
+  // Stripe dahlia API change: invoice.period_start/end now reflects invoice
+  // creation time, NOT the billing period. The actual subscription billing
+  // period lives on the Subscription object (current_period_start/end).
+  // Fetch the subscription to get the correct period dates.
+  let periodStart: string | null = null;
+  let periodEnd: string | null = null;
+
+  try {
+    const stripe = getStripe();
+    const sub = await stripe.subscriptions.retrieve(subscriptionId);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const subAny = sub as any;
+
+    // Stripe dahlia: current_period_start/end moved from top-level subscription
+    // to sub.items.data[0].current_period_start/end
+    const item0 = subAny.items?.data?.[0];
+    const cps = (item0?.current_period_start ?? subAny.current_period_start) as
+      | number
+      | null
+      | undefined;
+    const cpe = (item0?.current_period_end ?? subAny.current_period_end) as
+      | number
+      | null
+      | undefined;
+
+    if (cps) periodStart = new Date(cps * 1000).toISOString();
+    if (cpe) periodEnd = new Date(cpe * 1000).toISOString();
+  } catch (err) {
+    console.error(
+      "[webhook] invoice.paid: failed to fetch subscription period:",
+      err,
+    );
+  }
+
+  const billingReason = (inv.billing_reason ?? invoice.billing_reason) as
+    | string
+    | null
+    | undefined;
+  const isFirstPayment = billingReason === "subscription_create";
+  const amountPaid = (
+    typeof inv.amount_paid === "number"
+      ? inv.amount_paid
+      : (invoice.amount_paid ?? 0)
+  ) as number;
+  const invoiceCurrency = (inv.currency ?? invoice.currency ?? "eur") as string;
 
   const rawPi = inv.payment_intent as
     | string
@@ -219,12 +325,18 @@ async function handleInvoicePaid(
   const paymentIntentId =
     typeof rawPi === "string" ? rawPi : (rawPi?.id ?? null);
 
+  console.log(
+    `[webhook] invoice.paid — booking: ${booking.id} | ` +
+      `period: ${periodStart} → ${periodEnd} | ` +
+      `amount: €${(amountPaid / 100).toFixed(2)} | first: ${isFirstPayment}`,
+  );
+
   await supabase.from("payments").insert({
     booking_id: booking.id,
     stripe_payment_intent_id: paymentIntentId,
     stripe_invoice_id: invoice.id,
-    amount_cents: invoice.amount_paid,
-    currency: invoice.currency ?? "eur",
+    amount_cents: amountPaid,
+    currency: invoiceCurrency,
     status: "succeeded",
     billing_period_start: periodStart,
     billing_period_end: periodEnd,
@@ -245,9 +357,7 @@ async function handleInvoicePaid(
     .eq("id", booking.id);
 
   console.log(
-    `[webhook] Invoice paid for booking ${booking.id}. ` +
-      `Period: ${periodStart} → ${periodEnd}. ` +
-      `Visits to schedule: ${booking.visits_per_month ?? "N/A"}`,
+    `[webhook] Booking ${booking.id} billing period updated: ${periodStart} → ${periodEnd}`,
   );
 
   // ── SCHEDULING HOOK ───────────────────────────────────────────────────────
@@ -269,8 +379,16 @@ async function handleInvoicePaymentFailed(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const inv = invoice as any;
 
+  // Stripe API dahlia: subscription moved to parent.subscription_details.subscription
   const rawSub = inv.subscription as string | { id: string } | null | undefined;
-  const subscriptionId = typeof rawSub === "string" ? rawSub : rawSub?.id;
+  const subFromLegacy =
+    typeof rawSub === "string" ? rawSub : (rawSub?.id ?? null);
+  const subFromParent =
+    (inv.parent?.subscription_details?.subscription as
+      | string
+      | null
+      | undefined) ?? null;
+  const subscriptionId = subFromLegacy ?? subFromParent;
 
   if (!subscriptionId) return;
 
@@ -345,24 +463,29 @@ async function handleSubscriptionUpdated(
   const booking = await findBookingBySubscription(supabase, subscription.id);
   if (!booking) return;
 
-  // current_period_start and current_period_end exist on Stripe.Subscription
-  // but TypeScript may not always resolve them — access via index to be safe
+  // Stripe dahlia: current_period_start/end moved to items.data[0]
   const sub = subscription as unknown as Record<string, unknown>;
+  const subItems = sub["items"] as Record<string, unknown> | undefined;
+  const item0 = (
+    subItems?.["data"] as Record<string, unknown>[] | undefined
+  )?.[0];
+  const cps = (item0?.["current_period_start"] ??
+    sub["current_period_start"]) as number | null | undefined;
+  const cpe = (item0?.["current_period_end"] ?? sub["current_period_end"]) as
+    | number
+    | null
+    | undefined;
 
   const updateFields: Record<string, unknown> = {
     subscription_status: subscription.status,
     cancel_at_period_end: subscription.cancel_at_period_end,
   };
 
-  if (typeof sub["current_period_start"] === "number") {
-    updateFields.current_period_start = new Date(
-      (sub["current_period_start"] as number) * 1000,
-    ).toISOString();
+  if (typeof cps === "number") {
+    updateFields.current_period_start = new Date(cps * 1000).toISOString();
   }
-  if (typeof sub["current_period_end"] === "number") {
-    updateFields.current_period_end = new Date(
-      (sub["current_period_end"] as number) * 1000,
-    ).toISOString();
+  if (typeof cpe === "number") {
+    updateFields.current_period_end = new Date(cpe * 1000).toISOString();
   }
 
   await supabase.from("bookings").update(updateFields).eq("id", booking.id);

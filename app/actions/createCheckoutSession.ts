@@ -151,7 +151,7 @@ export async function createCheckoutSession(
       };
     }
 
-    const { priceId, mode } = resolved;
+    const { priceId, mode, intervalCount } = resolved;
     const visitsPerMonth = resolveVisitsPerMonth(frequency);
 
     // ── Step 2: Get or create Stripe Customer ─────────────────────────────
@@ -175,42 +175,93 @@ export async function createCheckoutSession(
         customer: stripeCustomerId,
         mode,
 
-        line_items: [
-          // ── Plan price (resolved from env var — amount set in Stripe dashboard) ──
-          {
-            price: priceId,
-            quantity: 1,
-          },
-          // ── Add-ons (inline price_data — amount computed server-side) ───────────
-          // Add-ons are not fixed Stripe Price objects because every booking can
-          // have a different add-on combination. We use price_data with an
-          // inline unit_amount instead. This is safe — the amount comes from
-          // booking.addonsSnapshot.discountedTotal, which was calculated server-side
-          // in submitBookingAction and stored in the DB before this call.
-          // The client never controls this number.
-          ...(addonsTotal > 0
-            ? [
-                {
-                  price_data: {
-                    currency: "eur",
-                    unit_amount: Math.round(addonsTotal * 100), // euros → cents
-                    product_data: {
-                      name: "Add-on services",
-                      description:
-                        addonNames.length > 0
-                          ? addonNames.join(", ")
-                          : "Selected add-on services",
-                    },
-                    // For subscriptions: recurring must match the plan interval
-                    ...(mode === "subscription" && {
-                      recurring: { interval: "month" as const },
-                    }),
+        // ── Line items strategy ────────────────────────────────────────────────
+        // When there are NO add-ons: use the pre-created Stripe Price object.
+        //   Simple, clean, amount set in Stripe dashboard.
+        //
+        // When there ARE add-ons on a SUBSCRIPTION: Stripe does not allow mixing
+        //   a pre-created Price (priceId) with inline price_data recurring items
+        //   even if intervals match — it throws "different billing intervals".
+        //   Solution: use price_data for BOTH items (plan + addons) so Stripe
+        //   sees two inline prices with identical intervals.
+        //
+        // When there ARE add-ons on a ONE-TIME payment: two separate line items
+        //   work fine — plan uses priceId, addons use price_data (no recurring).
+        //
+        // Plan unit_amount for price_data path: fetched from Stripe Price object
+        //   so we never hardcode the amount — Stripe dashboard is still the
+        //   source of truth for the plan price.
+        line_items: await (async () => {
+          const hasAddons = addonsTotal > 0;
+          const isSubscription = mode === "subscription";
+
+          if (!hasAddons) {
+            // Simple case: just the plan Price object
+            return [{ price: priceId, quantity: 1 }];
+          }
+
+          if (isSubscription && hasAddons) {
+            // Fetch the plan price amount from Stripe so we can use price_data
+            // for both line items — avoids the "different billing intervals" error
+            const planPrice = await stripe.prices.retrieve(priceId);
+            const planCents = planPrice.unit_amount ?? 0;
+
+            return [
+              {
+                price_data: {
+                  currency: "eur",
+                  unit_amount: planCents,
+                  product_data: {
+                    name:
+                      addonNames.length > 0
+                        ? `${planPrice.nickname ?? "Cleaning plan"} + add-ons`
+                        : (planPrice.nickname ?? "Cleaning plan"),
+                    description:
+                      addonNames.length > 0
+                        ? `Plan + ${addonNames.join(", ")}`
+                        : undefined,
                   },
-                  quantity: 1,
+                  recurring: {
+                    interval: "month" as const,
+                    interval_count: intervalCount,
+                  },
                 },
-              ]
-            : []),
-        ],
+                quantity: 1,
+              },
+              {
+                price_data: {
+                  currency: "eur",
+                  unit_amount: Math.round(addonsTotal * 100),
+                  product_data: {
+                    name: "Add-on services",
+                    description: addonNames.join(", ") || "Selected add-ons",
+                  },
+                  recurring: {
+                    interval: "month" as const,
+                    interval_count: intervalCount,
+                  },
+                },
+                quantity: 1,
+              },
+            ];
+          }
+
+          // One-time payment with add-ons: plan priceId + inline add-ons
+          return [
+            { price: priceId, quantity: 1 },
+            {
+              price_data: {
+                currency: "eur",
+                unit_amount: Math.round(addonsTotal * 100),
+                product_data: {
+                  name: "Add-on services",
+                  description: addonNames.join(", ") || "Selected add-ons",
+                },
+              },
+              quantity: 1,
+            },
+          ];
+        })(),
 
         // ── Metadata: links the Stripe session back to our booking ────────────
         // The checkout.session.completed webhook reads booking_id to find
@@ -228,12 +279,9 @@ export async function createCheckoutSession(
         ...(mode === "subscription" && {
           subscription_data: {
             metadata: {
-              booking_id: bookingId, // also on subscription for future webhook lookups
+              booking_id: bookingId, // used by invoice.paid fallback lookup
               customer_id: customerId,
             },
-            // Align all subscriptions to the 1st of the month for predictable billing.
-            // Customers always know their charge date.
-            // billing_cycle_anchor: 'month_start',  // enable when ready
           },
         }),
 

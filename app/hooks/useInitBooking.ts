@@ -1,5 +1,5 @@
-// hooks/useInitBooking.ts
 "use client";
+// hooks/useInitBooking.ts
 
 import { useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -25,10 +25,38 @@ interface UseInitBookingParams {
   addonsSummary: AddonsSummary;
 }
 
-function resolveFrequency(planKey: string): BookingFrequency {
+// ── Frequency resolution ──────────────────────────────────────────────────────
+// Maps the planKey (from your pricing data) to the BookingFrequency value
+// that createCheckoutSession uses to resolve the Stripe Price and mode.
+//
+// MAINTENANCE plans → Stripe mode=subscription, interval=month, interval_count=1
+// DEEP MONTHLY     → Stripe mode=subscription, interval=month, interval_count=1
+// DEEP QUARTERLY   → Stripe mode=subscription, interval=month, interval_count=3
+// MOVEOUT / ONE-TIME → Stripe mode=payment (no subscription)
+
+function resolveFrequency(
+  planKey: string,
+  serviceType: ServiceType,
+): BookingFrequency {
+  // ── Maintenance ─────────────────────────────────────────────────────────────
   if (planKey === "weekly") return "weekly";
   if (planKey === "biweekly") return "biweekly";
   if (planKey === "monthly") return "monthly";
+
+  // ── Deep cleaning ───────────────────────────────────────────────────────────
+
+  if (serviceType === "deep") {
+    if (planKey.includes("quarterly") || planKey.includes("Quarterly"))
+      return "deepQuarterly";
+    if (planKey.includes("monthly") || planKey.includes("Monthly"))
+      return "deepMonthly";
+    return "deepOnetime";
+  }
+
+  // ── Moveout ─────────────────────────────────────────────────────────────────
+  if (serviceType === "moveout") return "one-time";
+
+  // ── Fallback ─────────────────────────────────────────────────────────────────
   return "one-time";
 }
 
@@ -71,12 +99,10 @@ export function useInitBooking({
     const snapshot: PricingSnapshot = {
       serviceType,
       showDeducted,
-      apartment: {
-        ...apt,
-      },
+      apartment: { ...apt },
       planKey,
       planLabel: t(`plans.${plan.labelKey}`),
-      frequency: resolveFrequency(planKey),
+      frequency: resolveFrequency(planKey, serviceType), // ← fixed
       basePrice,
       addonsSummary: addonsSummary ?? {
         selectedCount: 0,

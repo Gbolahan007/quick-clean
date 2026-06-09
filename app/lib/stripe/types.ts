@@ -63,4 +63,5 @@ export interface PriceResolutionInput {
 export interface PriceResolutionResult {
   priceId: string;
   mode: CheckoutMode;
+  intervalCount: number;
 }
