@@ -96,7 +96,6 @@ input[type="time"],
 input[type="datetime-local"] {
   box-sizing: border-box;
   width: 100%;
-  /* Enough right padding to show Safari's native calendar icon */
   padding-right: 0.75rem;
 }
 
