@@ -37,11 +37,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           </p>
         )}
 
-        {/* 
-          iOS Safari fix: the outer div clips anything that overflows.
-          The input gets explicit inline styles because Safari ignores
-          box-sizing and width from the CSS cascade on date inputs.
-        */}
         <div
           style={isDate ? { width: "100%", overflow: "hidden" } : undefined}
           className={isDate ? "rounded-xl" : undefined}
@@ -339,7 +334,7 @@ export function StepActions({
   isLoading = false,
 }: StepActionsProps) {
   return (
-    <div className="flex items-center justify-between gap-4 pt-1">
+    <div className="flex items-center justify-between gap-4 mb-4">
       {onBack ? (
         <button
           type="button"
