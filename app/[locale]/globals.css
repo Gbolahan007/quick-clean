@@ -90,25 +90,22 @@ body {
   animation: float-2 2.6s ease-in-out infinite;
 }
 
-/* Force all inputs to respect box-sizing — fixes Safari overflow */
-input[type="date"],
-input[type="time"],
-input[type="datetime-local"] {
+input[type="date"] {
   box-sizing: border-box;
   width: 100%;
-  padding-right: 0.75rem;
-}
-
-/* Prevent the webkit date input inner elements from overflowing */
-input[type="date"]::-webkit-date-and-time-value {
-  text-align: left;
+  max-width: 100%;
   min-width: 0;
 }
 
-/* Ensure the calendar picker indicator is visible and positioned correctly */
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+  width: 100%;
+  min-width: 0;
+}
+
 input[type="date"]::-webkit-calendar-picker-indicator {
+  flex-shrink: 0;
   cursor: pointer;
   opacity: 0.6;
-  margin-left: auto;
-  flex-shrink: 0;
+  padding-left: 4px;
 }

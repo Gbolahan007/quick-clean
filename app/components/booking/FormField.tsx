@@ -15,16 +15,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const fieldId = id ?? label.toLowerCase().replace(/\s+/g, "-");
     const hintId = hint ? `${fieldId}-hint` : undefined;
     const errId = error ? `${fieldId}-error` : undefined;
+    const isDate = props.type === "date";
 
     return (
-      <div className="flex flex-col gap-1 ">
+      <div className="flex flex-col gap-1">
         <label
           htmlFor={fieldId}
-          className="text-[13px]   font-semibold text-[#0a1628]"
+          className="text-[13px] font-semibold text-[#0a1628]"
         >
           {label}
           {props.required && (
-            <span className="text-[#7c9885]  ml-0.5" aria-hidden>
+            <span className="text-[#7c9885] ml-0.5" aria-hidden>
               *
             </span>
           )}
@@ -36,25 +37,47 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           </p>
         )}
 
-        <input
-          ref={ref}
-          id={fieldId}
-          aria-describedby={
-            [hintId, errId].filter(Boolean).join(" ") || undefined
-          }
-          aria-invalid={!!error}
-          className={[
-            "w-full px-4 py-3 rounded-xl border text-sm text-[#0a1628] box-border min-w-0",
-            "placeholder:text-gray-300 transition-all duration-150",
-            "focus:outline-none focus:ring-2 focus:ring-[#7c9885]/40 focus:border-[#7c9885]",
-            "disabled:bg-gray-50 disabled:cursor-not-allowed [&[type=date]]:pr-3",
-            error
-              ? "border-red-400 bg-red-50/40"
-              : "border-gray-200 bg-white hover:border-gray-300",
-            className ?? "",
-          ].join(" ")}
-          {...props}
-        />
+        {/* 
+          iOS Safari fix: the outer div clips anything that overflows.
+          The input gets explicit inline styles because Safari ignores
+          box-sizing and width from the CSS cascade on date inputs.
+        */}
+        <div
+          style={isDate ? { width: "100%", overflow: "hidden" } : undefined}
+          className={isDate ? "rounded-xl" : undefined}
+        >
+          <input
+            ref={ref}
+            id={fieldId}
+            aria-describedby={
+              [hintId, errId].filter(Boolean).join(" ") || undefined
+            }
+            aria-invalid={!!error}
+            style={
+              isDate
+                ? {
+                    boxSizing: "border-box",
+                    width: "100%",
+                    maxWidth: "100%",
+                    minWidth: "0",
+                    paddingRight: "12px",
+                    WebkitAppearance: "none",
+                  }
+                : undefined
+            }
+            className={[
+              "w-full px-4 py-3 rounded-xl border text-sm text-[#0a1628] box-border min-w-0",
+              "placeholder:text-gray-300 transition-all duration-150",
+              "focus:outline-none focus:ring-2 focus:ring-[#7c9885]/40 focus:border-[#7c9885]",
+              "disabled:bg-gray-50 disabled:cursor-not-allowed",
+              error
+                ? "border-red-400 bg-red-50/40"
+                : "border-gray-200 bg-white hover:border-gray-300",
+              className ?? "",
+            ].join(" ")}
+            {...props}
+          />
+        </div>
 
         {error && (
           <p
