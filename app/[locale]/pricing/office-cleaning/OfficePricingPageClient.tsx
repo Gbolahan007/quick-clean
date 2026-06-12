@@ -1,17 +1,16 @@
 "use client";
 
 import { HoursSlider } from "@/app/components/office/HoursSlider";
+import { TierIndicator } from "@/app/components/office/TierIndicator";
 import { PricingHeader } from "../components/PricingHeader";
 import { PricingStoreProvider } from "../components/PricingStoreProvider";
 import { useOfficePricingState } from "../hooks/useOfficePricingState";
-import { TierIndicator } from "@/app/components/office/TierIndicator";
 // import { OfficeSizeSelector } from "@/app/components/office/OfficeSizeSelector";
+import { InfoPanels, TrustBadges } from "@/app/components/office/InfoPanels";
+import { OfficeCTABar } from "@/app/components/office/OfficeCTABar";
+import { PricingSummaryCard } from "@/app/components/office/PricingSummaryCard";
 import { ScheduleSelector } from "@/app/components/office/ScheduleSelector";
 import { SurchargeToggle } from "@/app/components/office/SurchargeToggle";
-import { AddonsSelector } from "@/app/components/office/AddonsSelector";
-import { InfoPanels, TrustBadges } from "@/app/components/office/InfoPanels";
-import { PricingSummaryCard } from "@/app/components/office/PricingSummaryCard";
-import { OfficeCTABar } from "@/app/components/office/OfficeCTABar";
 import { useTranslations } from "next-intl";
 
 type Props = { localeProp: "en" | "fi" };
@@ -26,14 +25,14 @@ function OfficePricingPageInner({ localeProp }: Props) {
     selectedSpace,
     schedule,
     hasSurcharge,
-    selectedAddons,
+    // selectedAddons,
     addonsTotal,
     pricing,
     handleHoursChange,
     // setSelectedSpace,
     setSchedule,
     setHasSurcharge,
-    toggleAddon,
+    // toggleAddon,
     handleBook,
   } = useOfficePricingState({ localeProp });
 
@@ -98,12 +97,12 @@ function OfficePricingPageInner({ localeProp }: Props) {
 
             <SurchargeToggle value={hasSurcharge} onChange={setHasSurcharge} />
 
-            <Card>
+            {/* <Card>
               <AddonsSelector
                 selected={selectedAddons}
                 onToggle={toggleAddon}
               />
-            </Card>
+            </Card> */}
 
             <InfoPanels />
 

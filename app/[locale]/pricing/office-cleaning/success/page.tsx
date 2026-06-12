@@ -77,7 +77,7 @@ export default async function OfficeBookingSuccessPage({
       <div className="w-full max-w-lg space-y-6">
         {/* ── Header ─────────────────────────────────────────────────────── */}
         {isConfirmed ? (
-          <div className="text-center space-y-3">
+          <div className="text-center  py-8 space-y-3">
             <div className="flex justify-center">
               <div className="w-16 h-16 rounded-full bg-[#f0f8f3] flex items-center justify-center">
                 <CheckCircle
@@ -97,7 +97,7 @@ export default async function OfficeBookingSuccessPage({
             </p>
           </div>
         ) : (
-          <div className="text-center space-y-3">
+          <div className="text-center  space-y-3">
             <div className="flex justify-center">
               <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center animate-pulse">
                 <Clock className="w-8 h-8 text-amber-500" strokeWidth={1.8} />

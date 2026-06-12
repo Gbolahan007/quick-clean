@@ -242,7 +242,7 @@
       "estimateEmptyHint": "Aseta viikkotunnit aloittaaksesi",
       "estimateLive": "Reaaliaikainen arvio",
       "estimateWeeklyCost": "Viikkokustannus",
-      "estimateMonthly": "Kuukausipohja (×4,33)",
+      "estimateMonthly": "Kuukausipohja (×4.2)",
       "estimateSurcharge": "Ilta-/viikonloppulisä (+15%)",
       "estimateAddons": "Lisäpalvelut (estimaatti)",
       "estimateTotal": "Yhteensä kuukaudessa",
