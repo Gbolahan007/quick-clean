@@ -129,7 +129,7 @@ export async function getOrCreateStripeCustomer(
       name: input.fullName,
       phone: input.phone,
       metadata: {
-        platform_customer_id: input.platformCustomerId, // link back to our DB
+        platform_customer_id: input.platformCustomerId,
       },
     });
     stripeCustomerId = newCustomer.id;

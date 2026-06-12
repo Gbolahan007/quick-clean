@@ -205,11 +205,11 @@ export const useOfficeBookingStore = create<
             return;
           }
 
-          set({
-            ...INITIAL_OFFICE_STATE,
-            confirmedBookingId: result.bookingId,
-            isSubmitting: false,
-          });
+          set({ ...INITIAL_OFFICE_STATE });
+          try {
+            localStorage.removeItem("office-booking-store");
+          } catch {}
+          window.location.href = result.checkoutUrl;
         } catch (err) {
           set({
             submissionError:
@@ -236,7 +236,6 @@ export const useOfficeBookingStore = create<
         contact: state.contact,
         address: state.address,
         currentStep: state.currentStep,
-        confirmedBookingId: state.confirmedBookingId,
       }),
     },
   ),

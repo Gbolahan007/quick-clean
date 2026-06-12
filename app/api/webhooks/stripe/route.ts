@@ -4,16 +4,15 @@ import Stripe from "stripe";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { getStripe } from "@/app/lib/stripe/stripeClient";
 import {
-  sendPaymentFailedEmail,
-  sendSubscriptionEndedEmail,
-} from "@/app/lib/email/emailServices";
+  sendPaymentSuccessEmails,
+  sendSubscriptionActivatedEmails,
+  sendRenewalSuccessEmails,
+  sendPaymentFailedEmails,
+  sendSubscriptionCancelledEmails,
+  sendRefundEmails,
+} from "@/app/lib/email/emailService";
 
 // ── Typed Supabase client ─────────────────────────────────────────────────────
-// Using `any` for the schema type avoids the "never" overload errors that
-// occur when Supabase cannot infer the table types from an untyped client.
-// If you have generated types (supabase gen types), import and use them here:
-//   import type { Database } from "@/types/supabase";
-//   createClient<Database>(url, key)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TypedSupabase = SupabaseClient<any>;
 
@@ -39,7 +38,6 @@ async function logWebhookEvent(
 
   if (error) {
     if (error.code === "23505") {
-      // Unique constraint — already processed
       console.log(
         `[webhook] Duplicate event skipped: ${event.id} (${event.type})`,
       );
@@ -76,7 +74,7 @@ async function findBookingBySubscription(
 ) {
   const { data, error } = await supabase
     .from("bookings")
-    .select("id, customer_id, visits_per_month, frequency")
+    .select("id, customer_id, visits_per_month, frequency, plan_label")
     .eq("stripe_subscription_id", subId)
     .maybeSingle();
 
@@ -84,11 +82,13 @@ async function findBookingBySubscription(
     throw new Error(
       `Booking lookup by subscription failed (${subId}): ${error.message}`,
     );
+
   return data as {
     id: string;
     customer_id: string;
     visits_per_month: number | null;
     frequency: string;
+    plan_label: string | null;
   } | null;
 }
 
@@ -108,6 +108,7 @@ async function findBookingBySession(
     throw new Error(
       `Booking lookup by session failed (${sessionId}): ${error.message}`,
     );
+
   return data as {
     id: string;
     customer_id: string;
@@ -119,6 +120,132 @@ async function findBookingBySession(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// EMAIL HELPERS (top-level — so they can be called from handlers)
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function sendCheckoutEmails(
+  supabase: TypedSupabase,
+  bookingId: string,
+  session: Stripe.Checkout.Session,
+): Promise<void> {
+  const { data } = await supabase
+    .from("bookings")
+    .select(
+      `
+      id, frequency, plan_label, visits_per_month,
+      booking_date, time_slot, final_price, apartment_size,
+      stripe_subscription_id, current_period_end,
+      customers ( full_name, email, phone )
+    `,
+    )
+    .eq("id", bookingId)
+    .single();
+
+  if (!data) {
+    console.warn(
+      `[email] Could not fetch booking ${bookingId} for checkout email`,
+    );
+    return;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const customer = data.customers as any;
+  const locale = (session.metadata?.locale as "en" | "fi") ?? "en";
+  const amountCents =
+    session.amount_total ?? Math.round((data.final_price ?? 0) * 100);
+
+  if (session.mode === "payment") {
+    sendPaymentSuccessEmails({
+      locale,
+      bookingId,
+      customerEmail: customer?.email ?? "",
+      customerName: customer?.full_name ?? "",
+      customerPhone: customer?.phone ?? undefined,
+      serviceType: data.plan_label ?? "",
+      planLabel: data.plan_label ?? "",
+      amountCents,
+      currency: session.currency ?? "eur",
+      paidAt: new Date().toISOString(),
+      stripePaymentIntentId: (session.payment_intent as string) ?? "",
+      bookingDate: data.booking_date ?? "",
+      timeSlot: data.time_slot ?? "",
+      apartmentSize: data.apartment_size ?? "",
+    }).catch((err) =>
+      console.error(`[email] Payment success email error [${bookingId}]:`, err),
+    );
+  } else if (session.mode === "subscription") {
+    sendSubscriptionActivatedEmails({
+      locale,
+      bookingId,
+      customerEmail: customer?.email ?? "",
+      customerName: customer?.full_name ?? "",
+      customerPhone: customer?.phone ?? undefined,
+      planLabel: data.plan_label ?? "",
+      frequency: data.frequency ?? "",
+      visitsPerMonth: data.visits_per_month ?? null,
+      firstBillingDate: data.current_period_end ?? new Date().toISOString(),
+      stripeSubscriptionId: data.stripe_subscription_id ?? "",
+      amountCents,
+      currency: session.currency ?? "eur",
+    }).catch((err) =>
+      console.error(
+        `[email] Subscription activated email error [${bookingId}]:`,
+        err,
+      ),
+    );
+  }
+}
+
+async function sendInvoicePaidEmail(
+  supabase: TypedSupabase,
+  bookingId: string,
+  planLabel: string,
+  amountPaid: number,
+  currency: string,
+  billingPeriodStart: string | null,
+  billingPeriodEnd: string | null,
+  visitsPerMonth: number | null,
+  invoiceId: string,
+  billingReason: string | null | undefined,
+): Promise<void> {
+  // Skip first payment — checkout.session.completed handles that email
+  if (billingReason === "subscription_create") return;
+
+  // Fetch customer via booking
+  const { data: bookingData } = await supabase
+    .from("bookings")
+    .select("customer_id")
+    .eq("id", bookingId)
+    .single();
+
+  if (!bookingData) return;
+
+  const { data: customerData } = await supabase
+    .from("customers")
+    .select("email, full_name")
+    .eq("id", bookingData.customer_id)
+    .single();
+
+  if (!customerData) return;
+
+  sendRenewalSuccessEmails({
+    locale: "en",
+    bookingId,
+    customerEmail: customerData.email,
+    customerName: customerData.full_name,
+    planLabel: planLabel ?? "",
+    amountCents: amountPaid,
+    currency,
+    billingPeriodStart: billingPeriodStart ?? new Date().toISOString(),
+    billingPeriodEnd: billingPeriodEnd ?? new Date().toISOString(),
+    visitsCovered: visitsPerMonth,
+    stripeInvoiceId: invoiceId,
+  }).catch((err) =>
+    console.error(`[email] Renewal email error [${bookingId}]:`, err),
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // HANDLER: checkout.session.completed
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -126,7 +253,6 @@ async function handleCheckoutCompleted(
   supabase: TypedSupabase,
   session: Stripe.Checkout.Session,
 ): Promise<string | undefined> {
-  // booking_id was stored in metadata when the Checkout Session was created
   const bookingId = session.metadata?.booking_id;
   if (!bookingId) {
     throw new Error(
@@ -145,11 +271,9 @@ async function handleCheckoutCompleted(
   if (isPayment && session.payment_intent) {
     updateFields.stripe_payment_intent_id = session.payment_intent as string;
   }
-
   if (isSubscription && session.subscription) {
     updateFields.stripe_subscription_id = session.subscription as string;
     updateFields.subscription_status = "active";
-    // current_period_start/end set by invoice.paid handler
   }
 
   const { error } = await supabase
@@ -164,8 +288,8 @@ async function handleCheckoutCompleted(
     `[webhook] Booking ${bookingId} confirmed (mode: ${session.mode})`,
   );
 
-  // One-time payments: create the payments row immediately
-  // Subscriptions: invoice.paid handler creates the payments row
+  // One-time payments: create payments row immediately
+
   if (isPayment && session.payment_intent && session.amount_total) {
     await supabase.from("payments").insert({
       booking_id: bookingId,
@@ -178,6 +302,11 @@ async function handleCheckoutCompleted(
     });
   }
 
+  // ── Send confirmation emails (non-blocking) ───────────────────────────────
+  sendCheckoutEmails(supabase, bookingId, session).catch((err) =>
+    console.error(`[webhook] Checkout email error [${bookingId}]:`, err),
+  );
+
   return bookingId;
 }
 
@@ -189,24 +318,17 @@ async function handleInvoicePaid(
   supabase: TypedSupabase,
   invoice: Stripe.Invoice,
 ): Promise<string | undefined> {
-  // Stripe SDK v18 removed `subscription` and `payment_intent` from the Invoice
-  // type definition. They still exist at runtime — cast to any to access them.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const inv = invoice as any;
 
-  // Stripe API dahlia (v18): subscription moved to invoice.parent.subscription_details.subscription
-  // Confirmed from debug log: inv.subscription is null, inv.parent.subscription_details.subscription has the ID.
-  // Support both the old location (inv.subscription) and the new location for forward compatibility.
   const rawSub = inv.subscription as string | { id: string } | null | undefined;
   const subFromLegacy =
     typeof rawSub === "string" ? rawSub : (rawSub?.id ?? null);
-
   const subFromParent =
     (inv.parent?.subscription_details?.subscription as
       | string
       | null
       | undefined) ?? null;
-
   const subscriptionId = subFromLegacy ?? subFromParent;
 
   if (!subscriptionId) {
@@ -220,17 +342,15 @@ async function handleInvoicePaid(
     `[webhook] invoice.paid: subscriptionId resolved → ${subscriptionId}`,
   );
 
-  // ── Primary lookup: by stripe_subscription_id ─────────────────────────────
+  // ── Primary lookup ────────────────────────────────────────────────────────
   let booking = await findBookingBySubscription(supabase, subscriptionId);
 
-  // ── Fallback lookup: by booking_id in subscription metadata ───────────────
+  // ── Fallback: booking_id from subscription metadata ───────────────────────
   // Race condition: invoice.paid can fire before checkout.session.completed
-  // finishes processing, meaning stripe_subscription_id may not yet be written
-  // to the booking row. Fall back to booking_id stored in Stripe subscription
-  // metadata (written during createCheckoutSession → subscription_data.metadata).
+  // has written stripe_subscription_id to the booking row.
   if (!booking) {
     console.warn(
-      `[webhook] invoice.paid: no booking by subscription ${subscriptionId}, trying metadata fallback`,
+      `[webhook] invoice.paid: no booking for ${subscriptionId}, trying metadata fallback`,
     );
     try {
       const stripe = getStripe();
@@ -239,7 +359,7 @@ async function handleInvoicePaid(
       if (bookingId) {
         const { data } = await supabase
           .from("bookings")
-          .select("id, customer_id, visits_per_month, frequency")
+          .select("id, customer_id, visits_per_month, frequency, plan_label")
           .eq("id", bookingId)
           .single();
         if (data) {
@@ -248,8 +368,8 @@ async function handleInvoicePaid(
             customer_id: string;
             visits_per_month: number | null;
             frequency: string;
+            plan_label: string | null;
           };
-          // Patch the subscription_id so future lookups work without fallback
           await supabase
             .from("bookings")
             .update({ stripe_subscription_id: subscriptionId })
@@ -266,15 +386,12 @@ async function handleInvoicePaid(
 
   if (!booking) {
     console.warn(
-      `[webhook] invoice.paid: booking not found for subscription ${subscriptionId} — skipping`,
+      `[webhook] invoice.paid: booking not found for ${subscriptionId} — skipping`,
     );
     return;
   }
 
-  // Stripe dahlia API change: invoice.period_start/end now reflects invoice
-  // creation time, NOT the billing period. The actual subscription billing
-  // period lives on the Subscription object (current_period_start/end).
-  // Fetch the subscription to get the correct period dates.
+  // ── Billing period (dahlia: lives on items.data[0]) ───────────────────────
   let periodStart: string | null = null;
   let periodEnd: string | null = null;
 
@@ -283,9 +400,6 @@ async function handleInvoicePaid(
     const sub = await stripe.subscriptions.retrieve(subscriptionId);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const subAny = sub as any;
-
-    // Stripe dahlia: current_period_start/end moved from top-level subscription
-    // to sub.items.data[0].current_period_start/end
     const item0 = subAny.items?.data?.[0];
     const cps = (item0?.current_period_start ?? subAny.current_period_start) as
       | number
@@ -295,7 +409,6 @@ async function handleInvoicePaid(
       | number
       | null
       | undefined;
-
     if (cps) periodStart = new Date(cps * 1000).toISOString();
     if (cpe) periodEnd = new Date(cpe * 1000).toISOString();
   } catch (err) {
@@ -316,7 +429,6 @@ async function handleInvoicePaid(
       : (invoice.amount_paid ?? 0)
   ) as number;
   const invoiceCurrency = (inv.currency ?? invoice.currency ?? "eur") as string;
-
   const rawPi = inv.payment_intent as
     | string
     | { id: string }
@@ -360,9 +472,23 @@ async function handleInvoicePaid(
     `[webhook] Booking ${booking.id} billing period updated: ${periodStart} → ${periodEnd}`,
   );
 
+  // ── Send renewal email (non-blocking, skips subscription_create) ──────────
+  sendInvoicePaidEmail(
+    supabase,
+    booking.id,
+    booking.plan_label ?? "",
+    amountPaid,
+    invoiceCurrency,
+    periodStart,
+    periodEnd,
+    booking.visits_per_month,
+    invoice.id,
+    billingReason,
+  ).catch((err) =>
+    console.error(`[webhook] Invoice paid email error [${booking.id}]:`, err),
+  );
+
   // ── SCHEDULING HOOK ───────────────────────────────────────────────────────
-  // Generate visit slots here when the scheduling system is ready.
-  // Use: booking.frequency, booking.visits_per_month, periodStart, periodEnd
 
   return booking.id;
 }
@@ -375,11 +501,9 @@ async function handleInvoicePaymentFailed(
   supabase: TypedSupabase,
   invoice: Stripe.Invoice,
 ): Promise<string | undefined> {
-  // Same as handleInvoicePaid — cast to any for removed Invoice fields
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const inv = invoice as any;
 
-  // Stripe API dahlia: subscription moved to parent.subscription_details.subscription
   const rawSub = inv.subscription as string | { id: string } | null | undefined;
   const subFromLegacy =
     typeof rawSub === "string" ? rawSub : (rawSub?.id ?? null);
@@ -419,10 +543,7 @@ async function handleInvoicePaymentFailed(
 
   await supabase
     .from("bookings")
-    .update({
-      payment_status: "failed",
-      subscription_status: "past_due",
-    })
+    .update({ payment_status: "failed", subscription_status: "past_due" })
     .eq("id", booking.id);
 
   console.log(
@@ -436,10 +557,12 @@ async function handleInvoicePaymentFailed(
     .single();
 
   if (customerData) {
-    sendPaymentFailedEmail({
+    sendPaymentFailedEmails({
+      locale: "en",
+      bookingId: booking.id,
       customerEmail: customerData.email,
       customerName: customerData.full_name,
-      bookingId: booking.id,
+      planLabel: booking.plan_label ?? "",
       failureReason: failureMessage,
     }).catch((err) =>
       console.error(
@@ -463,7 +586,6 @@ async function handleSubscriptionUpdated(
   const booking = await findBookingBySubscription(supabase, subscription.id);
   if (!booking) return;
 
-  // Stripe dahlia: current_period_start/end moved to items.data[0]
   const sub = subscription as unknown as Record<string, unknown>;
   const subItems = sub["items"] as Record<string, unknown> | undefined;
   const item0 = (
@@ -481,12 +603,10 @@ async function handleSubscriptionUpdated(
     cancel_at_period_end: subscription.cancel_at_period_end,
   };
 
-  if (typeof cps === "number") {
+  if (typeof cps === "number")
     updateFields.current_period_start = new Date(cps * 1000).toISOString();
-  }
-  if (typeof cpe === "number") {
+  if (typeof cpe === "number")
     updateFields.current_period_end = new Date(cpe * 1000).toISOString();
-  }
 
   await supabase.from("bookings").update(updateFields).eq("id", booking.id);
 
@@ -527,10 +647,14 @@ async function handleSubscriptionDeleted(
     .single();
 
   if (customerData) {
-    sendSubscriptionEndedEmail({
+    sendSubscriptionCancelledEmails({
+      locale: "en",
+      bookingId: booking.id,
       customerEmail: customerData.email,
       customerName: customerData.full_name,
-      bookingId: booking.id,
+      planLabel: booking.plan_label ?? "",
+      canceledAt: new Date().toISOString(),
+      accessUntil: null,
     }).catch((err) =>
       console.error(
         `[webhook] Subscription ended email error [${booking.id}]:`,
@@ -568,6 +692,9 @@ async function handleChargeRefunded(
     return;
   }
 
+  const p = payment as Record<string, unknown>;
+  const paymentId = p["id"] as string;
+  const bookingId = p["booking_id"] as string;
   const refundedAmount = charge.amount_refunded;
   const isFullRefund = refundedAmount >= charge.amount;
   const latestRefund = charge.refunds?.data?.[0];
@@ -579,20 +706,57 @@ async function handleChargeRefunded(
       stripe_refund_id: latestRefund?.id ?? null,
       refunded_at: new Date().toISOString(),
     })
-    .eq("id", (payment as Record<string, unknown>)["id"] as string);
+    .eq("id", paymentId);
 
   if (isFullRefund) {
     await supabase
       .from("bookings")
       .update({ payment_status: "refunded" })
-      .eq("id", (payment as Record<string, unknown>)["booking_id"] as string);
+      .eq("id", bookingId);
   }
 
   console.log(
     `[webhook] Charge refunded. Amount: ${refundedAmount} cents. Full: ${isFullRefund}`,
   );
 
-  return (payment as Record<string, unknown>)["booking_id"] as string;
+  // ── Send refund emails (non-blocking) ─────────────────────────────────────
+  try {
+    const { data: bookingData } = await supabase
+      .from("bookings")
+      .select("customer_id, plan_label")
+      .eq("id", bookingId)
+      .single();
+
+    if (bookingData) {
+      const bd = bookingData as Record<string, unknown>;
+      const { data: customerData } = await supabase
+        .from("customers")
+        .select("email, full_name")
+        .eq("id", bd["customer_id"] as string)
+        .single();
+
+      if (customerData) {
+        const cd = customerData as Record<string, unknown>;
+        sendRefundEmails({
+          locale: "en",
+          bookingId,
+          customerEmail: cd["email"] as string,
+          customerName: cd["full_name"] as string,
+          refundAmountCents: refundedAmount,
+          currency: "eur",
+          refundedAt: new Date().toISOString(),
+          stripeRefundId: latestRefund?.id ?? "",
+          isFullRefund,
+        }).catch((err) =>
+          console.error(`[webhook] Refund email error [${bookingId}]:`, err),
+        );
+      }
+    }
+  } catch (err) {
+    console.error(`[webhook] Refund email lookup error [${bookingId}]:`, err);
+  }
+
+  return bookingId;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -603,7 +767,6 @@ export async function POST(req: NextRequest) {
   const supabase = getSupabase();
   const stripe = getStripe();
 
-  // ── 1. Raw body — required for signature verification ─────────────────────
   const rawBody = await req.arrayBuffer();
   const body = Buffer.from(rawBody);
   const sig = req.headers.get("stripe-signature");
@@ -617,7 +780,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // ── 2. Signature verification (FIRST — rejects forged events) ─────────────
   let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(body, sig!, webhookSecret);
@@ -627,13 +789,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
-  // ── 3. Idempotency check ──────────────────────────────────────────────────
   const { alreadyProcessed } = await logWebhookEvent(supabase, event);
   if (alreadyProcessed) {
     return NextResponse.json({ received: true, skipped: "duplicate" });
   }
 
-  // ── 4. Route to handler ───────────────────────────────────────────────────
   let relatedBookingId: string | undefined;
   let processingError: string | undefined;
 
@@ -645,48 +805,41 @@ export async function POST(req: NextRequest) {
           event.data.object as Stripe.Checkout.Session,
         );
         break;
-
       case "invoice.paid":
         relatedBookingId = await handleInvoicePaid(
           supabase,
           event.data.object as Stripe.Invoice,
         );
         break;
-
       case "invoice.payment_failed":
         relatedBookingId = await handleInvoicePaymentFailed(
           supabase,
           event.data.object as Stripe.Invoice,
         );
         break;
-
       case "customer.subscription.updated":
         relatedBookingId = await handleSubscriptionUpdated(
           supabase,
           event.data.object as Stripe.Subscription,
         );
         break;
-
       case "customer.subscription.deleted":
         relatedBookingId = await handleSubscriptionDeleted(
           supabase,
           event.data.object as Stripe.Subscription,
         );
         break;
-
       case "charge.refunded":
         relatedBookingId = await handleChargeRefunded(
           supabase,
           event.data.object as Stripe.Charge,
         );
         break;
-
       case "checkout.session.expired":
         console.log(
           `[webhook] Checkout session expired: ${(event.data.object as Stripe.Checkout.Session).id}`,
         );
         break;
-
       default:
         console.log(`[webhook] Unhandled event type: ${event.type}`);
     }
@@ -696,11 +849,8 @@ export async function POST(req: NextRequest) {
       `[webhook] Handler error for ${event.type} (${event.id}):`,
       processingError,
     );
-    // Return 200 — Stripe should not retry bugs. Error is logged for ops review.
   }
 
-  // ── 5. Mark processed ─────────────────────────────────────────────────────
   await markProcessed(supabase, event.id, relatedBookingId, processingError);
-
   return NextResponse.json({ received: true });
 }

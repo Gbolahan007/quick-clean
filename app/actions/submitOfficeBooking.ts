@@ -1,4 +1,5 @@
 "use server";
+// app/actions/submitOfficeBooking.ts
 
 import { createClient } from "@supabase/supabase-js";
 import { officeBookingSubmitSchema } from "../schema/officeBooking";
@@ -6,10 +7,21 @@ import {
   calculateOfficePricing,
   validateScheduleHours,
 } from "../../app/[locale]/pricing/data/lib/officePricing";
-import type { OfficeBookingResult } from "../types/office";
 import type { OfficeBookingSubmitPayload } from "../types/office";
-import { buildOfficeEmailData } from "../lib/email/buildBookingEmailData";
-import { sendBookingEmails } from "../lib/email/emailServices";
+import { createOfficeCheckoutSession } from "./createOfficeCheckoutSession";
+
+export type OfficeBookingSubmitResult =
+  | {
+      success: true;
+      bookingId: string;
+      customerId: string;
+      checkoutUrl: string;
+    }
+  | { success: false; error: string; code: string };
+
+// Hourly rate in cents — single source of truth.
+// Change this when the business rate changes. Never read from client.
+const OFFICE_HOURLY_RATE_CENTS = 4500; // €45.00/hour
 
 function getServiceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -20,7 +32,7 @@ function getServiceClient() {
 
 export async function submitOfficeBookingAction(
   payload: OfficeBookingSubmitPayload,
-): Promise<OfficeBookingResult> {
+): Promise<OfficeBookingSubmitResult> {
   // ── 1. Validate ────────────────────────────────────────────────────────────
   const parsed = officeBookingSubmitSchema.safeParse(payload);
   if (!parsed.success) {
@@ -35,7 +47,10 @@ export async function submitOfficeBookingAction(
   const supabase = getServiceClient();
 
   try {
-    // ── 2. Authoritative pricing recalculation ─────────────────────────────
+    // ── 2. Server-side pricing calculation ────────────────────────────────
+    // SECURITY: client sends weeklyHoursInput. Server calculates everything else.
+    // Client-provided addonsMonthlyTotal is accepted for display but we
+    // re-derive the Stripe amount from server-calculated fields only.
     const serverPricing = calculateOfficePricing(
       data.weeklyHoursInput,
       data.eveningWeekendSurcharge,
@@ -52,6 +67,12 @@ export async function submitOfficeBookingAction(
         code: "SCHEDULE_HOURS_MISMATCH",
       };
     }
+
+    // Server-authoritative amounts for Stripe
+    const estimatedHours = serverPricing.weeklyHours; // e.g. 3.0
+    const hourlyRateCents = OFFICE_HOURLY_RATE_CENTS; // 4500
+
+    const monthlyAmount = serverPricing.finalMonthly + data.addonsMonthlyTotal;
 
     // ── 3. Find or create customer ─────────────────────────────────────────
     let customerId: string;
@@ -124,7 +145,7 @@ export async function submitOfficeBookingAction(
       );
     }
 
-    // ── 6. Duplicate office booking guard ──────────────────────────────────
+    // ── 6. Duplicate guard ────────────────────────────────────────────────
     const { data: duplicate } = await supabase
       .from("bookings")
       .select("id")
@@ -143,48 +164,45 @@ export async function submitOfficeBookingAction(
       };
     }
 
-    // ── 7. Determine first booking_date ────────────────────────────────────
+    // ── 7. First booking date ──────────────────────────────────────────────
     const firstBookingDate = getFirstScheduledDate(data.recurringRules);
     const defaultStartTime = data.recurringRules[0]?.startTime ?? "08:00";
 
     // ── 8. Insert booking ──────────────────────────────────────────────────
-    const serverMonthly = serverPricing.finalMonthly + data.addonsMonthlyTotal;
-    const serverBasePrice = serverPricing.monthlyCost;
-
     const { data: booking, error: bookingError } = await supabase
       .from("bookings")
       .insert({
-        // ── Core relations ─────────────────────────────────────────────────
+        // ── Relations ─────────────────────────────────────────────────────
         customer_id: customerId,
         service_id: serviceRecord.id,
         address_id: addressRecord.id,
         subscription_plan_id: null,
 
-        // ── Scheduling ─────────────────────────────────────────────────────
+        // ── Schedule ──────────────────────────────────────────────────────
         booking_date: firstBookingDate,
         time_slot: defaultStartTime,
 
-        // ── Status ─────────────────────────────────────────────────────────
+        // ── Status ────────────────────────────────────────────────────────
         status: "pending",
         payment_status: "pending",
         frequency: "weekly",
 
-        // ── Pricing ────────────────────────────────────────────────────────
-        final_price: serverMonthly,
-        base_price: serverBasePrice,
+        // ── Pricing (all server-calculated) ───────────────────────────────
+        final_price: monthlyAmount,
+        base_price: serverPricing.monthlyCost,
 
-        // ── Service snapshot ───────────────────────────────────────────────
+        estimated_hours: estimatedHours,
+        hourly_rate_cents: hourlyRateCents,
+
+        // ── Service snapshot ──────────────────────────────────────────────
         service_type: "office",
         plan_key: data.planKey,
         plan_label: data.planLabel,
         show_deducted: false,
-
-        // ── Apartment snapshot (repurposed for office context) ─────────────
         apartment_key: "office",
         apartment_label: `${data.officeSizeSqm} m²`,
         apartment_size: `${data.officeSizeSqm} m²`,
 
-        // ── Addons snapshot ────────────────────────────────────────────────
         addons_snapshot: {
           count: data.selectedAddons.length,
           rawTotal: data.addonsMonthlyTotal,
@@ -193,25 +211,26 @@ export async function submitOfficeBookingAction(
           names: data.selectedAddons,
         },
 
-        // ── Notes ──────────────────────────────────────────────────────────
         special_notes: data.specialNotes,
-
-        // ── Office-specific columns ────────────────────────────────────────
         office_name: data.officeName,
         office_size_sqm: data.officeSizeSqm,
         weekly_hours: serverPricing.weeklyHours,
         hourly_rate: serverPricing.hourlyRate,
         recurring_time: defaultStartTime,
         evening_weekend_surcharge: data.eveningWeekendSurcharge,
-        monthly_estimate: serverMonthly,
+        monthly_estimate: monthlyAmount,
       })
-      .select("id, created_at") // ← added created_at for email timestamp
+      .select("id, created_at")
       .single();
 
     if (bookingError)
       throw new Error(`Booking insertion: ${bookingError.message}`);
 
-    console.log("[submitOfficeBookingAction] Booking created:", booking.id);
+    console.log(
+      "[submitOfficeBookingAction] Booking created:",
+      booking.id,
+      `| €${monthlyAmount.toFixed(2)}/month | ${estimatedHours}h/week @ €${(hourlyRateCents / 100).toFixed(2)}/hr`,
+    );
 
     // ── 9. Insert office_schedule_rules ────────────────────────────────────
     const scheduleRows = data.recurringRules.map((rule) => ({
@@ -225,7 +244,6 @@ export async function submitOfficeBookingAction(
     const { error: scheduleError } = await supabase
       .from("office_schedule_rules")
       .insert(scheduleRows);
-
     if (scheduleError) {
       console.error(
         "[submitOfficeBookingAction] Schedule rules error:",
@@ -238,67 +256,40 @@ export async function submitOfficeBookingAction(
       );
     }
 
-    // ── 10. Send emails (non-blocking) ─────────────────────────────────────
-    // Fires after successful DB write + schedule rules.
-    // Uses .then() intentionally — email failure must never roll back a booking.
-    sendBookingEmails(
-      buildOfficeEmailData({
-        bookingId: booking.id,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phone: data.phone,
-        streetAddress: data.streetAddress,
-        apartmentNumber: data.apartmentNumber,
-        postalCode: data.postalCode,
-        city: data.city,
-        officeName: data.officeName,
-        officeSizeSqm: data.officeSizeSqm,
-        weeklyHours: serverPricing.weeklyHours,
-        hourlyRate: serverPricing.hourlyRate,
-        pricingTier: serverPricing.tier,
-        monthlyEstimate: serverMonthly,
-        firstBookingDate,
-        defaultStartTime,
-        eveningWeekendSurcharge: data.eveningWeekendSurcharge,
-        specialNotes: data.specialNotes,
-        planLabel: data.planLabel,
-        selectedAddons: data.selectedAddons,
-        locale: (data.locale as "en" | "fi") ?? "en",
-        createdAt: booking.created_at,
-      }),
-    ).then((results) => {
-      if (!results.customer.success)
-        console.error(
-          `[submitOfficeBookingAction] Customer email failed [${booking.id}]:`,
-          results.customer.error,
-        );
-      if (!results.admin.success)
-        console.error(
-          `[submitOfficeBookingAction] Admin email failed [${booking.id}]:`,
-          results.admin.error,
-        );
+    // ── 10. Create Stripe Checkout Session ────────────────────────────────
+
+    const checkoutResult = await createOfficeCheckoutSession({
+      bookingId: booking.id,
+      customerId,
+      customerEmail: data.email,
+      locale: (data.locale as "en" | "fi") ?? "en",
+      successPath: "/pricing/office-cleaning/success",
+      cancelPath: "/pricing/office-cleaning/cancelled",
     });
 
-    // ── 11. TODO: Create Stripe recurring subscription ─────────────────────
-    // When Stripe is wired:
-    //   const stripeSession = await createStripeSubscription({
-    //     customerId,
-    //     bookingId:     booking.id,
-    //     amountCents:   toStripeCents(serverMonthly),
-    //     customerEmail: data.email,
-    //     planLabel:     data.planLabel,
-    //   });
-    //
-    //   await supabase
-    //     .from("bookings")
-    //     .update({ stripe_subscription_id: stripeSession.subscriptionId })
-    //     .eq("id", booking.id);
-    //
-    //   return { success: true, bookingId: booking.id, customerId, stripeSessionUrl: stripeSession.url };
+    if (!checkoutResult.success) {
+      console.error(
+        `[submitOfficeBookingAction] Stripe failed [${booking.id}]:`,
+        checkoutResult.error,
+      );
+      return {
+        success: false,
+        error: checkoutResult.error,
+        code: checkoutResult.code,
+      };
+    }
 
-    // ── 12. Return ─────────────────────────────────────────────────────────
-    return { success: true, bookingId: booking.id, customerId };
+    console.log(
+      `[submitOfficeBookingAction] Checkout session: ${checkoutResult.sessionId} → ${booking.id}`,
+    );
+
+    // ── 11. Return ─────────────────────────────────────────────────────────
+    return {
+      success: true,
+      bookingId: booking.id,
+      customerId,
+      checkoutUrl: checkoutResult.checkoutUrl,
+    };
   } catch (err) {
     console.error("[submitOfficeBookingAction] Fatal:", err);
     return {
@@ -309,7 +300,6 @@ export async function submitOfficeBookingAction(
   }
 }
 
-// ── Helper: first scheduled date ──────────────────────────────────────────────
 function getFirstScheduledDate(rules: { dayOfWeek: number }[]): string {
   if (rules.length === 0) {
     const d = new Date();

@@ -1,12 +1,14 @@
+// app/[locale]/pricing/office-cleaning/cancelled/page.tsx
+
 import Link from "next/link";
-import { XCircle, ArrowLeft, RefreshCw } from "lucide-react";
+import { ArrowLeft, RefreshCw, XCircle } from "lucide-react";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
   searchParams: Promise<{ booking_id?: string }>;
 }
 
-export default async function BookingCancelledPage({
+export default async function OfficeBookingCancelledPage({
   params,
   searchParams,
 }: PageProps) {
@@ -29,8 +31,8 @@ export default async function BookingCancelledPage({
             Payment cancelled
           </h1>
           <p className="text-[15px] text-[#0a1628]/55 max-w-xs mx-auto">
-            No charge was made. Your booking is saved — you can complete it any
-            time.
+            No charge was made. Your office contract request is saved — you can
+            complete it any time.
           </p>
         </div>
 
@@ -39,7 +41,7 @@ export default async function BookingCancelledPage({
           <div className="rounded-2xl border border-gray-200 bg-white px-5 py-4 flex items-center justify-between">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400">
-                Booking reference
+                Contract reference
               </p>
               <p className="text-[18px] font-extrabold font-mono text-[#0a1628] mt-0.5">
                 #{ref}
@@ -57,27 +59,26 @@ export default async function BookingCancelledPage({
             What happened
           </p>
           <p className="text-[13px] text-[#0a1628]/65 leading-relaxed">
-            You left the payment page before completing the checkout. This
-            sometimes happens accidentally — your booking details are still held
-            for a short time.
+            You left the payment page before completing checkout. This sometimes
+            happens accidentally — your contract details are still held.
           </p>
           <p className="text-[13px] text-[#0a1628]/65 leading-relaxed">
-            If you&apos;d like to continue, click <strong>Try again</strong>{" "}
-            below to go back through the booking flow. It only takes a minute.
+            Click <strong>Try again</strong> to go back through the booking
+            flow. Your details from the previous steps are still saved.
           </p>
         </div>
 
         {/* ── Actions ────────────────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row gap-3">
           <Link
-            href={`/${locale}/pricing`}
+            href={`/${locale}/pricing/office-cleaning`}
             className="flex-1 flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl border border-gray-200 text-[14px] font-semibold text-[#0a1628] hover:border-gray-300 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to pricing
           </Link>
           <Link
-            href={`/${locale}/booking`}
+            href={`/${locale}/pricing/office-cleaning-booking`}
             className="flex-1 flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-[#7c9885] text-[14px] font-semibold text-white hover:bg-[#6f8c78] transition-colors"
           >
             <RefreshCw className="w-4 h-4" />

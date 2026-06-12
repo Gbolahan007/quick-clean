@@ -94,8 +94,6 @@ export function StepAddress() {
           {...register("city")}
         />
 
-        {/* Pre-filled from apartment selection — read-only so the user
-            can't accidentally change values that were set during pricing. */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label={t("squareMeters")}

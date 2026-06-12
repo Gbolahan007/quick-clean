@@ -172,79 +172,6 @@ function SidebarRow({
   );
 }
 
-// ── Confirmation screen ───────────────────────────────────────────────────────
-
-function ConfirmationScreen() {
-  const t = useTranslations("officeBooking.confirmation");
-  const params = useParams();
-  const locale = params.locale as string;
-  const bookingId = useOfficeBookingStore((s) => s.confirmedBookingId);
-  const details = useOfficeBookingStore((s) => s.details);
-  const reset = useOfficeBookingStore((s) => s.resetOfficeBooking);
-  const nextSteps = t.raw("nextSteps.items") as string[];
-
-  return (
-    <div className="text-center py-12 space-y-6">
-      <div className="text-5xl" aria-hidden>
-        🎉
-      </div>
-      <div>
-        <h2 className="text-[26px] font-extrabold text-[#0a1628] tracking-tight">
-          {t("title")}
-        </h2>
-        <p className="text-[14px] text-gray-500 mt-2">
-          {t("subtitle")}
-          {details.officeName && ` ${details.officeName}!`}
-        </p>
-      </div>
-
-      {bookingId && (
-        <div className="inline-block px-5 py-3 rounded-xl bg-[#f0f8f3] border border-[#d4e8d9]">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-[#7c9885] mb-1">
-            {t("bookingRef")}
-          </p>
-          <p className="text-[14px] font-mono font-bold text-[#0a1628]">
-            {bookingId.slice(0, 8).toUpperCase()}
-          </p>
-        </div>
-      )}
-
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 text-left max-w-md mx-auto space-y-2">
-        <p className="text-[12px] font-bold text-[#0a1628] mb-3">
-          {t("nextSteps.title")}
-        </p>
-        {nextSteps.map((item) => (
-          <div key={item} className="flex items-start gap-2">
-            <span
-              className="text-[#7c9885] shrink-0 mt-0.5 text-[11px]"
-              aria-hidden
-            >
-              ✓
-            </span>
-            <span className="text-[12px] text-[#0a1628]/70">{item}</span>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-3 justify-center ">
-        <Link
-          href={`/${locale}`}
-          className="px-6 py-3 rounded-xl border border-gray-200 text-[14px] font-semibold text-[#0a1628] hover:border-gray-300 transition-colors"
-        >
-          {t("goHome")}
-        </Link>
-        <button
-          type="button"
-          onClick={reset}
-          className="px-6 py-3 rounded-xl bg-[#7c9885] text-[14px] font-semibold text-white hover:bg-[#6f8c78] transition-colors cursor-pointer"
-        >
-          {t("bookAnother")}
-        </button>
-      </div>
-    </div>
-  );
-}
-
 // ── Main page client ──────────────────────────────────────────────────────────
 
 export function OfficeBookingPageClient({ localeProp }: Props) {
@@ -252,17 +179,6 @@ export function OfficeBookingPageClient({ localeProp }: Props) {
   const params = useParams();
   const locale = (params.locale as string) ?? localeProp;
   const currentStep = useOfficeBookingStore((s) => s.currentStep);
-  const confirmedId = useOfficeBookingStore((s) => s.confirmedBookingId);
-
-  if (confirmedId) {
-    return (
-      <div className="min-h-screen bg-[#f8faf9]">
-        <div className="mx-auto max-w-2xl px-5 py-12">
-          <ConfirmationScreen />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen  bg-[#f8faf9] ">
