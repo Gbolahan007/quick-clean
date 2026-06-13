@@ -1,9 +1,3 @@
-// app/lib/email/templates/layout.ts
-// ─────────────────────────────────────────────────────────────────────────────
-// Shared HTML primitives for all QuickClean email templates.
-// Keeps templates consistent and DRY.
-// ─────────────────────────────────────────────────────────────────────────────
-
 export const BRAND = {
   dark: "#0a1628",
   green: "#7c9885",

@@ -14,7 +14,7 @@ import {
   formatAmount,
   ctaButton,
   BRAND,
-} from "./layout";
+} from "./emailLayout";
 import type {
   BookingSubmittedEmailInput,
   PaymentSuccessEmailInput,

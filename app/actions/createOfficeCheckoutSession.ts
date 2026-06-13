@@ -102,20 +102,34 @@ export async function createOfficeCheckoutSession(
 
     // ── 4. Resolve amount from DB ─────────────────────────────────────────
     const b = booking as Record<string, unknown>;
+    // SOURCE OF TRUTH: monthly_estimate = serverPricing.finalMonthly + addons.
+    // This is the TRUE monthly cost (weekly_hours × hourly_rate × WEEKS_PER_MONTH + surcharge).
+    // DO NOT use quoted_amount_cents — that is weekly cost only (hours × hourly_rate_cents).
+    const monthlyEstimate = b["monthly_estimate"] as number | null;
+    const estimatedHoursFromDb = b["estimated_hours"] as number | null;
+    const hourlyRateCentsFromDb = b["hourly_rate_cents"] as number | null;
 
-    const quotedCents =
-      (b["quoted_amount_cents"] as number | null) ??
-      Math.round(((b["monthly_estimate"] as number | null) ?? 0) * 100);
+    console.log(
+      `[stripe:office] DB values — monthly_estimate: €${monthlyEstimate} | ` +
+        `estimated_hours: ${estimatedHoursFromDb}h | hourly_rate_cents: ${hourlyRateCentsFromDb}¢ | ` +
+        `weekly_cost_check: €${((estimatedHoursFromDb ?? 0) * ((hourlyRateCentsFromDb ?? 0) / 100)).toFixed(2)}`,
+    );
+
+    const quotedCents = Math.round((monthlyEstimate ?? 0) * 100);
 
     if (!quotedCents || quotedCents <= 0) {
       return {
         success: false,
-        error:
-          "No calculable amount. Check estimated_hours and hourly_rate_cents.",
+        error: `Invalid monthly_estimate on booking (got: ${monthlyEstimate}). Check submitOfficeBookingAction.`,
         code: "INVALID_AMOUNT",
       };
     }
 
+    console.log(
+      `[stripe:office] Stripe charge: €${(quotedCents / 100).toFixed(2)}/month`,
+    );
+
+    // ── Add-ons ────────────────────────────────────────────────────────────
     const addonsSnapshot = b["addons_snapshot"] as Record<
       string,
       unknown
@@ -124,10 +138,6 @@ export async function createOfficeCheckoutSession(
       (addonsSnapshot?.["discountedTotal"] as number | null) ?? 0;
     const addonNames = (addonsSnapshot?.["names"] as string[] | null) ?? [];
     const addonCents = Math.round(addonsTotal * 100);
-
-    console.log(
-      `[stripe:office] Amounts — plan: €${(quotedCents / 100).toFixed(2)} | addons: €${(addonCents / 100).toFixed(2)}`,
-    );
 
     // ── 5. Stripe Product ID ──────────────────────────────────────────────
     const officeProductId = process.env.STRIPE_PRODUCT_OFFICE_CLEANING;
@@ -139,7 +149,8 @@ export async function createOfficeCheckoutSession(
     }
 
     // ── 6. Get or create Stripe Customer ──────────────────────────────────
-
+    // FIXED: correct param name is platformCustomerId, not customerId
+    // Fetch customer full_name from DB for Stripe customer record
     const { data: customerRecord } = await supabase
       .from("customers")
       .select("full_name, phone")

@@ -1,5 +1,4 @@
 "use client";
-// hooks/useInitBooking.ts
 
 import { useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";

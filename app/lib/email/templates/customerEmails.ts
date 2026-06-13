@@ -1,9 +1,3 @@
-// app/lib/email/templates/customerEmails.ts
-// ─────────────────────────────────────────────────────────────────────────────
-// All customer-facing email templates for QuickClean.
-// EN + FI for every email.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import type {
   BookingSubmittedEmailInput,
   EmailLocale,
@@ -23,7 +17,7 @@ import {
   emailWrapper,
   formatAmount,
   refBadge,
-} from "./layout";
+} from "./emailLayout";
 
 // ── i18n copy ─────────────────────────────────────────────────────────────────
 

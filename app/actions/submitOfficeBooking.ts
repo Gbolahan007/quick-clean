@@ -19,9 +19,10 @@ export type OfficeBookingSubmitResult =
     }
   | { success: false; error: string; code: string };
 
-// Hourly rate in cents — single source of truth.
-// Change this when the business rate changes. Never read from client.
-const OFFICE_HOURLY_RATE_CENTS = 4500; // €45.00/hour
+// Hourly rates in cents per tier — must match your pricing page display.
+// Tier is determined server-side by calculateOfficePricing(), never by the client.
+// Hourly rate comes directly from calculateOfficePricing() → tier.hourlyRate
+// No hardcoded map needed — the pricing function is the single source of truth.
 
 function getServiceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -69,10 +70,23 @@ export async function submitOfficeBookingAction(
     }
 
     // Server-authoritative amounts for Stripe
-    const estimatedHours = serverPricing.weeklyHours; // e.g. 3.0
-    const hourlyRateCents = OFFICE_HOURLY_RATE_CENTS; // 4500
-
+    const estimatedHours = serverPricing.weeklyHours;
+    // hourlyRate from calculateOfficePricing() — tier resolved server-side from weeklyHoursInput.
+    // Convert to cents for DB storage (hourly_rate_cents column).
+    const hourlyRateCents = Math.round(serverPricing.hourlyRate * 100);
+    console.log(
+      `[submitOfficeBookingAction] Pricing inputs — weeklyHoursInput: ${data.weeklyHoursInput} | hasSurcharge: ${data.eveningWeekendSurcharge}`,
+    );
+    console.log(
+      `[submitOfficeBookingAction] Pricing output — tier: ${serverPricing.tier} | hourlyRate: €${serverPricing.hourlyRate}/h | weeklyCost: €${serverPricing.weeklyCost} | monthlyCost: €${serverPricing.monthlyCost} | surcharge: €${serverPricing.surchargeAmount} | finalMonthly: €${serverPricing.finalMonthly}`,
+    );
+    // quoted_amount_cents will be computed by Postgres generated column
+    // but we also compute here for the payments table
     const monthlyAmount = serverPricing.finalMonthly + data.addonsMonthlyTotal;
+    // NOTE: monthly_estimate stores the BASE plan cost only (without addons).
+    // Addons are stored separately in addons_snapshot and added as a second
+    // Stripe line item in createOfficeCheckoutSession — never double-counted.
+    const planMonthlyAmount = serverPricing.finalMonthly;
 
     // ── 3. Find or create customer ─────────────────────────────────────────
     let customerId: string;
@@ -191,8 +205,12 @@ export async function submitOfficeBookingAction(
         final_price: monthlyAmount,
         base_price: serverPricing.monthlyCost,
 
+        // ── NEW: office Stripe fields ─────────────────────────────────────
+        // These three fields drive the Stripe price_data amount.
+        // quoted_amount_cents is computed by Postgres from these two:
         estimated_hours: estimatedHours,
         hourly_rate_cents: hourlyRateCents,
+        // stripe_product_id written by createOfficeCheckoutSession
 
         // ── Service snapshot ──────────────────────────────────────────────
         service_type: "office",
@@ -218,7 +236,7 @@ export async function submitOfficeBookingAction(
         hourly_rate: serverPricing.hourlyRate,
         recurring_time: defaultStartTime,
         evening_weekend_surcharge: data.eveningWeekendSurcharge,
-        monthly_estimate: monthlyAmount,
+        monthly_estimate: planMonthlyAmount, // plan + surcharge only; addons added as separate Stripe line item
       })
       .select("id, created_at")
       .single();
@@ -257,7 +275,8 @@ export async function submitOfficeBookingAction(
     }
 
     // ── 10. Create Stripe Checkout Session ────────────────────────────────
-
+    // Uses createOfficeCheckoutSession — reads amount from DB, never client.
+    // No need to pass an amount — it reads quoted_amount_cents from the booking row.
     const checkoutResult = await createOfficeCheckoutSession({
       bookingId: booking.id,
       customerId,
