@@ -154,20 +154,12 @@ export const useBookingStore = create<BookingState & BookingActions>()(
             return;
           }
 
-          // ── Redirect to Stripe Checkout ──────────────────────────────────
-
-          set({ ...INITIAL_STATE });
-          try {
-            localStorage.removeItem("booking-store");
-            localStorage.removeItem("pricing-selections");
-          } catch {}
+          // ── Redirect to Stripe Checkout ───────────────────────────────────
 
           console.log(
-            "[submitBooking] ✓ Redirecting to Stripe Checkout",
-            "bookingId:",
+            "[submitBooking] ✓ Redirecting to Stripe Checkout | bookingId:",
             result.bookingId,
           );
-
           window.location.href = result.checkoutUrl;
         } catch (err) {
           set({

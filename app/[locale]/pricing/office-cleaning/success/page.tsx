@@ -1,5 +1,4 @@
-// app/[locale]/office-cleaning/success/page.tsx
-
+import { StoreCleaner } from "@/app/components/StoreCleaner";
 import { createClient } from "@supabase/supabase-js";
 import { ArrowRight, Calendar, CheckCircle, Clock } from "lucide-react";
 import Link from "next/link";
@@ -74,6 +73,7 @@ export default async function OfficeBookingSuccessPage({
 
   return (
     <main className="min-h-screen bg-[#f8faf9] flex items-start justify-center px-5 py-16">
+      <StoreCleaner storeKeys={["office-booking-store"]} />
       <div className="w-full max-w-lg space-y-6">
         {/* ── Header ─────────────────────────────────────────────────────── */}
         {isConfirmed ? (

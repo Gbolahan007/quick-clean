@@ -10,7 +10,6 @@ import { StepSchedule } from "@/app/components/booking/step/stepSchedule";
 import { StepNotes } from "@/app/components/booking/step/stepNotes";
 import { StepReview } from "@/app/components/booking/step/stepReview";
 import { useBookingStore } from "@/app/store/useBookingStore";
-import { BookingConfirmation } from "@/app/components/booking/BookingConfirmation";
 import { BookingProgress } from "@/app/components/booking/BookingProgress";
 import { BookingSidebar } from "@/app/components/booking/BookingSidebar";
 
@@ -33,15 +32,25 @@ export default function BookingPage({ params }: BookingPageProps) {
 
   const pricing = useBookingStore((s) => s.pricing);
   const currentStep = useBookingStore((s) => s.currentStep);
-  const confirmedBookingId = useBookingStore((s) => s.confirmedBookingId);
+  const isSubmitting = useBookingStore((s) => s.isSubmitting);
 
+  // Redirect to home if there is no pricing data AND we are not currently
+  // submitting. When isSubmitting=true the store is in the process of calling
+  // the server action and then setting window.location.href to Stripe.
+  // Without this guard the useEffect would fire during that window and send
+  // the user to "/" before the browser finishes navigating to Stripe checkout.
   useEffect(() => {
-    if (!pricing && !confirmedBookingId) {
+    if (!pricing && !isSubmitting) {
       router.replace(`/${locale}`);
     }
-  }, [pricing, confirmedBookingId, router, locale]);
+  }, [pricing, isSubmitting, router, locale]);
 
-  if (!pricing && !confirmedBookingId) {
+  // Show spinner while:
+  //   a) pricing is being rehydrated from localStorage on first render, OR
+  //   b) isSubmitting=true and window.location.href is in progress
+  // Never redirect here — the useEffect above handles that once we are certain
+  // we are not mid-submission.
+  if (!pricing) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f7faf8]">
         <div className="flex flex-col items-center gap-4">
@@ -52,16 +61,12 @@ export default function BookingPage({ params }: BookingPageProps) {
     );
   }
 
-  if (confirmedBookingId) {
-    return <BookingConfirmation />;
-  }
-
   const ActiveStep = STEP_COMPONENTS[currentStep];
 
   return (
     <div className="min-h-screen bg-[#f7faf8] pt-24">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4 ">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
           <button
             type="button"
             onClick={() => router.back()}
@@ -107,7 +112,7 @@ export default function BookingPage({ params }: BookingPageProps) {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 ">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8 items-start">
           <div
             className={[
@@ -119,7 +124,7 @@ export default function BookingPage({ params }: BookingPageProps) {
             <ActiveStep />
           </div>
 
-          <div className="hidden lg:block ">
+          <div className="hidden lg:block">
             <BookingSidebar />
           </div>
         </div>

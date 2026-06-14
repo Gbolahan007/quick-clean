@@ -16,10 +16,10 @@ export default async function BookingCancelledPage({
   const ref = booking_id ? booking_id.slice(0, 8).toUpperCase() : null;
 
   return (
-    <main className="min-h-screen bg-[#f8faf9] flex items-start justify-center px-5 py-16">
+    <main className="min-h-screen bg-[#f8faf9] flex items-start justify-center px-5 py-16 border-4">
       <div className="w-full max-w-lg space-y-6">
         {/* ── Header ─────────────────────────────────────────────────────── */}
-        <div className="text-center space-y-3">
+        <div className="text-center space-y-3 py-7">
           <div className="flex justify-center">
             <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
               <XCircle className="w-8 h-8 text-gray-400" strokeWidth={1.8} />

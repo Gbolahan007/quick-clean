@@ -1,16 +1,4 @@
-// app/[locale]/booking/success/page.tsx
-// Stripe redirects here after successful payment via success_url in createCheckoutSession.
-// URL contains: ?session_id=cs_test_xxx&booking_id=uuid
-//
-// This page:
-//   1. Reads booking_id from the URL
-//   2. Fetches the booking from Supabase to confirm it's actually "confirmed"
-//   3. Shows a confirmation screen with booking details
-//
-// SECURITY: We verify the booking status from the DB — never trust the URL alone.
-// The webhook has already updated the booking to "confirmed" by the time
-// the customer lands here (Stripe fires the webhook before redirecting).
-
+import { StoreCleaner } from "@/app/components/StoreCleaner";
 import { createClient } from "@supabase/supabase-js";
 import { ArrowRight, Calendar, CheckCircle, Clock } from "lucide-react";
 import Link from "next/link";
@@ -103,9 +91,6 @@ export default async function BookingSuccessPage({
 
   const booking = await getBookingDetails(booking_id);
 
-  // Guard: booking must exist and be confirmed
-  // If the webhook hasn't fired yet (rare race), show a pending state
-  // rather than a 404.
   const isConfirmed =
     booking?.status === "confirmed" && booking?.payment_status === "paid";
   const isPending = booking?.status === "pending";
@@ -120,6 +105,7 @@ export default async function BookingSuccessPage({
 
   return (
     <main className="min-h-screen bg-[#f8faf9] flex items-start justify-center px-5 py-24">
+      <StoreCleaner storeKeys={["booking-store"]} />
       <div className="w-full max-w-lg space-y-6">
         {/* ── Status header ──────────────────────────────────────────────── */}
         {isConfirmed ? (

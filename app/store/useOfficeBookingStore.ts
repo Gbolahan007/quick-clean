@@ -1,8 +1,4 @@
 // store/useOfficeBookingStore.ts
-// Dedicated Zustand store for the office booking flow.
-// Mirrors the pattern of useBookingStore but with office-specific state.
-// Contact + address steps delegate to this store but reuse the same
-// components (StepContact, StepAddress) — just bound to different actions.
 
 import { useMemo } from "react";
 import { create } from "zustand";
@@ -17,8 +13,6 @@ import type {
   OfficeScheduleInfo,
 } from "../types/office";
 import { OFFICE_BOOKING_STEPS } from "../types/office";
-
-// ── Initial state ─────────────────────────────────────────────────────────────
 
 const INITIAL_OFFICE_STATE = {
   details: {} as Partial<OfficeDetailsInfo>,
@@ -36,29 +30,18 @@ const INITIAL_OFFICE_STATE = {
 type OfficeBookingFullState = typeof INITIAL_OFFICE_STATE;
 
 interface OfficeBookingActions {
-  // Navigation
   goToStep: (step: OfficeBookingStep) => void;
   nextStep: () => void;
   prevStep: () => void;
-
-  // Step saves
   saveDetails: (data: OfficeDetailsInfo) => void;
   saveSchedule: (data: OfficeScheduleInfo) => void;
   saveAddons: (data: OfficeAddonsInfo) => void;
   saveContact: (data: ContactInfo) => void;
   saveAddress: (data: AddressInfo) => void;
-
-  // Pricing (recalculates on weeklyHours or surcharge change)
   recalculatePricing: (weeklyHours: number, hasSurcharge: boolean) => void;
-
-  // Submit
   submitOfficeBooking: () => Promise<void>;
-
-  // Reset
   resetOfficeBooking: () => void;
 }
-
-// ── Store ─────────────────────────────────────────────────────────────────────
 
 export const useOfficeBookingStore = create<
   OfficeBookingFullState & OfficeBookingActions
@@ -67,7 +50,6 @@ export const useOfficeBookingStore = create<
     (set, get) => ({
       ...INITIAL_OFFICE_STATE,
 
-      // ── Navigation ─────────────────────────────────────────────────────────
       goToStep: (step) => set({ currentStep: step }),
 
       nextStep: () => {
@@ -84,14 +66,12 @@ export const useOfficeBookingStore = create<
         if (prev) set({ currentStep: prev });
       },
 
-      // ── Step saves ─────────────────────────────────────────────────────────
       saveDetails: (data) => {
         set({ details: data });
         get().nextStep();
       },
 
       saveSchedule: (data) => {
-        // Auto-recalculate pricing when schedule is saved
         const pricing = calculateOfficePricing(
           data.weeklyHours ?? 0,
           data.eveningWeekendSurcharge ?? false,
@@ -104,25 +84,20 @@ export const useOfficeBookingStore = create<
         set({ addons: data });
         get().nextStep();
       },
-
       saveContact: (data) => {
         set({ contact: data });
         get().nextStep();
       },
-
       saveAddress: (data) => {
         set({ address: data });
         get().nextStep();
       },
 
-      // ── Pricing recalculation (called from schedule step as hours change) ──
       recalculatePricing: (weeklyHours, hasSurcharge) => {
         if (weeklyHours < 2) return;
-        const pricing = calculateOfficePricing(weeklyHours, hasSurcharge);
-        set({ pricing });
+        set({ pricing: calculateOfficePricing(weeklyHours, hasSurcharge) });
       },
 
-      // ── Submit ─────────────────────────────────────────────────────────────
       submitOfficeBooking: async () => {
         const { details, schedule, addons, pricing, contact, address } = get();
 
@@ -137,7 +112,6 @@ export const useOfficeBookingStore = create<
           const { submitOfficeBookingAction } =
             await import("../actions/submitOfficeBooking");
 
-          // Determine plan key from tier
           const planKeyMap: Record<string, string> = {
             tier1: "office-tier1",
             tier2: "office-tier2",
@@ -147,13 +121,11 @@ export const useOfficeBookingStore = create<
           const planLabel = `Tier ${pricing.tier.replace("tier", "")} — ${pricing.weeklyHours}h/week`;
 
           const payload = {
-            // Customer
             firstName: contact.firstName ?? "",
             lastName: contact.lastName ?? "",
             email: contact.email ?? "",
             phone: contact.phone ?? "",
 
-            // Address
             streetAddress: address.streetAddress ?? "",
             apartmentNumber: address.apartmentNumber,
             city: address.city ?? "",
@@ -162,35 +134,29 @@ export const useOfficeBookingStore = create<
             squareMeters: details.officeSizeSqm ?? 50,
             numberOfRooms: Math.ceil((details.officeSizeSqm ?? 50) / 25),
 
-            // Office details
             officeName: details.officeName ?? "",
             workspaceType: details.workspaceType ?? "open_plan",
             officeSizeSqm: details.officeSizeSqm ?? 50,
             staffCount: details.staffCount ?? 0,
 
-            // Schedule
             weeklyHours: schedule.weeklyHours ?? 0,
             recurringRules: schedule.recurringRules ?? [],
             eveningWeekendSurcharge: schedule.eveningWeekendSurcharge ?? false,
             frequency: "weekly" as const,
 
-            // Pricing
             weeklyHoursInput: pricing.weeklyHours,
             pricingTier: pricing.tier,
             hourlyRate: pricing.hourlyRate,
             monthlyEstimate: pricing.finalMonthly,
 
-            // Addons
             selectedAddons: addons.selected,
             addonsMonthlyTotal: addons.addonsMonthlyTotal,
 
-            // Notes
             specialNotes: JSON.stringify({
               officeNotes: null,
               accessDetails: address.accessInstructions ?? null,
             }),
 
-            // Service snapshot
             serviceType: "office" as const,
             planKey,
             planLabel,
@@ -205,10 +171,12 @@ export const useOfficeBookingStore = create<
             return;
           }
 
-          set({ ...INITIAL_OFFICE_STATE });
-          try {
-            localStorage.removeItem("office-booking-store");
-          } catch {}
+          // ── Redirect to Stripe Checkout ─────────────────────────────────
+
+          console.log(
+            "[submitOfficeBooking] ✓ Redirecting to Stripe Checkout | bookingId:",
+            result.bookingId,
+          );
           window.location.href = result.checkoutUrl;
         } catch (err) {
           set({
@@ -221,7 +189,6 @@ export const useOfficeBookingStore = create<
         }
       },
 
-      // ── Reset ──────────────────────────────────────────────────────────────
       resetOfficeBooking: () => set(INITIAL_OFFICE_STATE),
     }),
 
@@ -240,8 +207,6 @@ export const useOfficeBookingStore = create<
     },
   ),
 );
-
-// ── Step completion selectors ─────────────────────────────────────────────────
 
 export function useOfficeStepCompletion() {
   const details = useOfficeBookingStore((s) => s.details);

@@ -1,7 +1,5 @@
 import { Plan } from "@/app/types/pricing";
 
-// ─── Maintenance plans ────────────────────────────────────────────────────────
-
 export const MAINTENANCE_PLANS = {
   weekly: {
     key: "weekly",

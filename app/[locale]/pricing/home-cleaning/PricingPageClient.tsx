@@ -1,4 +1,3 @@
-// app/[locale]/pricing/PricingPageClient.tsx
 "use client";
 
 import { useTranslations } from "next-intl";
