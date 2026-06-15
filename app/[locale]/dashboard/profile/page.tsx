@@ -1,5 +1,3 @@
-// app/[locale]/dashboard/profile/page.tsx
-
 import { createServerClient } from "@/app/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { PasswordForm } from "./PasswordForm";

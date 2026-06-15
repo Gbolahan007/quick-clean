@@ -1,6 +1,3 @@
-// app/[locale]/dashboard/payments/page.tsx
-// RLS scopes all queries through bookings → customers → auth_user_id.
-
 import { createServerClient } from "@/app/lib/supabase/server";
 import { redirect } from "next/navigation";
 

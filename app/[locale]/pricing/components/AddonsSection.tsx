@@ -134,7 +134,7 @@ export function AddonsSection({
                 <div className="flex items-center gap-1.5">
                   <StepBtn onClick={() => decrement(addon.key)}>−</StepBtn>
 
-                  <span className="min-w-[16px] text-center text-sm font-bold text-[#0a1628]">
+                  <span className="min-w-4 text-center text-sm font-bold text-[#0a1628]">
                     {qty}
                   </span>
 

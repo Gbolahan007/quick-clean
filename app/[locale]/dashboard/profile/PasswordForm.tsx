@@ -1,5 +1,4 @@
 "use client";
-// app/[locale]/dashboard/profile/PasswordForm.tsx
 
 import { useState, useTransition } from "react";
 import { setPassword } from "@/app/actions/auth";

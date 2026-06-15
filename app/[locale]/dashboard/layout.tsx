@@ -1,4 +1,3 @@
-// app/[locale]/dashboard/layout.tsx
 // ─────────────────────────────────────────────────────────────────────────────
 // Dashboard layout — server component.
 // Auth guard: unauthenticated users are redirected to /login.
@@ -72,7 +71,7 @@ export default async function DashboardLayout({
 
           {/* User display + sign out */}
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[11px] text-[#0a1628]/40 hidden sm:block truncate max-w-[140px]">
+            <span className="text-[11px] text-[#0a1628]/40 hidden sm:block truncate max-w-35">
               {displayName}
             </span>
             <form

@@ -1,4 +1,3 @@
-// app/[locale]/about/page.tsx
 import { BadgeCheck, CalendarClock, MapPin, Shield } from "lucide-react";
 import type { Metadata } from "next";
 import { useTranslations } from "next-intl";
@@ -87,7 +86,7 @@ function StorySection() {
             </span>
             {/* Decorative rule */}
             <div
-              className="mt-3 w-8 h-[2px] rounded-full bg-[#7c9885]/40"
+              className="mt-3 w-8 h-0.5 rounded-full bg-[#7c9885]/40"
               aria-hidden
             />
           </div>

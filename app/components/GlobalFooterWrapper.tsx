@@ -8,6 +8,7 @@ export function GlobalFooterWrapper() {
 
   if (pathname.includes("/pricing")) return null;
   if (pathname.includes("/booking")) return null;
+  if (pathname.includes("/dashboard")) return null;
 
   return <Footer />;
 }

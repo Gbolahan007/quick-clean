@@ -1,4 +1,3 @@
-// app/[locale]/auth/callback/route.ts
 // ─────────────────────────────────────────────────────────────────────────────
 // Supabase Auth PKCE callback handler.
 //
@@ -15,8 +14,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/app/lib/supabase/server";
 
-// Allowed redirect paths after authentication.
-// Prevents open redirect attacks via the ?next= parameter.
 const ALLOWED_PATHS = [
   "/dashboard",
   "/dashboard/bookings",

@@ -130,7 +130,6 @@ export default async function BookingSuccessPage({
             </p>
           </div>
         ) : (
-          // Webhook hasn't fired yet — very rare, show pending state
           <div className="text-center space-y-3">
             <div className="flex justify-center">
               <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center animate-pulse">
