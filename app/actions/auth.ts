@@ -21,7 +21,7 @@ import {
 } from "@/app/lib/supabase/server";
 
 // ── Rate limit constant ───────────────────────────────────────────────────────
-const MAGIC_LINK_COOLDOWN_SECONDS = 1000;
+const MAGIC_LINK_COOLDOWN_SECONDS = 5;
 
 // ── Result types ─────────────────────────────────────────────────────────────
 
