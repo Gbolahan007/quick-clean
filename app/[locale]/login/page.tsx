@@ -100,7 +100,7 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen bg-[#f8faf9] flex items-center justify-center px-5">
-      <div className="w-full max-w-md space-y-6">
+      <div className="w-full max-w-md space-y-6  py-24">
         {/* ── Header ─────────────────────────────────────────────────────── */}
         <div className="text-center space-y-2">
           <Link
