@@ -1,9 +1,4 @@
 "use client";
-// app/[locale]/login/page.tsx
-// ─────────────────────────────────────────────────────────────────────────────
-// Login page — magic link (default) + password (secondary).
-// Redirects to dashboard if already authenticated.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useTransition } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
@@ -11,6 +6,7 @@ import Link from "next/link";
 import { sendMagicLink, loginWithPassword } from "@/app/actions/auth";
 import { createClient } from "@/app/lib/supabase/client";
 import { useEffect } from "react";
+import type { User } from "@supabase/supabase-js";
 
 type Mode = "magic" | "password";
 
@@ -32,9 +28,11 @@ export default function LoginPage() {
   // Redirect to dashboard if already logged in
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) router.replace(`/${locale}/dashboard`);
-    });
+    supabase.auth
+      .getUser()
+      .then(({ data: { user } }: { data: { user: User | null } }) => {
+        if (user) router.replace(`/${locale}/dashboard`);
+      });
   }, [locale, router]);
 
   function handleSubmit() {

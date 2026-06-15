@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from "react";
 import { HeaderProvider, useHeader } from "./contexts/HeaderContext";
 import Logo from "./Logo";
 import { createClient } from "@/app/lib/supabase/client";
+import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 
 function useScrollDirection() {
   const [visible, setVisible] = useState(true);
@@ -192,18 +193,20 @@ function HeaderContent() {
     const supabase = createClient();
 
     // Check current session on mount
-    
-    supabase.auth.getUser().then(({ data: { 
-      user } }) => {
-      setIsLoggedIn(!!user);
-    });
+    supabase.auth
+      .getUser()
+      .then(({ data: { user } }: { data: { user: User | null } }) => {
+        setIsLoggedIn(!!user);
+      });
 
     // Keep in sync with login / logout events
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsLoggedIn(!!session);
-    });
+    } = supabase.auth.onAuthStateChange(
+      (_event: AuthChangeEvent, session: Session | null) => {
+        setIsLoggedIn(!!session);
+      },
+    );
 
     return () => subscription.unsubscribe();
   }, []);
