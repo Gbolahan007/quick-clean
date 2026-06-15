@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState, useRef, useEffect } from "react";
 import { HeaderProvider, useHeader } from "./contexts/HeaderContext";
 import Logo from "./Logo";
+import { createClient } from "@/app/lib/supabase/client";
 
 function useScrollDirection() {
   const [visible, setVisible] = useState(true);
@@ -16,12 +17,11 @@ function useScrollDirection() {
     const THRESHOLD = 8;
 
     function onScroll() {
-      const current = Math.max(0, window.scrollY); // clamp negative iOS bounce values
+      const current = Math.max(0, window.scrollY);
       const isAtTop = current < 10;
 
       setAtTop(isAtTop);
 
-      // Always show header when near the top
       if (isAtTop) {
         setVisible(true);
         lastScrollY.current = current;
@@ -29,7 +29,6 @@ function useScrollDirection() {
       }
 
       const delta = current - lastScrollY.current;
-
       if (Math.abs(delta) >= THRESHOLD) {
         setVisible(delta < 0);
         lastScrollY.current = current;
@@ -184,9 +183,32 @@ function HeaderContent() {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
-  const [isLoggedIn] = useState(false);
-  const { visible, atTop } = useScrollDirection();
   const isFinnish = locale === "fi";
+
+  // ── Auth state ─────────────────────────────────────────────────────────────
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    // Check current session on mount
+    
+    supabase.auth.getUser().then(({ data: { 
+      user } }) => {
+      setIsLoggedIn(!!user);
+    });
+
+    // Keep in sync with login / logout events
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const { visible, atTop } = useScrollDirection();
 
   const {
     mobileMenuOpen,
@@ -233,11 +255,10 @@ function HeaderContent() {
         >
           <Logo />
 
-          {/* Desktop Nav */}
+          {/* ── Desktop nav ──────────────────────────────────────────────── */}
           <div
             className={`hidden lg:flex lg:items-center ${isFinnish ? "lg:space-x-4" : "lg:space-x-8"}`}
           >
-            {/* About dropdown */}
             <Dropdown
               label={t("nav.about")}
               isOpen={companyDropdownOpen}
@@ -258,7 +279,6 @@ function HeaderContent() {
               </Link>
             </Dropdown>
 
-            {/* Services dropdown */}
             <Dropdown
               label={t("nav.services")}
               isOpen={servicesDropdownOpen}
@@ -291,7 +311,6 @@ function HeaderContent() {
               </Link>
             </Dropdown>
 
-            {/* Pricing dropdown */}
             <Dropdown
               label={t("nav.pricing")}
               isOpen={pricingDropdownOpen}
@@ -317,23 +336,19 @@ function HeaderContent() {
                 {t("services.cards.moveOut.title")}
               </Link>
             </Dropdown>
-
-            {/* <Link
-              href="/contact"
-              className="text-gray-700 hover:text-[#7c9885] font-medium transition-colors"
-            >
-              {t("nav.quote")}
-            </Link> */}
           </div>
 
-          {/* Desktop Right */}
+          {/* ── Desktop right ─────────────────────────────────────────────── */}
           <div
             className={`hidden lg:flex lg:items-center ${isFinnish ? "lg:space-x-2" : "lg:space-x-4"}`}
           >
             {isLoggedIn ? (
+              // Authenticated: show Dashboard link instead of Login/Signup
               <Link
                 href="/dashboard"
-                className="px-4 py-2 text-[#7c9885] hover:text-[#435247] font-medium transition-colors"
+                className={`${isFinnish ? "px-4 py-2 text-sm" : "px-5 py-2.5"} text-[#7c9885] border border-[#7c9885]/40 rounded-full
+                  hover:bg-[#7c9885]/10 hover:border-[#7c9885]
+                  font-semibold transition-all duration-200`}
               >
                 {t("nav.dashboard")}
               </Link>
@@ -341,7 +356,7 @@ function HeaderContent() {
               <>
                 <Link
                   href="/login"
-                  className={`${isFinnish ? "px-4 py-2 text-sm" : "px-5 py-2.5"} text-[#7c9885] border border-[#7c9885]/40 rounded-full 
+                  className={`${isFinnish ? "px-4 py-2 text-sm" : "px-5 py-2.5"} text-[#7c9885] border border-[#7c9885]/40 rounded-full
                     hover:bg-[#7c9885]/10 hover:border-[#7c9885]
                     font-semibold transition-all duration-200`}
                 >
@@ -349,7 +364,7 @@ function HeaderContent() {
                 </Link>
                 <Link
                   href="/signup"
-                  className={`${isFinnish ? "px-4 py-2 text-sm" : "px-5 py-2.5"} text-[#7c9885] rounded-full 
+                  className={`${isFinnish ? "px-4 py-2 text-sm" : "px-5 py-2.5"} text-[#7c9885] rounded-full
                     border border-[#7c9885]
                     hover:bg-[#7c9885]/10 hover:border-[#435247]
                     shadow-sm hover:shadow-md
@@ -374,7 +389,7 @@ function HeaderContent() {
             />
           </div>
 
-          {/* Mobile Hamburger */}
+          {/* ── Mobile hamburger ─────────────────────────────────────────── */}
           <button
             onClick={toggleMobileMenu}
             className="lg:hidden p-2 text-gray-600 hover:text-gray-900"
@@ -387,7 +402,7 @@ function HeaderContent() {
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* ── Mobile menu ──────────────────────────────────────────────────── */}
         {mobileMenuOpen && (
           <div className="lg:hidden py-4 px-3 mt-2 bg-white rounded-2xl shadow-md mx-3 space-y-4 border-t border-gray-100">
             {/* About */}
@@ -466,7 +481,7 @@ function HeaderContent() {
               )}
             </div>
 
-            {/* Pricing — mobile */}
+            {/* Pricing */}
             <div>
               <button
                 onClick={() => setPricingDropdownOpen(!pricingDropdownOpen)}
@@ -504,21 +519,14 @@ function HeaderContent() {
               )}
             </div>
 
-            {/* <Link
-              href="/contact"
-              className="block py-2 text-gray-700 font-medium hover:text-[#7c9885]"
-              onClick={handleMobileClick}
-            >
-              {t("nav.quote")}
-            </Link> */}
-
             <MobileLanguagePill locale={locale} onSwitch={switchLocale} />
 
+            {/* Auth / CTA buttons */}
             <div className="space-y-2 pt-4 border-t border-gray-100">
               {isLoggedIn ? (
                 <Link
                   href="/dashboard"
-                  className="block w-full px-4 py-3 text-center bg-[#7c9885] text-white rounded-lg font-semibold hover:bg-[#435247] transition-all"
+                  className="block w-full px-4 py-3 text-center border border-[#7c9885] text-[#7c9885] rounded-lg font-semibold hover:bg-[#7c9885]/10 transition-all"
                   onClick={handleMobileClick}
                 >
                   {t("nav.dashboard")}

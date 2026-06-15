@@ -7,11 +7,13 @@
 --   v1  — Phase 1 MVP: residential + office bookings, guest-first auth
 --   v2  — Stripe payment integration: monthly billing, subscriptions,
 --          idempotent webhooks, full payment history
+--   v3  — Post-payment magic link authentication, customer dashboard,
+--          guest-to-auth linking, rate limiting, email normalisation
 --
--- TABLE INVENTORY (14 tables + 2 new + admin views)
+-- TABLE INVENTORY (14 tables + admin views)
 -- ─────────────────────────────────────────────────────────────────────────────
 --   Core identity
---     profiles                  — authenticated admin/user records
+--     profiles                  — ADMIN ONLY. Never created for customers.
 --     customers                 — guest + authenticated customer identity
 --     addresses                 — service locations
 --
@@ -33,6 +35,43 @@
 --     availability_slots        — residential booking time slots
 --     quote_requests            — lead generation / enquiry capture
 --
+-- ============================================================================
+-- AUTHENTICATION ARCHITECTURE (v3)
+-- ============================================================================
+--
+-- CUSTOMER FLOW (the only flow that matters for 99% of users):
+--
+--   1. Customer visits site — no account needed
+--   2. Customer books → customers row created (auth_user_id = NULL)
+--   3. Customer pays via Stripe Checkout
+--   4. Stripe webhook confirms payment → booking confirmed
+--   5. Success page offers "save your booking — get a free account"
+--   6. Customer enters email → sendMagicLink() server action fires
+--   7. Supabase sends magic link email
+--   8. Customer clicks link → /[locale]/auth/callback?code=xxx
+--   9. Route handler exchanges code for session cookie
+--  10. on_auth_user_created trigger fires → link_customer_to_auth()
+--      → customers.auth_user_id = auth.users.id
+--  11. Customer redirected to /[locale]/dashboard
+--  12. RLS policies use auth_user_id to scope all data to this customer
+--
+-- PROFILES TABLE IS NOT PART OF THIS FLOW.
+-- Customers NEVER get a profiles row. profiles is for admins only.
+-- The trigger handle_new_auth_user() ONLY updates customers.auth_user_id.
+-- It does NOT touch profiles.
+--
+-- RETURNING CUSTOMER FLOW:
+--   Option A: Magic link (always works — Supabase sends new OTP)
+--   Option B: Password (after customer sets one in dashboard → Profile)
+--
+-- GUEST-TO-AUTH LINKING GUARANTEE:
+--   - customers.email is UNIQUE and lowercase — no duplicates possible
+--   - link_customer_to_auth() uses WHERE auth_user_id IS NULL — never overwrites
+--   - Postgres UPDATE is atomic — race conditions on simultaneous clicks are safe
+--   - on_auth_user_created trigger is fault-tolerant — a linking failure
+--     never blocks auth.users INSERT (wrapped in EXCEPTION handler)
+--
+-- ============================================================================
 -- ARCHITECTURE PRINCIPLES
 -- ─────────────────────────────────────────────────────────────────────────────
 --   1. Guest-first: customers exists independently of auth.users
@@ -46,6 +85,10 @@
 --      so retries never cause duplicate side-effects
 --   6. Non-blocking payments: email/booking confirmation is safe even if
 --      Stripe webhook fires twice — the stripe_webhook_events table deduplicates
+--   7. Auth is optional and post-payment: customers are never forced to create
+--      an account before booking or paying
+--   8. Email is normalised to lowercase on INSERT — prevents case mismatch
+--      between booking email and auth email during magic link linking
 --
 -- ============================================================================
 
@@ -70,25 +113,33 @@ $$ LANGUAGE plpgsql;
 -- 1. PROFILES TABLE
 -- ============================================================================
 -- PURPOSE: Extends Supabase auth.users with role and admin metadata.
---   Only exists for users who have completed Supabase Auth sign-up.
---   Guest customers who book without an account do NOT appear here —
---   they exist only in the customers table.
+--
+-- !! ADMIN ONLY — CUSTOMERS NEVER GET A PROFILES ROW !!
+--
+-- This table is ONLY created manually for admin users. The authentication
+-- trigger (on_auth_user_created) does NOT insert into this table.
+-- When a customer authenticates via magic link, only customers.auth_user_id
+-- is updated — profiles is never touched.
+--
+-- If you see a customer row in profiles, something is wrong. Delete it.
 --
 -- KEY RELATIONSHIPS:
 --   profiles.id → auth.users.id (1:1, cascade delete)
---   addresses.user_id → profiles.id (optional, legacy path)
 --
--- WHY SEPARATE FROM customers:
---   Keeps auth concerns (roles, permissions) separate from booking concerns
---   (guest identity, booking history). Guests can book without ever touching
---   this table. Admins always have a profiles row.
+-- HOW TO CREATE AN ADMIN:
+--   1. Create the user in Supabase Auth dashboard (or via invite)
+--   2. Manually INSERT into profiles:
+--      INSERT INTO profiles (id, full_name, role)
+--      VALUES ('<auth_user_id>', 'Admin Name', 'admin');
 -- ============================================================================
 
 CREATE TABLE profiles (
     id         UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    full_name  TEXT NOT NULL,
+    full_name  TEXT,  -- nullable: admin may not have full name set
     phone      TEXT,
-    role       TEXT NOT NULL DEFAULT 'customer' CHECK (role IN ('customer', 'admin')),
+    role       TEXT NOT NULL DEFAULT 'admin' CHECK (role IN ('admin')),
+    -- Only 'admin' allowed — customers use the customers table, not profiles.
+    -- The 'customer' role has been intentionally removed to prevent misuse.
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -107,9 +158,21 @@ CREATE TRIGGER update_profiles_updated_at
 --   who is booking, regardless of whether they have a Supabase account.
 --
 -- GUEST FLOW: Customer books → customers row created (auth_user_id = NULL)
--- AUTH UPGRADE: Customer later signs up → handle_new_auth_user trigger
---   automatically links auth.users.id into customers.auth_user_id
---   All booking history is preserved. No data loss, no duplicate rows.
+-- AUTH UPGRADE: Customer authenticates via magic link →
+--   on_auth_user_created trigger fires → link_customer_to_auth() →
+--   customers.auth_user_id = auth.users.id
+--   All booking history is preserved. No data loss. No duplicate rows.
+--
+-- EMAIL NORMALISATION:
+--   email is stored as LOWER(TRIM(email)) everywhere.
+--   The CHECK constraint enforces this at the DB level.
+--   This prevents case mismatch: "Jane@gmail.com" at booking time vs
+--   "jane@gmail.com" at auth time — both resolve to the same customer row.
+--
+-- RATE LIMITING:
+--   magic_link_sent_at tracks when the last magic link was sent.
+--   The sendMagicLink() server action refuses to send again within 60 seconds.
+--   This prevents the endpoint from being used as a free email spam tool.
 --
 -- STRIPE LINK: stripe_customer_id is set the moment a Checkout Session
 --   is created — even before the customer pays. It is reused across all
@@ -131,31 +194,43 @@ CREATE TRIGGER update_profiles_updated_at
 CREATE TABLE customers (
     id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
-    -- Identity anchor for the guest booking flow.
-    -- UNIQUE because email is how we deduplicate returning guests.
-    email        TEXT NOT NULL UNIQUE,
+    -- Stored as LOWER(TRIM(email)) — enforced by CHECK constraint.
+    -- UNIQUE because email is how we deduplicate returning guests and
+    -- how we match customers to auth.users during magic link linking.
+    email        TEXT NOT NULL UNIQUE CHECK (email = LOWER(TRIM(email))),
     full_name    TEXT NOT NULL,
     phone        TEXT,
 
-    -- Nullable: NULL until the customer optionally creates a Supabase account.
-    -- Populated automatically by handle_new_auth_user trigger (section 13).
+    -- NULL until the customer optionally authenticates via magic link.
+    -- Populated automatically by handle_new_auth_user trigger (section 15).
+    -- ON DELETE SET NULL: deleting auth user preserves booking history.
     auth_user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
 
-    -- ── Stripe (v2) ──────────────────────────────────────────────────────────
-    -- The Stripe Customer ID (cus_xxx) for this person.
-    -- Set during the first Checkout Session creation via your server action.
-    -- Reused for all subsequent bookings — never create two Stripe Customers
-    -- for the same email address.
+    -- ── Stripe ───────────────────────────────────────────────────────────────
+    -- Set during the first Checkout Session creation.
     -- UNIQUE: one Stripe Customer per platform customer.
     stripe_customer_id TEXT UNIQUE,
+
+    -- ── Magic link rate limiting (v3) ─────────────────────────────────────────
+    -- Updated by sendMagicLink() server action on each send.
+    -- Checked before each send — refuses if < 60 seconds since last send.
+    magic_link_sent_at TIMESTAMPTZ,
+
+    -- ── Auth conversion tracking (v3) ─────────────────────────────────────────
+    -- Set by link_customer_to_auth() when auth_user_id is first populated.
+    -- Useful for: conversion analytics, welcome email logic,
+    -- suppressing "create account" CTA on success page for returning customers.
+    onboarding_completed_at TIMESTAMPTZ,
 
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_customers_email              ON customers(email);
-CREATE INDEX idx_customers_auth_user_id       ON customers(auth_user_id);
-CREATE INDEX idx_customers_stripe_customer_id ON customers(stripe_customer_id);
+CREATE INDEX idx_customers_email                ON customers(email);
+CREATE INDEX idx_customers_auth_user_id         ON customers(auth_user_id);
+CREATE INDEX idx_customers_stripe_customer_id   ON customers(stripe_customer_id);
+CREATE INDEX idx_customers_magic_link_sent_at   ON customers(magic_link_sent_at)
+  WHERE magic_link_sent_at IS NOT NULL;
 
 CREATE TRIGGER update_customers_updated_at
     BEFORE UPDATE ON customers
@@ -188,21 +263,18 @@ CREATE POLICY "Admins can manage all customers"
 -- ============================================================================
 -- 3. ADDRESSES TABLE
 -- ============================================================================
--- PURPOSE: Stores service locations for both guests and authenticated users.
---   Each booking references one address. Multiple bookings can share an address
---   (e.g. the same apartment booked weekly for 6 months).
+-- PURPOSE: Stores service locations for bookings.
+--   Each booking references one address. Multiple bookings can share an address.
 --
--- TWO OWNERSHIP PATHS:
---   customer_id → customers (primary, always set for guest bookings)
---   user_id     → profiles  (legacy, set only for fully authenticated users)
---   The CHECK constraint ensures at least one is populated.
+-- OWNERSHIP:
+--   customer_id → customers (always set — the only path used in v3)
+--   user_id     → profiles  (legacy column, always NULL in the current flow,
+--                            kept for backward compatibility but never written)
 --
--- WHY ADDRESSES ARE SEPARATE FROM BOOKINGS:
---   A customer may have multiple properties. An address can be reused across
---   many bookings. Normalizing avoids address data duplication and enables
---   address-level analytics (e.g. all visits to this building).
+-- The CHECK constraint ensures customer_id OR user_id is always set.
+-- In practice, all new addresses have customer_id set and user_id = NULL.
 --
--- OFFICE USE: office_size_sqm and number_of_rooms are repurposed for office
+-- OFFICE USE: square_meters and number_of_rooms are repurposed for office
 --   square meters and estimated room count. The schema is shared to avoid
 --   a separate office_addresses table at MVP.
 -- ============================================================================
@@ -210,9 +282,11 @@ CREATE POLICY "Admins can manage all customers"
 CREATE TABLE addresses (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
-    -- Populated only for fully authenticated post-onboarding users (legacy path)
+    -- Legacy column — always NULL in the current flow. Do not write to this.
+    -- Kept for backward compatibility. Will be dropped in a future migration.
     user_id             UUID REFERENCES profiles(id) ON DELETE CASCADE,
-    -- Always populated for guest flow bookings (primary path)
+
+    -- Always populated for bookings (the only path used in v3).
     customer_id         UUID REFERENCES customers(id) ON DELETE CASCADE,
 
     street_address      TEXT NOT NULL,
@@ -242,6 +316,7 @@ CREATE TRIGGER update_addresses_updated_at
 -- RLS
 ALTER TABLE addresses ENABLE ROW LEVEL SECURITY;
 
+-- Legacy policy for user_id path (kept for backward compat, effectively unused)
 CREATE POLICY "Users can view own addresses"
     ON addresses FOR SELECT
     USING (auth.uid() = user_id);
@@ -254,6 +329,7 @@ CREATE POLICY "Users can update own addresses"
     ON addresses FOR UPDATE
     USING (auth.uid() = user_id);
 
+-- Primary policy — used by the dashboard for authenticated customers
 CREATE POLICY "Customer can view own addresses"
     ON addresses FOR SELECT
     USING (
@@ -276,24 +352,22 @@ CREATE POLICY "Admins can manage all addresses"
 -- 4. SERVICES TABLE
 -- ============================================================================
 -- PURPOSE: The service catalog — what types of cleaning you offer.
---   Each booking references one service. Services rarely change but their
---   IDs are snapshot into bookings.service_type for historical accuracy.
+--   Each booking references one service by UUID.
+--   service_type on bookings is a denormalized snapshot for historical accuracy.
 --
 -- OFFICE PRICING NOTE:
 --   Office Cleaning has base_price = 0 because it is priced dynamically:
---   weekly_hours × hourly_rate × 4.33 weeks/month = monthly_estimate
+--   weekly_hours × hourly_rate × 4.2 weeks/month = monthly_estimate
 --   The base_price column is irrelevant for office — the actual charge is
 --   stored in bookings.monthly_estimate and bookings.final_price.
---
--- WHY duration_hours EXISTS:
---   Used for scheduling — knowing how long a visit takes lets the system
---   prevent double-booking of cleaners on the same day.
 -- ============================================================================
 
 CREATE TABLE services (
     id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name           TEXT NOT NULL UNIQUE,
+    name_en        TEXT,
     description    TEXT,
+    slug           TEXT UNIQUE,
     base_price     DECIMAL(10,2) NOT NULL CHECK (base_price >= 0),
     duration_hours DECIMAL(4,2)  NOT NULL CHECK (duration_hours > 0),
     is_active      BOOLEAN DEFAULT true,
@@ -302,43 +376,38 @@ CREATE TABLE services (
     updated_at     TIMESTAMPTZ DEFAULT NOW()
 );
 
-INSERT INTO services (name, description, base_price, duration_hours, display_order) VALUES
-('Maintenance Cleaning', 'Regular home cleaning — kitchen, bathroom, living areas',      80.00,  2.5, 1),
-('Deep Cleaning',        'Thorough top-to-bottom cleaning including hard-to-reach areas', 150.00, 4.0, 2),
-('Move-Out Cleaning',    'Inspection-ready clean meeting Finnish landlord requirements',  158.00, 4.0, 3),
-('Office Cleaning',      'Recurring office cleaning — priced per hour, scheduled weekly',  0.00,  1.0, 4);
+INSERT INTO services (name, name_en, slug, description, base_price, duration_hours, display_order) VALUES
+('Maintenance Cleaning', 'Maintenance Cleaning', 'maintenance', 'Regular home cleaning — kitchen, bathroom, living areas',      80.00,  2.5, 1),
+('Deep Cleaning',        'Deep Cleaning',        'deep',        'Thorough top-to-bottom cleaning including hard-to-reach areas', 150.00, 4.0, 2),
+('Move-Out Cleaning',    'Move-Out Cleaning',    'moveout',     'Inspection-ready clean meeting Finnish landlord requirements',  158.00, 4.0, 3),
+('Office Cleaning',      'Office Cleaning',      'office',      'Recurring office cleaning — priced per hour, scheduled weekly',  0.00,  1.0, 4);
+
+ALTER TABLE services ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read active services"
+    ON services FOR SELECT
+    USING (is_active = true);
+
+CREATE POLICY "Admins can manage services"
+    ON services FOR ALL
+    USING (
+        EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+    );
 
 
 -- ============================================================================
 -- 5. SUBSCRIPTION_PLANS TABLE
 -- ============================================================================
--- PURPOSE: Defines the three residential subscription tiers and links each
---   to its Stripe Price object. Used only by residential bookings.
+-- PURPOSE: Defines the three residential subscription tiers.
+--   Used only by residential bookings.
 --   Office contracts use their own pricing model (weekly_hours × hourly_rate).
 --
 -- CRITICAL BILLING MODEL:
 --   ALL plans bill ONCE per month in Stripe regardless of visit frequency.
---   "Weekly" means 4 visits per month, billed as one monthly charge.
---   "Bi-weekly" means 2 visits per month, billed as one monthly charge.
---   "Monthly" means 1 visit per month, billed as one monthly charge.
---   stripe_billing_interval is constrained to 'month' to enforce this — it
---   is NOT 'week' for the weekly plan. Stripe only knows the monthly amount.
---
--- visits_per_month:
---   This is YOUR platform's scheduling data — Stripe never sees it.
---   When invoice.paid fires, your code uses booking.visits_per_month to
---   generate the correct number of visit slots for that billing period.
---
--- stripe_price_id (per-plan default):
---   Each plan has a default Stripe Price for reference. However, because
---   the actual charge amount varies by apartment type, the authoritative
---   price snapshot is stored on bookings.stripe_price_id — not here.
---   This column is useful for plan-level admin visibility.
---
--- discount_percentage:
---   Applied to the per-visit price at booking time. The discounted total
---   is what becomes the monthly charge in Stripe. This discount is baked
---   into the Stripe Price amount — Stripe does not apply discounts itself.
+--   "Weekly" = 4 visits/month billed as one monthly charge.
+--   "Bi-weekly" = 2 visits/month billed as one monthly charge.
+--   "Monthly" = 1 visit/month billed as one monthly charge.
+--   stripe_billing_interval is constrained to 'month' — do NOT change to 'week'.
 -- ============================================================================
 
 CREATE TABLE subscription_plans (
@@ -348,21 +417,8 @@ CREATE TABLE subscription_plans (
     discount_percentage DECIMAL(5,2) NOT NULL CHECK (discount_percentage BETWEEN 0 AND 100),
     description         TEXT,
     is_active           BOOLEAN DEFAULT true,
-
-    -- ── Stripe (v2) ──────────────────────────────────────────────────────────
-    -- How many cleaning visits are included per month for this plan.
-    -- 4 = weekly plan (4 visits/month)
-    -- 2 = bi-weekly plan (2 visits/month)
-    -- 1 = monthly plan (1 visit/month)
-    -- Your scheduling system reads this to generate visit slots after invoice.paid.
-    visits_per_month INTEGER NOT NULL DEFAULT 1
-        CHECK (visits_per_month IN (1, 2, 4)),
-
-    -- Always 'month'. Constrained to document that ALL plans bill monthly.
-    -- Do not change to 'week' — Stripe Prices for all plans use interval=month.
-    stripe_billing_interval TEXT NOT NULL DEFAULT 'month'
-        CHECK (stripe_billing_interval = 'month'),
-
+    visits_per_month    INTEGER NOT NULL DEFAULT 1 CHECK (visits_per_month IN (1, 2, 4)),
+    stripe_billing_interval TEXT NOT NULL DEFAULT 'month' CHECK (stripe_billing_interval = 'month'),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -376,75 +432,37 @@ INSERT INTO subscription_plans (name, frequency, discount_percentage, descriptio
 -- 6. BOOKINGS TABLE
 -- ============================================================================
 -- PURPOSE: The central transaction record. One row per booking agreement.
---   Unified for both residential and office bookings — office-specific columns
---   are nullable and only populated when service_type = 'office'.
+--   Unified for both residential and office bookings.
 --
--- SNAPSHOT COLUMNS (apartment_key, apartment_label, apartment_size, addons_snapshot,
---   plan_key, plan_label, stripe_price_id, visits_per_month):
---   Prices and service definitions change over time. Snapshots capture exactly
---   what the customer agreed to and paid for at booking time. This ensures
---   historical receipts are accurate even after price updates.
+-- FREQUENCY VALUES:
+--   Residential subscriptions: 'weekly' | 'biweekly' | 'monthly'
+--   Deep cleaning:             'deepMonthly' | 'deepQuarterly' | 'deepOnetime'
+--   One-time / move-out:       'one-time'
+--   Office:                    'weekly' (always weekly recurring)
 --
--- STRIPE COLUMNS EXPLAINED:
+-- SERVICE TYPE VALUES:
+--   'maintenance' | 'deep' | 'moveout' | 'office'
 --
---   stripe_checkout_session_id (cs_xxx) — MOST CRITICAL
---     Set by your server action immediately after stripe.checkout.sessions.create().
---     Used by the checkout.session.completed webhook to identify which booking
---     was just paid. Without this, the webhook cannot find the booking to confirm.
---
---   stripe_payment_intent_id (pi_xxx)
---     For one-time: set by checkout.session.completed (session.payment_intent).
---     For subscriptions: updated by invoice.paid for the most recent invoice.
---     Also lives on the payments table per-invoice for full history.
---
---   stripe_subscription_id (sub_xxx)
---     Set by checkout.session.completed (session.subscription).
---     NULL for one-time bookings.
---     Used as the lookup key for all subsequent subscription webhook events.
---
---   stripe_price_id (price_xxx)
---     Snapshot of which Stripe Price object was used. Set at Checkout creation.
---     For subscriptions: a monthly recurring Price (interval=month).
---     For one-time: a one_time Price.
---     Needed because Prices can be archived; this preserves the billing reference.
---
---   subscription_status
---     Tracks the Stripe subscription lifecycle — NOT the payment outcome.
---     payment_status = "did money move?" (pending/paid/failed/refunded)
---     subscription_status = "is the subscription alive?" (active/past_due/canceled)
---     These answer different questions and must be separate columns.
---     Updated by: customer.subscription.updated and customer.subscription.deleted.
---
---   current_period_start / current_period_end
---     The current Stripe billing window. Updated monthly by invoice.paid.
---     Used to display "your next billing date is X" to customers.
---     Also used to determine whether a past_due subscription still has valid access.
---
---   cancel_at_period_end
---     True when a customer has cancelled but their paid period hasn't expired.
---     When this is true, no new invoice will be generated but the subscription
---     remains active until current_period_end. UI shows "cancels on [date]".
---     Set by customer.subscription.updated webhook.
---
---   canceled_at
---     Timestamp when the subscription actually ended (after cancel_at_period_end
---     period expires). Set by customer.subscription.deleted webhook.
---
---   visits_per_month (snapshot)
---     Copied from subscription_plans.visits_per_month at booking time.
---     Your scheduling system reads this to generate visit slots each month.
---     NULL for one-time bookings. Never sent to Stripe.
+-- OFFICE-SPECIFIC STRIPE FIELDS:
+--   estimated_hours     — weekly hours input, used for Stripe amount calculation
+--   hourly_rate_cents   — tier rate in cents (4900 = €49/h), snapshotted at booking
+--   quoted_amount_cents — GENERATED: estimated_hours × hourly_rate_cents (weekly cost)
+--                         NOTE: this is the WEEKLY cost, not monthly.
+--                         Use monthly_estimate for the Stripe billing amount.
+--   stripe_product_id   — the Stripe Product used (prod_xxx for office cleaning)
+--   monthly_estimate    — the actual Stripe billing amount (finalMonthly from pricing engine)
+--                         = weeklyCost × WEEKS_PER_MONTH + surcharge
+--                         Does NOT include addons (those are a separate Stripe line item)
 -- ============================================================================
 
 CREATE TABLE bookings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- ── Relationships ────────────────────────────────────────────────────────
-    customer_id          UUID NOT NULL REFERENCES customers(id) ON DELETE RESTRICT,
-    service_id           UUID NOT NULL REFERENCES services(id)  ON DELETE RESTRICT,
-    address_id           UUID NOT NULL REFERENCES addresses(id) ON DELETE RESTRICT,
-    -- NULL for office bookings and one-time bookings
-    subscription_plan_id UUID REFERENCES subscription_plans(id),
+    customer_id          UUID NOT NULL REFERENCES customers(id)           ON DELETE RESTRICT,
+    service_id           UUID NOT NULL REFERENCES services(id)            ON DELETE RESTRICT,
+    address_id           UUID NOT NULL REFERENCES addresses(id)           ON DELETE RESTRICT,
+    subscription_plan_id UUID          REFERENCES subscription_plans(id),
 
     -- ── Scheduling ───────────────────────────────────────────────────────────
     booking_date DATE NOT NULL,
@@ -457,89 +475,87 @@ CREATE TABLE bookings (
 
     -- ── Frequency ────────────────────────────────────────────────────────────
     frequency TEXT NOT NULL DEFAULT 'one-time' CHECK (
-        frequency IN ('one-time', 'weekly', 'biweekly', 'monthly')
+        frequency IN (
+            'one-time', 'weekly', 'biweekly', 'monthly',
+            'deepMonthly', 'deepQuarterly', 'deepOnetime'
+        )
     ),
 
     -- ── Pricing ──────────────────────────────────────────────────────────────
-    final_price DECIMAL(10,2) NOT NULL,
+    final_price DECIMAL(10,2) NOT NULL,  -- plan + addons (display/reporting)
     base_price  DECIMAL(10,2),
 
-    -- ── Payment — Stripe identifiers ─────────────────────────────────────────
-    -- See column explanations in table header above.
+    -- ── Stripe identifiers ────────────────────────────────────────────────────
+    stripe_checkout_session_id TEXT UNIQUE,   -- cs_xxx — links webhook to booking
+    stripe_payment_intent_id   TEXT,          -- pi_xxx — latest payment attempt
+    stripe_subscription_id     TEXT,          -- sub_xxx — NULL for one-time
+    stripe_price_id            TEXT,          -- price_xxx — residential only
+    stripe_product_id          TEXT,          -- prod_xxx — office only
 
-    -- Set before Checkout redirect. Used by webhook to find this booking.
-    stripe_checkout_session_id TEXT UNIQUE,
-
-    -- Set by checkout.session.completed. For subscriptions: latest pi only.
-    stripe_payment_intent_id   TEXT,
-
-    -- Set by checkout.session.completed. NULL for one-time bookings.
-    stripe_subscription_id     TEXT,
-
-    -- Snapshot of the Stripe Price object used. Set at Checkout creation.
-    stripe_price_id            TEXT,
-
-    -- Payment outcome: did money move?
+    -- ── Payment status ────────────────────────────────────────────────────────
     payment_status TEXT DEFAULT 'pending' CHECK (
         payment_status IN ('pending', 'paid', 'failed', 'refunded')
     ),
 
-    -- Subscription lifecycle: is the subscription alive?
-    -- NULL for one-time bookings.
+    -- ── Subscription lifecycle ────────────────────────────────────────────────
     subscription_status TEXT CHECK (
         subscription_status IN (
             'trialing', 'active', 'past_due', 'unpaid', 'canceled', 'incomplete'
         )
     ),
-
-    -- Current Stripe billing window. Updated monthly by invoice.paid webhook.
     current_period_start TIMESTAMPTZ,
     current_period_end   TIMESTAMPTZ,
-
-    -- True when customer cancelled but period hasn't expired yet.
     cancel_at_period_end BOOLEAN DEFAULT false,
+    canceled_at          TIMESTAMPTZ,
 
-    -- When the subscription actually ended. Set by customer.subscription.deleted.
-    canceled_at TIMESTAMPTZ,
-
-    -- ── Service snapshot (denormalized) ──────────────────────────────────────
+    -- ── Service snapshot ──────────────────────────────────────────────────────
     service_type  TEXT CHECK (service_type IN ('maintenance', 'deep', 'moveout', 'office')),
     plan_key      TEXT,
     plan_label    TEXT,
     show_deducted BOOLEAN DEFAULT false,
 
-    -- ── Visit scheduling (v2) ─────────────────────────────────────────────────
-    -- Snapshot of visits included per month. Copied from subscription_plans
-    -- at booking time. Scheduling system reads this after each invoice.paid
-    -- to generate the correct number of visit slots for the period.
-    -- NULL for one-time bookings. NOT sent to Stripe.
+    -- ── Visit scheduling ──────────────────────────────────────────────────────
     visits_per_month INTEGER CHECK (visits_per_month IN (1, 2, 4)),
 
-    -- ── Apartment snapshot (denormalized) ────────────────────────────────────
-    -- NULL for office bookings.
+    -- ── Apartment snapshot (residential only, NULL for office) ────────────────
     apartment_key   TEXT,
     apartment_label TEXT,
     apartment_size  TEXT,
 
-    -- ── Addons snapshot (JSONB) ───────────────────────────────────────────────
+    -- ── Addons snapshot ───────────────────────────────────────────────────────
     -- Shape: { "count": 2, "rawTotal": 80, "discount": 8,
     --          "discountedTotal": 72, "names": ["Oven cleaning", "Sauna cleaning"] }
-    -- NULL / '{}' for office bookings.
+    -- addons_snapshot.discountedTotal is used as a SEPARATE Stripe line item.
+    -- It is NOT included in monthly_estimate (office) or the plan Price (residential).
     addons_snapshot JSONB DEFAULT '{}',
 
     -- ── Notes ────────────────────────────────────────────────────────────────
     special_notes TEXT,
 
-    -- ── Office-specific columns ───────────────────────────────────────────────
-    -- All nullable — NULL when service_type != 'office'.
+    -- ── Office-specific columns (NULL when service_type != 'office') ──────────
     office_name               TEXT,
     office_size_sqm           INTEGER,
     weekly_hours              DECIMAL(5,2),
     hourly_rate               DECIMAL(10,2),
     recurring_time            TIME,
     evening_weekend_surcharge BOOLEAN DEFAULT false,
-    -- weekly_hours × hourly_rate × 4.33 — the Stripe subscription amount for office
-    monthly_estimate          DECIMAL(10,2),
+
+    -- The Stripe billing amount for office (plan only, no addons).
+    -- = serverPricing.finalMonthly = weeklyCost × 4.2 + surcharge
+    -- Addons are a separate line item. final_price = monthly_estimate + addons.
+    monthly_estimate DECIMAL(10,2),
+
+    -- ── Office Stripe pricing fields (v3) ─────────────────────────────────────
+    -- estimated_hours and hourly_rate_cents drive the Stripe price_data amount.
+    -- quoted_amount_cents is a computed field for analytics — NOT the billing amount.
+    -- For billing: use monthly_estimate (true monthly = weeks × hours × rate).
+    estimated_hours     NUMERIC(4,1),
+    hourly_rate_cents   INTEGER,
+    -- WEEKLY cost = estimated_hours × hourly_rate_cents. NOT used for billing.
+    -- monthly_estimate is the billing amount.
+    quoted_amount_cents INTEGER GENERATED ALWAYS AS (
+        ROUND(estimated_hours * hourly_rate_cents)
+    ) STORED,
 
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -551,6 +567,8 @@ CREATE INDEX idx_bookings_status                  ON bookings(status);
 CREATE INDEX idx_bookings_service_type            ON bookings(service_type);
 CREATE INDEX idx_bookings_stripe_checkout_session ON bookings(stripe_checkout_session_id);
 CREATE INDEX idx_bookings_stripe_subscription_id  ON bookings(stripe_subscription_id);
+CREATE INDEX idx_bookings_office_rate             ON bookings(hourly_rate_cents)
+    WHERE service_type = 'office';
 
 CREATE TRIGGER update_bookings_updated_at
     BEFORE UPDATE ON bookings
@@ -589,27 +607,13 @@ CREATE POLICY "Admins can manage all bookings"
 -- ============================================================================
 -- 7. OFFICE_SCHEDULE_RULES TABLE
 -- ============================================================================
--- PURPOSE: Stores the recurring weekly cleaning pattern for office contracts.
---   An office contract is not a single date but a repeating pattern:
---   e.g. Mon 2h + Wed 4h + Fri 4h = 10 hrs/week.
---   Each pattern day gets one row. All rows link to one bookings row.
---
--- WHY NOT in bookings:
---   bookings.booking_date is a single DATE — correct for one-off residential
---   visits. A weekly pattern cannot fit in one DATE column. This table gives
---   each day of the pattern its own row with time and duration.
---
--- is_active: allows pausing a specific day (e.g. client temporarily drops
---   Wednesdays) without losing the schedule configuration.
---
--- UNIQUE(booking_id, day_of_week): prevents two Monday rules for the same
---   booking — each day of the week appears at most once per contract.
+-- PURPOSE: Recurring weekly cleaning pattern for office contracts.
+--   e.g. Mon 2h + Wed 4h + Fri 4h = 10h/week → 3 rows per booking.
 -- ============================================================================
 
 CREATE TABLE office_schedule_rules (
     id             UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
     booking_id     UUID         NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
-    -- 0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday
     day_of_week    INTEGER      NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),
     start_time     TIME         NOT NULL,
     duration_hours DECIMAL(4,2) NOT NULL CHECK (duration_hours > 0),
@@ -626,7 +630,6 @@ CREATE TRIGGER update_office_schedule_rules_updated_at
     BEFORE UPDATE ON office_schedule_rules
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- RLS
 ALTER TABLE office_schedule_rules ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Customer can view own office schedule"
@@ -642,33 +645,26 @@ CREATE POLICY "Customer can view own office schedule"
 CREATE POLICY "Admins can manage all office schedules"
     ON office_schedule_rules FOR ALL
     USING (
-        EXISTS (
-            SELECT 1 FROM profiles
-            WHERE id = auth.uid() AND role = 'admin'
-        )
+        EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
     );
 
 
 -- ============================================================================
 -- 8. BOOKING_EXTRAS TABLE
 -- ============================================================================
--- PURPOSE: Normalised record of add-on services per residential booking.
---   The addons_snapshot JSONB on bookings handles fast reads and receipt display.
---   This table enables analytics queries:
---     "How many oven cleans did we do in Q2?"
---     "Which add-ons are most popular with 3-room apartments?"
---   Not used for office bookings (no addons model at MVP).
---
--- WHY SEPARATE FROM addons_snapshot:
---   JSONB is great for storing and displaying a snapshot but poor for
---   aggregating across thousands of rows. This table is the analytics layer.
+-- PURPOSE: Normalised add-on services per residential booking.
+--   The addons_snapshot JSONB on bookings handles display.
+--   This table enables analytics: "how many oven cleans in Q2?"
 -- ============================================================================
 
 CREATE TABLE booking_extras (
     id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     booking_id UUID NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
     extra_type TEXT NOT NULL CHECK (
-        extra_type IN ('windows', 'oven', 'fridge', 'deep_clean', 'high_dust', 'sauna', 'ironing', 'laundry')
+        extra_type IN (
+            'windows', 'oven', 'oven_interior', 'fridge', 'deep_clean',
+            'high_dust', 'trash_cabinet', 'sauna', 'ironing', 'laundry'
+        )
     ),
     price      DECIMAL(10,2) NOT NULL CHECK (price >= 0),
     created_at TIMESTAMPTZ DEFAULT NOW()
@@ -678,107 +674,64 @@ CREATE INDEX idx_booking_extras_booking_id ON booking_extras(booking_id);
 
 ALTER TABLE booking_extras ENABLE ROW LEVEL SECURITY;
 
+CREATE POLICY "Customer can view own booking extras"
+    ON booking_extras FOR SELECT
+    USING (
+        booking_id IN (
+            SELECT b.id FROM bookings b
+            JOIN customers c ON b.customer_id = c.id
+            WHERE c.auth_user_id = auth.uid()
+        )
+    );
+
 CREATE POLICY "Admins can manage booking extras"
     ON booking_extras FOR ALL
     USING (
-        EXISTS (
-            SELECT 1 FROM profiles
-            WHERE id = auth.uid() AND role = 'admin'
-        )
+        EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
     );
 
 
 -- ============================================================================
--- 9. PAYMENTS TABLE (NEW in v2)
+-- 9. PAYMENTS TABLE
 -- ============================================================================
--- PURPOSE: One row per Stripe invoice or charge. This is the complete payment
---   history for every booking.
---
--- WHY NOT just use bookings.payment_status:
---   A monthly subscription generates one invoice per month — 12 per year.
---   A weekly subscriber for 1 year = 12 payment records.
---   bookings.payment_status can only hold the CURRENT state, not history.
---   This table records every invoice: when it was paid, what period it covered,
---   whether it failed, how many retries occurred, and whether it was refunded.
+-- PURPOSE: One row per Stripe invoice or charge — complete payment history.
 --
 -- HOW IT WORKS WITH STRIPE WEBHOOKS:
---   invoice.paid              → INSERT row (status='succeeded', paid_at=NOW())
---   invoice.payment_failed    → INSERT row (status='failed', failure_message=...)
---   charge.refunded           → UPDATE row (status='refunded', stripe_refund_id=...)
+--   invoice.paid           → INSERT row (status='succeeded', paid_at=NOW())
+--   invoice.payment_failed → INSERT row (status='failed', failure_message=...)
+--   charge.refunded        → UPDATE row (status='refunded', stripe_refund_id=...)
 --
--- amount_cents:
---   Stripe always uses the smallest currency unit. €89.00 = 8900 cents.
---   Storing in cents avoids floating-point arithmetic errors (e.g. 0.1 + 0.2 ≠ 0.3).
---   Display: amount_cents / 100.0
+-- AMOUNT: stored in cents (€89.00 = 8900). Avoids floating-point errors.
 --
--- billing_period_start / billing_period_end:
---   Which calendar period this invoice covers.
---   For a weekly subscriber: "Jun 1 – Jul 1 = 4 visits included"
---   Comes from Stripe invoice.period_start and invoice.period_end.
---   Used to show customers "your June plan is paid".
---
--- visits_covered:
---   Snapshot of how many visits this payment entitles the customer to.
---   Redundant with bookings.visits_per_month but useful for per-invoice display:
---   "This invoice covers 4 visits (weekly plan, Jun 1 – Jul 1)"
---
--- is_first_payment:
---   True when invoice.billing_reason = 'subscription_create'.
---   Useful for welcome email triggers and conversion analytics.
---
--- failure_message:
---   Stripe's human-readable decline reason. Stored for support visibility.
---   e.g. "Your card was declined." / "Insufficient funds."
---   Each retry attempt is a new row, so retry history is fully preserved.
+-- DOUBLE-COUNTING PREVENTION:
+--   For subscriptions, invoice.paid fires on subscription_create AND every
+--   renewal. The is_first_payment flag identifies the first invoice.
+--   checkout.session.completed only creates a payments row for one-time bookings.
+--   For subscriptions, the payments row is created by invoice.paid.
 -- ============================================================================
 
 CREATE TABLE payments (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
-    -- Every payment belongs to one booking.
-    -- RESTRICT prevents deleting a booking that has payment history.
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     booking_id UUID NOT NULL REFERENCES bookings(id) ON DELETE RESTRICT,
 
-    -- ── Stripe identifiers ────────────────────────────────────────────────────
-    -- pi_xxx — the specific charge attempt. UNIQUE because each PaymentIntent
-    -- is a distinct Stripe object. Retry = new PaymentIntent = new row here.
-    stripe_payment_intent_id TEXT UNIQUE,
+    stripe_payment_intent_id TEXT UNIQUE,  -- pi_xxx
+    stripe_invoice_id        TEXT UNIQUE,  -- in_xxx
+    stripe_refund_id         TEXT,         -- re_xxx (set when refunded)
 
-    -- in_xxx — the Stripe Invoice. For subscriptions: one per billing period.
-    -- For one-time: Stripe may or may not create an invoice (config-dependent).
-    stripe_invoice_id TEXT UNIQUE,
-
-    -- re_xxx — the Stripe Refund object. NULL until a refund is issued.
-    -- For partial refunds at MVP: one refund per payment row is sufficient.
-    -- Add a refunds table later if you need multiple partial refund tracking.
-    stripe_refund_id TEXT,
-
-    -- ── Amount ────────────────────────────────────────────────────────────────
-    amount_cents INTEGER NOT NULL CHECK (amount_cents >= 0),  -- €89.00 = 8900
+    amount_cents INTEGER NOT NULL CHECK (amount_cents >= 0),
     currency     TEXT    NOT NULL DEFAULT 'eur',
 
-    -- ── Status ────────────────────────────────────────────────────────────────
     status TEXT NOT NULL DEFAULT 'pending' CHECK (
         status IN ('pending', 'succeeded', 'failed', 'refunded', 'partially_refunded')
     ),
-
-    -- Stripe's decline reason if status = 'failed'. e.g. "Insufficient funds."
     failure_message TEXT,
 
-    -- ── Billing period this invoice covers ────────────────────────────────────
-    billing_period_start TIMESTAMPTZ,  -- e.g. 2025-06-01 00:00:00 UTC
-    billing_period_end   TIMESTAMPTZ,  -- e.g. 2025-07-01 00:00:00 UTC
-
-    -- ── Visit entitlement for this invoice ────────────────────────────────────
-    -- Snapshot: how many visits does this payment include?
-    -- Redundant with bookings.visits_per_month but enables per-invoice display.
-    visits_covered INTEGER,
-
-    -- ── Metadata ──────────────────────────────────────────────────────────────
-    -- True for the first invoice (billing_reason='subscription_create').
-    is_first_payment BOOLEAN     DEFAULT false,
-    paid_at          TIMESTAMPTZ,    -- when Stripe confirmed successful payment
-    refunded_at      TIMESTAMPTZ,    -- when refund was issued
+    billing_period_start TIMESTAMPTZ,
+    billing_period_end   TIMESTAMPTZ,
+    visits_covered       INTEGER,
+    is_first_payment     BOOLEAN     DEFAULT false,
+    paid_at              TIMESTAMPTZ,
+    refunded_at          TIMESTAMPTZ,
 
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -794,7 +747,6 @@ CREATE TRIGGER update_payments_updated_at
     BEFORE UPDATE ON payments
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- RLS
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Customer can view own payments"
@@ -810,82 +762,35 @@ CREATE POLICY "Customer can view own payments"
 CREATE POLICY "Admins can manage all payments"
     ON payments FOR ALL
     USING (
-        EXISTS (
-            SELECT 1 FROM profiles
-            WHERE id = auth.uid() AND role = 'admin'
-        )
+        EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
     );
 
 
 -- ============================================================================
--- 10. STRIPE_WEBHOOK_EVENTS TABLE (NEW in v2)
+-- 10. STRIPE_WEBHOOK_EVENTS TABLE
 -- ============================================================================
--- PURPOSE: Idempotency log for Stripe webhook events. Prevents duplicate
---   processing when Stripe retries delivery.
+-- PURPOSE: Idempotency log — prevents duplicate processing on Stripe retries.
 --
--- WHY THIS IS NON-NEGOTIABLE:
---   Stripe retries webhook delivery for up to 72 hours if your endpoint
---   returns anything other than HTTP 2xx. This means the SAME event can
---   arrive 3, 5, or 20 times. Without this table:
---     • A booking gets confirmed twice → two confirmation emails sent
---     • A payment is recorded twice → wrong revenue in your dashboard
---     • A subscription cancellation fires twice → error in your handler
+-- HOW IDEMPOTENCY WORKS:
+--   1. Event arrives (evt_xxx)
+--   2. INSERT into this table — if duplicate, unique constraint throws 23505
+--   3. Handler catches 23505 → returns 200 immediately, does nothing
+--   4. If INSERT succeeds → process event → set processed = true
 --
--- HOW IDEMPOTENCY WORKS WITH THIS TABLE:
---   1. Webhook arrives (evt_xxx)
---   2. Your handler: SELECT id FROM stripe_webhook_events WHERE stripe_event_id = 'evt_xxx'
---   3. If found AND processed = true → return 200 immediately, do nothing
---   4. If not found → INSERT this row, process the event, set processed = true
---
--- SECONDARY BENEFITS:
---   • Full audit log: every event Stripe ever sent is permanently recorded
---   • Replay capability: if a handler had a bug, you can replay the event
---   • Failure visibility: processed=false rows show events that need retry
---   • Debugging: payload JSONB lets you query inside event data
---
--- stripe_event_id (evt_xxx):
---   Stripe's globally unique event identifier. The UNIQUE constraint here
---   IS your idempotency guarantee — inserting the same evt_xxx twice will fail.
---
--- payload (JSONB):
---   The complete raw Stripe event JSON. Always store it. Reasons:
---   regulatory audit trail, debugging, replaying events, support queries.
---
--- processing_error:
---   If your handler threw an error mid-processing, store the message.
---   Enables "show me all failed webhook events" admin queries.
---
--- related_booking_id:
---   Set during processing once you've resolved which booking this event
---   belongs to. Enables "show me all webhook events for booking X".
+-- Stripe retries for up to 72 hours. Without this table, duplicate invoices
+-- and emails would occur on every retry.
 -- ============================================================================
 
 CREATE TABLE stripe_webhook_events (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
-    -- Stripe's unique event ID. UNIQUE = the idempotency guarantee.
-    -- Inserting the same evt_xxx twice will throw a unique violation —
-    -- your handler catches this and returns 200 without reprocessing.
-    stripe_event_id TEXT NOT NULL UNIQUE,
-
-    -- e.g. 'checkout.session.completed', 'invoice.paid', 'charge.refunded'
-    event_type TEXT NOT NULL,
-
-    -- Complete raw Stripe event JSON. Store always. Never truncate.
-    payload JSONB NOT NULL,
-
-    -- false on insert. Set to true after your handler completes successfully.
-    processed BOOLEAN DEFAULT false,
-
-    -- Error message if handler threw. NULL on success.
-    -- Allows ops team to identify and retry failed events.
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    stripe_event_id TEXT NOT NULL UNIQUE,  -- evt_xxx — the idempotency key
+    event_type      TEXT NOT NULL,
+    payload         JSONB NOT NULL,        -- full raw event — never truncate
+    processed       BOOLEAN DEFAULT false,
     processing_error TEXT,
-
-    -- Set during processing once the booking is identified.
     related_booking_id UUID REFERENCES bookings(id),
-
-    received_at  TIMESTAMPTZ DEFAULT NOW(),  -- when webhook arrived at your server
-    processed_at TIMESTAMPTZ                 -- when handler completed (NULL if failed)
+    received_at     TIMESTAMPTZ DEFAULT NOW(),
+    processed_at    TIMESTAMPTZ
 );
 
 CREATE INDEX idx_webhook_events_stripe_event_id ON stripe_webhook_events(stripe_event_id);
@@ -893,38 +798,25 @@ CREATE INDEX idx_webhook_events_event_type      ON stripe_webhook_events(event_t
 CREATE INDEX idx_webhook_events_processed       ON stripe_webhook_events(processed);
 CREATE INDEX idx_webhook_events_related_booking ON stripe_webhook_events(related_booking_id);
 
--- No RLS — accessed only via service role key in webhook handlers.
--- Never expose to client or authenticated users directly.
+-- No RLS — service role key only. Never expose to client.
 
 
 -- ============================================================================
 -- 11. CUSTOMER_PAYMENT_METHODS TABLE
 -- ============================================================================
--- PURPOSE: Stores saved Stripe payment methods for authenticated customers.
---   Enables future bookings without re-entering card details.
---   Guest customers cannot save payment methods (requires auth).
---
--- RELATIONSHIP TO customers.stripe_customer_id:
---   customers.stripe_customer_id is set at first Checkout — before any card
---   is saved. This table is populated AFTER a customer saves their card,
---   which only authenticated users can do. The Stripe Customer exists in
---   both places; this table has card-level detail.
---
--- stripe_customer_id HERE vs ON customers:
---   Having it on both is intentional. This table mirrors the Stripe
---   PaymentMethod object which always carries the customer ID. It allows
---   querying "what cards does customer X have?" without joining customers.
+-- PURPOSE: Saved Stripe payment methods for authenticated customers.
+--   Guest customers cannot save payment methods — requires auth_user_id.
 -- ============================================================================
 
 CREATE TABLE customer_payment_methods (
     id                       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customer_id              UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
-    stripe_payment_method_id TEXT NOT NULL UNIQUE,   -- pm_xxx
-    stripe_customer_id       TEXT NOT NULL,           -- cus_xxx (denormalized for convenience)
-    card_brand               TEXT,       -- 'visa', 'mastercard', 'amex'
-    card_last4               TEXT,       -- '4242'
-    card_exp_month           INTEGER,    -- 12
-    card_exp_year            INTEGER,    -- 2027
+    stripe_payment_method_id TEXT NOT NULL UNIQUE,
+    stripe_customer_id       TEXT NOT NULL,
+    card_brand               TEXT,
+    card_last4               TEXT,
+    card_exp_month           INTEGER,
+    card_exp_year            INTEGER,
     is_default               BOOLEAN DEFAULT false,
     created_at               TIMESTAMPTZ DEFAULT NOW()
 );
@@ -944,20 +836,12 @@ CREATE POLICY "Customer can view own payment methods"
 CREATE POLICY "Admins can manage all payment methods"
     ON customer_payment_methods FOR ALL
     USING (
-        EXISTS (
-            SELECT 1 FROM profiles
-            WHERE id = auth.uid() AND role = 'admin'
-        )
+        EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
     );
 
 
 -- ============================================================================
 -- 12. QUOTE_REQUESTS TABLE
--- ============================================================================
--- PURPOSE: Lead capture for customers who want a custom quote before booking.
---   Not linked to bookings — quote requests are pre-booking enquiries that
---   may or may not convert. When they do convert, a booking is created
---   separately and the quote_request.status is set to 'converted'.
 -- ============================================================================
 
 CREATE TABLE quote_requests (
@@ -984,29 +868,17 @@ CREATE INDEX idx_quote_requests_created ON quote_requests(created_at);
 ALTER TABLE quote_requests ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Anyone can insert quote requests"
-    ON quote_requests FOR INSERT
-    WITH CHECK (true);
+    ON quote_requests FOR INSERT WITH CHECK (true);
 
 CREATE POLICY "Admins can view all quote requests"
     ON quote_requests FOR ALL
     USING (
-        EXISTS (
-            SELECT 1 FROM profiles
-            WHERE id = auth.uid() AND role = 'admin'
-        )
+        EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
     );
 
 
 -- ============================================================================
 -- 13. AVAILABILITY_SLOTS TABLE
--- ============================================================================
--- PURPOSE: Defines which time windows are available for residential bookings.
---   The booking flow queries this to show available slots for a given date.
---   Office bookings do not use this — their schedule is in office_schedule_rules
---   and managed directly by the admin.
---
--- max_bookings: how many concurrent residential bookings can share this slot.
---   Currently 1 (one cleaner per slot). Increase to run parallel teams.
 -- ============================================================================
 
 CREATE TABLE availability_slots (
@@ -1019,7 +891,6 @@ CREATE TABLE availability_slots (
     created_at   TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Monday–Friday, three slots per day
 INSERT INTO availability_slots (day_of_week, start_time, end_time, is_available, max_bookings) VALUES
 (1, '08:00', '11:00', true, 1), (1, '11:00', '14:00', true, 1), (1, '14:00', '17:00', true, 1),
 (2, '08:00', '11:00', true, 1), (2, '11:00', '14:00', true, 1), (2, '14:00', '17:00', true, 1),
@@ -1032,11 +903,6 @@ INSERT INTO availability_slots (day_of_week, start_time, end_time, is_available,
 -- 14. HELPER FUNCTIONS
 -- ============================================================================
 
--- ── Residential slot availability check ──────────────────────────────────────
--- Returns true if the slot has capacity on the given date.
--- Used by the booking flow before allowing a slot selection.
--- Server action also re-validates this immediately before INSERT (race safety).
-
 CREATE OR REPLACE FUNCTION check_slot_availability(
     p_booking_date DATE,
     p_time_slot    TIME
@@ -1048,51 +914,68 @@ DECLARE
     v_current_bookings INTEGER;
 BEGIN
     v_day_of_week := EXTRACT(DOW FROM p_booking_date);
-
     SELECT max_bookings INTO v_max_bookings
     FROM availability_slots
     WHERE day_of_week = v_day_of_week
       AND p_time_slot >= start_time
       AND p_time_slot < end_time
       AND is_available = true;
-
-    IF v_max_bookings IS NULL THEN
-        RETURN false;
-    END IF;
-
+    IF v_max_bookings IS NULL THEN RETURN false; END IF;
     SELECT COUNT(*) INTO v_current_bookings
     FROM bookings
     WHERE booking_date = p_booking_date
       AND time_slot    = p_time_slot
       AND status NOT IN ('cancelled');
-
     RETURN v_current_bookings < v_max_bookings;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION get_available_slots(p_date DATE)
 RETURNS TABLE (time_slot TIME, is_available BOOLEAN) AS $$
-DECLARE
-    v_day_of_week INTEGER;
+DECLARE v_day_of_week INTEGER;
 BEGIN
     v_day_of_week := EXTRACT(DOW FROM p_date);
     RETURN QUERY
-    SELECT
-        a.start_time,
-        check_slot_availability(p_date, a.start_time) AS is_available
+    SELECT a.start_time, check_slot_availability(p_date, a.start_time)
     FROM availability_slots a
-    WHERE a.day_of_week = v_day_of_week
-      AND a.is_available = true
+    WHERE a.day_of_week = v_day_of_week AND a.is_available = true
     ORDER BY a.start_time;
 END;
 $$ LANGUAGE plpgsql;
 
 
 -- ============================================================================
--- 15. AUTH UPGRADE FUNCTIONS
+-- 15. AUTH UPGRADE FUNCTIONS (v3)
 -- ============================================================================
--- When a guest later creates a Supabase account with the same email,
--- their customer record is automatically linked. Booking history is preserved.
+-- These functions implement the guest-to-authenticated customer linking.
+--
+-- FLOW:
+--   Customer authenticates via magic link
+--   → Supabase creates auth.users row
+--   → on_auth_user_created trigger fires
+--   → handle_new_auth_user() calls link_customer_to_auth()
+--   → customers.auth_user_id is set
+--   → customers.onboarding_completed_at is set
+--   → Dashboard RLS policies now work for this customer
+--
+-- IDEMPOTENCY:
+--   link_customer_to_auth() uses WHERE auth_user_id IS NULL.
+--   Running it twice for the same customer is a safe no-op.
+--
+-- EMAIL MATCHING:
+--   Uses LOWER(TRIM()) on both sides — prevents case mismatch between
+--   booking email ("Jane@gmail.com") and auth email ("jane@gmail.com").
+--
+-- FAULT TOLERANCE:
+--   handle_new_auth_user() wraps the link call in EXCEPTION.
+--   A linking failure NEVER blocks auth.users INSERT.
+--   The customer can still authenticate — just without the link.
+--   The admin can manually run link_customer_to_auth() to fix it.
+--
+-- MANUAL LINKING (if trigger missed a customer):
+--   SELECT link_customer_to_auth('customer@email.com',
+--     (SELECT id FROM auth.users WHERE email = 'customer@email.com'));
+-- ============================================================================
 
 CREATE OR REPLACE FUNCTION link_customer_to_auth(
     p_email        TEXT,
@@ -1102,12 +985,24 @@ RETURNS BOOLEAN AS $$
 DECLARE
     v_customer_id UUID;
 BEGIN
-    SELECT id INTO v_customer_id FROM customers WHERE email = p_email LIMIT 1;
-    IF v_customer_id IS NULL THEN RETURN false; END IF;
+    -- Case-insensitive match — prevents linking failure due to email case mismatch
+    SELECT id INTO v_customer_id
+    FROM customers
+    WHERE LOWER(TRIM(email)) = LOWER(TRIM(p_email))
+    LIMIT 1;
+
+    IF v_customer_id IS NULL THEN
+        -- No customer found for this email — first-time auth user, not a booker yet
+        RETURN false;
+    END IF;
 
     UPDATE customers
-    SET auth_user_id = p_auth_user_id, updated_at = NOW()
-    WHERE id = v_customer_id AND auth_user_id IS NULL;  -- never overwrite existing link
+    SET
+        auth_user_id            = p_auth_user_id,
+        onboarding_completed_at = NOW(),
+        updated_at              = NOW()
+    WHERE id             = v_customer_id
+      AND auth_user_id  IS NULL;  -- never overwrite an existing link
 
     RETURN true;
 END;
@@ -1116,10 +1011,20 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION handle_new_auth_user()
 RETURNS TRIGGER AS $$
 BEGIN
-    PERFORM link_customer_to_auth(NEW.email, NEW.id);
+    -- Fault-tolerant: EXCEPTION block ensures a linking failure never
+    -- rolls back the auth.users INSERT. The customer can still authenticate.
+    BEGIN
+        PERFORM link_customer_to_auth(NEW.email, NEW.id);
+        RAISE NOTICE '[handle_new_auth_user] Processed: %', NEW.email;
+    EXCEPTION WHEN OTHERS THEN
+        RAISE WARNING '[handle_new_auth_user] Failed for %: %', NEW.email, SQLERRM;
+    END;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Drop and recreate to ensure correct definition
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 
 CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
@@ -1130,30 +1035,16 @@ CREATE TRIGGER on_auth_user_created
 -- 16. ADMIN VIEWS
 -- ============================================================================
 
--- ── Residential upcoming bookings ─────────────────────────────────────────────
 CREATE VIEW v_admin_upcoming_bookings AS
 SELECT
-    b.id,
-    b.booking_date,
-    b.time_slot,
-    b.status,
-    b.payment_status,
-    b.subscription_status,
-    b.visits_per_month,
-    b.current_period_end  AS next_billing_date,
-    b.cancel_at_period_end,
-    c.full_name           AS customer_name,
-    c.email               AS customer_email,
-    c.phone               AS customer_phone,
-    s.name                AS service_name,
-    b.service_type,
-    b.plan_label,
-    b.frequency,
-    b.final_price,
-    b.apartment_size,
+    b.id, b.booking_date, b.time_slot, b.status, b.payment_status,
+    b.subscription_status, b.visits_per_month,
+    b.current_period_end AS next_billing_date, b.cancel_at_period_end,
+    c.full_name AS customer_name, c.email AS customer_email, c.phone AS customer_phone,
+    s.name AS service_name, b.service_type, b.plan_label, b.frequency,
+    b.final_price, b.apartment_size,
     a.street_address || ', ' || a.city AS address,
-    b.addons_snapshot,
-    b.special_notes,
+    b.addons_snapshot, b.special_notes,
     (c.auth_user_id IS NOT NULL) AS is_authenticated
 FROM bookings b
 JOIN customers c ON b.customer_id = c.id
@@ -1163,42 +1054,25 @@ WHERE b.booking_date >= CURRENT_DATE
   AND (b.service_type IS NULL OR b.service_type != 'office')
 ORDER BY b.booking_date, b.time_slot;
 
--- ── Office contracts ───────────────────────────────────────────────────────────
 CREATE VIEW v_office_bookings AS
 SELECT
-    b.id,
-    b.booking_date           AS contract_start_date,
-    b.status,
-    b.payment_status,
-    b.subscription_status,
-    b.frequency,
-    b.office_name,
-    b.office_size_sqm,
-    b.weekly_hours,
-    b.hourly_rate,
-    b.monthly_estimate,
-    b.evening_weekend_surcharge,
-    b.current_period_end     AS next_billing_date,
-    b.cancel_at_period_end,
-    c.full_name              AS customer_name,
-    c.email                  AS customer_email,
-    c.phone                  AS customer_phone,
+    b.id, b.booking_date AS contract_start_date,
+    b.status, b.payment_status, b.subscription_status, b.frequency,
+    b.office_name, b.office_size_sqm, b.weekly_hours, b.hourly_rate,
+    b.monthly_estimate, b.evening_weekend_surcharge,
+    b.current_period_end AS next_billing_date, b.cancel_at_period_end,
+    c.full_name AS customer_name, c.email AS customer_email, c.phone AS customer_phone,
     (c.auth_user_id IS NOT NULL) AS is_authenticated,
-    s.name                   AS service_name,
-    a.street_address || ', ' || a.city AS address,
+    s.name AS service_name, a.street_address || ', ' || a.city AS address,
     (
         SELECT json_agg(
-            json_build_object(
-                'day',      osr.day_of_week,
-                'start',    osr.start_time,
-                'duration', osr.duration_hours
-            ) ORDER BY osr.day_of_week
+            json_build_object('day', osr.day_of_week, 'start', osr.start_time, 'duration', osr.duration_hours)
+            ORDER BY osr.day_of_week
         )
         FROM office_schedule_rules osr
         WHERE osr.booking_id = b.id AND osr.is_active = true
     ) AS schedule_rules,
-    b.special_notes,
-    b.created_at
+    b.special_notes, b.created_at
 FROM bookings b
 JOIN customers c ON b.customer_id = c.id
 JOIN services  s ON b.service_id  = s.id
@@ -1206,68 +1080,46 @@ JOIN addresses a ON b.address_id  = a.id
 WHERE b.service_type = 'office'
 ORDER BY b.created_at DESC;
 
--- ── Subscription health dashboard ─────────────────────────────────────────────
--- Active subscriptions with payment history summary.
--- Answers: "which subscribers are past_due?", "who has failed payments?"
 CREATE VIEW v_subscription_health AS
 SELECT
-    b.id                         AS booking_id,
-    c.full_name                  AS customer_name,
-    c.email                      AS customer_email,
-    b.service_type,
-    b.plan_label,
-    b.frequency,
-    b.visits_per_month,
-    b.subscription_status,
-    b.payment_status,
-    b.current_period_start,
-    b.current_period_end         AS next_billing_date,
-    b.cancel_at_period_end,
-    b.canceled_at,
-    -- Payment aggregates from payments table
-    COUNT(p.id)                                                          AS total_invoices,
-    SUM(CASE WHEN p.status = 'succeeded' THEN p.amount_cents ELSE 0 END)
-        / 100.0                                                          AS total_collected_eur,
-    SUM(CASE WHEN p.status = 'failed'    THEN 1              ELSE 0 END) AS failed_payment_count,
-    MAX(CASE WHEN p.status = 'succeeded' THEN p.paid_at END)             AS last_successful_payment,
-    -- Stripe references
-    b.stripe_subscription_id,
-    b.stripe_price_id
+    b.id AS booking_id,
+    c.full_name AS customer_name, c.email AS customer_email,
+    b.service_type, b.plan_label, b.frequency, b.visits_per_month,
+    b.subscription_status, b.payment_status,
+    b.current_period_start, b.current_period_end AS next_billing_date,
+    b.cancel_at_period_end, b.canceled_at,
+    COUNT(p.id) AS total_invoices,
+    SUM(CASE WHEN p.status = 'succeeded' THEN p.amount_cents ELSE 0 END) / 100.0 AS total_collected_eur,
+    SUM(CASE WHEN p.status = 'failed'    THEN 1              ELSE 0 END)          AS failed_payment_count,
+    MAX(CASE WHEN p.status = 'succeeded' THEN p.paid_at END)                      AS last_successful_payment,
+    b.stripe_subscription_id, b.stripe_price_id
 FROM bookings b
 JOIN customers c ON b.customer_id = c.id
 LEFT JOIN payments p ON b.id = p.booking_id
 WHERE b.frequency != 'one-time'
 GROUP BY
-    b.id, c.full_name, c.email,
-    b.service_type, b.plan_label, b.frequency, b.visits_per_month,
-    b.subscription_status, b.payment_status,
+    b.id, c.full_name, c.email, b.service_type, b.plan_label, b.frequency,
+    b.visits_per_month, b.subscription_status, b.payment_status,
     b.current_period_start, b.current_period_end,
     b.cancel_at_period_end, b.canceled_at,
     b.stripe_subscription_id, b.stripe_price_id
 ORDER BY b.created_at DESC;
 
--- ── Customer list with booking and payment stats ───────────────────────────────
 CREATE VIEW v_customer_list AS
 SELECT
-    c.id,
-    c.full_name,
-    c.email,
-    c.phone,
-    (c.auth_user_id IS NOT NULL)     AS has_account,
+    c.id, c.full_name, c.email, c.phone,
+    (c.auth_user_id IS NOT NULL)       AS has_account,
+    c.onboarding_completed_at          AS account_created_at,
     (c.stripe_customer_id IS NOT NULL) AS has_stripe_customer,
-    COUNT(DISTINCT b.id)             AS total_bookings,
-    MAX(b.booking_date)              AS last_booking_date,
-    SUM(b.final_price)               AS total_billed,
-    -- Actual collected from payments table (more accurate than final_price)
-    COALESCE(
-        SUM(p_agg.collected) / 100.0, 0
-    )                                AS total_collected_eur,
+    COUNT(DISTINCT b.id)               AS total_bookings,
+    MAX(b.booking_date)                AS last_booking_date,
+    SUM(b.final_price)                 AS total_billed,
+    COALESCE(SUM(p_agg.collected) / 100.0, 0) AS total_collected_eur,
     CASE
-        WHEN COUNT(b.id) FILTER (WHERE b.frequency != 'one-time') > 0
-        THEN 'Subscriber'
+        WHEN COUNT(b.id) FILTER (WHERE b.frequency != 'one-time') > 0 THEN 'Subscriber'
         ELSE 'One-time'
-    END                              AS customer_type,
-    c.created_at                     AS joined_date
+    END AS customer_type,
+    c.created_at AS joined_date
 FROM customers c
 LEFT JOIN bookings b ON c.id = b.customer_id
 LEFT JOIN LATERAL (
@@ -1276,55 +1128,76 @@ LEFT JOIN LATERAL (
     WHERE booking_id = b.id AND status = 'succeeded'
 ) p_agg ON true
 GROUP BY c.id, c.full_name, c.email, c.phone, c.auth_user_id,
-         c.stripe_customer_id, c.created_at
+         c.onboarding_completed_at, c.stripe_customer_id, c.created_at
 ORDER BY c.created_at DESC;
 
--- ── Failed webhook events (ops monitoring) ────────────────────────────────────
--- Shows events that were received but failed to process.
--- Ops team uses this to identify and manually replay problematic events.
 CREATE VIEW v_failed_webhook_events AS
-SELECT
-    stripe_event_id,
-    event_type,
-    processing_error,
-    related_booking_id,
-    received_at,
-    processed_at
+SELECT stripe_event_id, event_type, processing_error,
+       related_booking_id, received_at, processed_at
 FROM stripe_webhook_events
-WHERE processed = false
-   OR processing_error IS NOT NULL
+WHERE processed = false OR processing_error IS NOT NULL
 ORDER BY received_at DESC;
 
 
 -- ============================================================================
--- STRIPE PRICES TO CREATE (reference)
+-- MIGRATION CHECKLIST (apply to existing DB, do not re-run on fresh installs)
 -- ============================================================================
--- Create these in Stripe Dashboard → Products → Add Product.
--- ALL subscription prices use interval='month' (1 month, not 1 week).
--- Store the resulting price_xxx in bookings.stripe_price_id at Checkout.
+-- Run these if upgrading from v1/v2:
 --
--- Maintenance — Studio (Yksiö):
---   Weekly:    price_weekly_maintenance_studio    → €X/month, recurring monthly
---   Biweekly:  price_biweekly_maintenance_studio  → €Y/month, recurring monthly
---   Monthly:   price_monthly_maintenance_studio   → €Z/month, recurring monthly
---   One-time:  price_onetime_maintenance_studio   → €89, one_time
+-- -- Normalise existing emails
+-- UPDATE customers SET email = LOWER(TRIM(email));
+-- ALTER TABLE customers ADD CONSTRAINT customers_email_lowercase
+--   CHECK (email = LOWER(TRIM(email)));
 --
--- Repeat per apartment type (two, three, four) and service type (deep cleaning).
--- Move-out: always one-time prices per apartment type.
--- Office: manual billing — Stripe integration phase 2.
+-- -- Add v3 columns
+-- ALTER TABLE customers
+--   ADD COLUMN IF NOT EXISTS magic_link_sent_at      TIMESTAMPTZ,
+--   ADD COLUMN IF NOT EXISTS onboarding_completed_at TIMESTAMPTZ;
+--
+-- -- Fix booking_extras constraint (add oven_interior, trash_cabinet)
+-- ALTER TABLE booking_extras DROP CONSTRAINT booking_extras_extra_type_check;
+-- ALTER TABLE booking_extras ADD CONSTRAINT booking_extras_extra_type_check
+--   CHECK (extra_type IN (
+--     'windows','oven','oven_interior','fridge','deep_clean',
+--     'high_dust','trash_cabinet','sauna','ironing','laundry'
+--   ));
+--
+-- -- Fix bookings frequency constraint (add deep variants)
+-- ALTER TABLE bookings DROP CONSTRAINT bookings_frequency_check;
+-- ALTER TABLE bookings ADD CONSTRAINT bookings_frequency_check
+--   CHECK (frequency IN (
+--     'one-time','weekly','biweekly','monthly',
+--     'deepMonthly','deepQuarterly','deepOnetime'
+--   ));
+--
+-- -- Add office Stripe columns
+-- ALTER TABLE bookings
+--   ADD COLUMN IF NOT EXISTS estimated_hours     NUMERIC(4,1),
+--   ADD COLUMN IF NOT EXISTS hourly_rate_cents   INTEGER,
+--   ADD COLUMN IF NOT EXISTS quoted_amount_cents INTEGER
+--     GENERATED ALWAYS AS (ROUND(estimated_hours * hourly_rate_cents)) STORED,
+--   ADD COLUMN IF NOT EXISTS stripe_product_id   TEXT;
+--
+-- -- Make profiles.full_name nullable (customers should never be in profiles)
+-- ALTER TABLE profiles ALTER COLUMN full_name DROP NOT NULL;
+--
+-- -- Recreate trigger with fault-tolerant exception handler
+-- DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+-- CREATE TRIGGER on_auth_user_created
+--   AFTER INSERT ON auth.users
+--   FOR EACH ROW EXECUTE FUNCTION handle_new_auth_user();
 --
 -- ============================================================================
 -- WEBHOOKS TO SUBSCRIBE IN STRIPE DASHBOARD
 -- ============================================================================
 -- checkout.session.completed    → confirm booking, set subscription_id
--- invoice.paid                  → record payment, update billing period,
---                                  trigger visit slot generation
+-- invoice.paid                  → record payment, update billing period
 -- invoice.payment_failed        → record failure, set past_due, send email
 -- customer.subscription.updated → sync subscription_status, cancel_at_period_end
 -- customer.subscription.deleted → set canceled, record canceled_at
 -- charge.refunded               → update payments row with refund data
--- checkout.session.expired      → optional: notify customer, clean up pending booking
+-- checkout.session.expired      → optional: notify customer, clean pending booking
 --
 -- ============================================================================
--- END OF SCHEMA
+-- END OF SCHEMA v3
 -- ============================================================================

@@ -1,3 +1,4 @@
+import { MagicLinkCTA } from "@/app/components/MagicLinkCTA";
 import { StoreCleaner } from "@/app/components/StoreCleaner";
 import { createClient } from "@supabase/supabase-js";
 import { ArrowRight, Calendar, CheckCircle, Clock } from "lucide-react";
@@ -274,6 +275,9 @@ export default async function BookingSuccessPage({
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
+
+        {/* ── Create account CTA ──────────────────────────────────────────── */}
+        <MagicLinkCTA bookingEmail={customer?.email} locale={locale} />
 
         {/* ── Support line ────────────────────────────────────────────────── */}
         <p className="text-center text-[12px] text-gray-400">
