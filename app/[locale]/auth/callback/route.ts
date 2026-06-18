@@ -27,10 +27,6 @@ export async function GET(
     );
   }
 
-  // ── Build response first, then create Supabase client that writes cookies TO it ──
-  // This is the correct pattern for Route Handlers. Using cookies() from next/headers
-  // in a Route Handler is read-only — you cannot set session cookies that way.
-  // Instead, create the Supabase client with get/set/remove wired to the Response.
   const response = NextResponse.redirect(
     new URL(`/${locale}${redirectPath}`, request.url),
   );
