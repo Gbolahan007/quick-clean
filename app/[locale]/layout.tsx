@@ -19,18 +19,18 @@ const monserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://quickclean.com"),
+  metadataBase: new URL("https://Frosh.com"),
 
   title: {
-    default: "QuickClean | Professional Home & Office Cleaning Services",
-    template: "%s | QuickClean",
+    default: "Frosh | Professional Home & Office Cleaning Services",
+    template: "%s | Frosh",
   },
 
   description:
-    "QuickClean is a trusted cleaning company providing professional home and office cleaning services. Enjoy more time and less stress with our reliable weekly, bi-weekly, and monthly cleaning plans.",
+    "Frosh is a trusted cleaning company providing professional home and office cleaning services. Enjoy more time and less stress with our reliable weekly, bi-weekly, and monthly cleaning plans.",
 
   keywords: [
-    "QuickClean",
+    "Frosh",
     "cleaning company",
     "home cleaning services",
     "office cleaning",
@@ -40,9 +40,9 @@ export const metadata: Metadata = {
     "cleaning services Tampere",
   ],
 
-  authors: [{ name: "QuickClean" }],
-  creator: "QuickClean",
-  publisher: "QuickClean",
+  authors: [{ name: "Frosh" }],
+  creator: "Frosh",
+  publisher: "Frosh",
 
   robots: {
     index: true,
@@ -50,11 +50,11 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
-    title: "QuickClean | Reliable Home & Office Cleaning Services",
+    title: "Frosh | Reliable Home & Office Cleaning Services",
     description:
-      "Enjoy a calm, clean home without the stress. QuickClean provides professional and reliable cleaning services for homes and businesses.",
-    url: "https://quickclean.com",
-    siteName: "QuickClean",
+      "Enjoy a calm, clean home without the stress. Frosh provides professional and reliable cleaning services for homes and businesses.",
+    url: "https://Frosh.com",
+    siteName: "Frosh",
     locale: "en_US",
     type: "website",
     images: [
@@ -62,16 +62,16 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "QuickClean Professional Cleaning Services",
+        alt: "Frosh Professional Cleaning Services",
       },
     ],
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "QuickClean | Professional Cleaning Services",
+    title: "Frosh | Professional Cleaning Services",
     description:
-      "Book reliable home and office cleaning services with QuickClean. Spend less time cleaning and more time living.",
+      "Book reliable home and office cleaning services with Frosh. Spend less time cleaning and more time living.",
     images: ["/og-image.png"],
   },
 

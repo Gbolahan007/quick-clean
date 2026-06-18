@@ -190,7 +190,7 @@ export default function Footer() {
                   className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-start group"
                 >
                   <Mail className="w-5 h-5 mr-3 mt-1 shrink-0 group-hover:text-[#7c9885]" />
-                  <span>hello@quickclean.fi</span>
+                  <span>hello@frosh.fi</span>
                 </a>
               </li>
               <li>
@@ -209,7 +209,7 @@ export default function Footer() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
             <p className="mb-4 md:mb-0">
-              © {new Date().getFullYear()} QuickClean. {t("footer.rights")}
+              © {new Date().getFullYear()} Frosh. {t("footer.rights")}
             </p>
             <div className="flex space-x-6">
               <Link

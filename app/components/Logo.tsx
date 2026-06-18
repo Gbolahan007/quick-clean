@@ -16,11 +16,7 @@ export default function Logo() {
       <div className="bg-[#7c9885] p-2 rounded-lg group-hover:bg-[#5f7465] transition-colors">
         <Home className="h-6 w-6 text-white" />
       </div>
-      <span className="text-2xl font-bold text-gray-900">
-        {firstPart}
-        <span className="text-[#7c9885]">Clean</span>
-        {lastPart}
-      </span>
+      <span className="text-2xl font-bold text-gray-900">{firstPart}</span>
     </Link>
   );
 }

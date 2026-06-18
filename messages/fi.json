@@ -1,7 +1,7 @@
 {
   "common": {
-    "appName": "QuickClean",
-    "logo": "QuickClean",
+    "appName": "Frosh",
+    "logo": "Frosh",
     "loading": "Ladataan...",
     "save": "Tallenna",
     "cancel": "Peruuta",
@@ -171,7 +171,7 @@
       "chooseSpace": "Valitse toimistosi koko",
       "bannerTitle": "Ammattimainen toimistosiivous",
       "bannerDescription": "Räätälöidyt siivoussuunnitelmat pienistä toimistoista suuriin avotiloihin. Säännöllinen tai kertaluonteinen syväsiivous.",
-      "featuresTitle": "Miksi QuickClean toimistoille",
+      "featuresTitle": "Miksi Frosh toimistoille",
       "features": [
         {
           "icon": "🔒",
@@ -1094,7 +1094,7 @@
     "ctaHeadline": "Ota yhteyttä tänään ammattimaiseen siivouspalveluun",
     "ctaLine1": "Tehdään tilastasi",
     "ctaLine2": "täydellinen",
-    "tagline": "QuickClean tarjoaa ammattimaista ja luotettavaa siivouspalvelua kodeille, toimistoille ja muille tiloille.",
+    "tagline": "Frosh tarjoaa ammattimaista ja luotettavaa siivouspalvelua kodeille, toimistoille ja muille tiloille.",
     "linksHeading": "Pikaohjeet",
     "servicesHeading": "Palvelumme",
     "contactHeading": "Ota yhteyttä",
@@ -1106,7 +1106,7 @@
   },
   "about": {
     "hero": {
-      "title": "Tarina QuickCleanin takana",
+      "title": "Tarina Froshin takana",
       "subtitle": "Puhtaan kodin ei pitäisi olla näin vaikea löytää.",
       "cta": "Katso suunnitelmat ja hinnat"
     },
@@ -1116,7 +1116,7 @@
         "Kun muutin Suomeen loppuvuodesta 2023, aloitin puhtaus- ja kiinteistöpalvelualan tutkinnon TAKKissa Tampereella. Opiskelun ja osa-aikatyön välissä huomasin nopeasti tutun ongelman — aikaa oman asunnon kunnolliseen siivoamiseen ei yksinkertaisesti ollut.",
         "Ihmiselle, joka arvostaa järjestystä ja puhtautta, se oli henkisesti kuormittavaa. Ajattelin: en voi olla ainoa, joka kamppailee tämän kanssa.",
         "Aloin kysellä ympäriltäni. Kiireiset ammattilaiset, lapsiperheet, kahden työssäkäyvän taloudet — sama tarina toistui kerta toisensa jälkeen. Ihmiset halusivat apua, mutta vaihtoehdot eivät olleet hyviä. Suurin osa Tampereen siivousyrityksistä käsittelee kotisiivousta sivupalveluna.",
-        "Näin aukon, jolla oli väliä. Ei pelkästään liiketoimintamahdollisuus — vaan todellinen, arkinen ongelma, joka ansaitsi kunnollisen ratkaisun. Niin QuickClean syntyi."
+        "Näin aukon, jolla oli väliä. Ei pelkästään liiketoimintamahdollisuus — vaan todellinen, arkinen ongelma, joka ansaitsi kunnollisen ratkaisun. Niin Frosh syntyi."
       ]
     },
     "principles": {
@@ -1139,16 +1139,16 @@
     "founder": {
       "eyebrow": "Tutustu perustajaan",
       "name": "Jubril Olalekan",
-      "role": "Perustaja, QuickClean",
-      "bio": "Olen puhtaus- ja kiinteistöpalvelualan ammattilainen, kouluttautunut TAKKissa Tampereella. Ennen QuickCleanin perustamista työskentelin alalla ruohonjuuritasolta — en toimistolta käsin, vaan välineet kädessä. Tuo näkökulma muovaa kaikkea yrityksen toiminnassa: miten koulutamme, miten kohtelemme tiimiämme ja miten toteutamme palvelun.",
-      "mission": "Perustin QuickCleanin, koska uskon, että jokainen ansaitsee puhtaan kodin ilman sen ylläpitämisen stressiä. Ja uskon, että palvelun tarjoavat ihmiset ansaitsevat reilut ja ammattimaiset työolot.",
+      "role": "Perustaja, Frosh",
+      "bio": "Olen puhtaus- ja kiinteistöpalvelualan ammattilainen, kouluttautunut TAKKissa Tampereella. Ennen Froshin perustamista työskentelin alalla ruohonjuuritasolta — en toimistolta käsin, vaan välineet kädessä. Tuo näkökulma muovaa kaikkea yrityksen toiminnassa: miten koulutamme, miten kohtelemme tiimiämme ja miten toteutamme palvelun.",
+      "mission": "Perustin Froshin, koska uskon, että jokainen ansaitsee puhtaan kodin ilman sen ylläpitämisen stressiä. Ja uskon, että palvelun tarjoavat ihmiset ansaitsevat reilut ja ammattimaiset työolot.",
       "contact": "Jos sinulla on kysyttävää palvelustamme, minut tavoittaa aina osoitteesta",
       "email": "hello@quickclean.fi",
-      "imageAlt": "Jubril Olalekan, QuickCleanin perustaja"
+      "imageAlt": "Jubril Olalekan, Froshin perustaja"
     },
     "tampere": {
       "eyebrow": "Tehty Tampereella",
-      "body": "QuickClean on tamperelainen yritys. Siivoojamme asuvat täällä. Koulutuskumppanimme — TAKK ja Tredu — ovat täällä. Kotitaloudet ja yritykset, joita palvelemme, ovat täällä. Rakennamme jotain tälle yhteisölle, ja aiomme olla täällä pitkään."
+      "body": "Frosh on tamperelainen yritys. Siivoojamme asuvat täällä. Koulutuskumppanimme — TAKK ja Tredu — ovat täällä. Kotitaloudet ja yritykset, joita palvelemme, ovat täällä. Rakennamme jotain tälle yhteisölle, ja aiomme olla täällä pitkään."
     },
     "cta": {
       "title": "Katso, miltä rauhallisempi koti näyttää.",
