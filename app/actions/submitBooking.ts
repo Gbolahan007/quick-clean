@@ -121,7 +121,19 @@ export async function submitBookingAction(
     }
 
     console.log("[submitBookingAction] Customer:", customerId);
+    const { error: linkError } = await supabase.rpc(
+      "link_customer_and_auth_by_email",
+      {
+        p_email: data.email,
+      },
+    );
 
+    if (linkError) {
+      console.error(
+        "[submitBookingAction] Customer/Auth link failed:",
+        linkError,
+      );
+    }
     // ── 3. Insert address ──────────────────────────────────────────────────
     const { data: addressRecord, error: addressError } = await supabase
       .from("addresses")

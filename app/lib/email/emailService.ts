@@ -1,4 +1,3 @@
-// app/lib/email/emailService.ts
 import { Resend } from "resend";
 import type { EmailResult, BookingEmailResults } from "./types";
 import type {
@@ -61,14 +60,10 @@ async function send(
   replyTo?: string,
 ): Promise<EmailResult> {
   const from = getFrom();
-  const isDev = process.env.NODE_ENV === "development";
 
-  // In development, Resend with onboarding@resend.dev only delivers to
-  // the Resend account owner. Override all recipient addresses to EMAIL_ADMIN
-  // so you can actually see emails during local testing.
-  // Subject is prefixed with [DEV → original@address] so you know who it was for.
-  const override = isDev ? process.env.EMAIL_ADMIN : undefined;
-  const actualTo = override ?? to;
+  // Explicit opt-in only — uncomment DEV_EMAIL_OVERRIDE in .env to redirect everything to one inbox.
+  const override = process.env.DEV_EMAIL_OVERRIDE;
+  const actualTo = override || to;
   const actualSubject =
     override && override !== to ? `[DEV → ${to}] ${subject}` : subject;
 
@@ -78,7 +73,7 @@ async function send(
 
   try {
     const { data, error } = await getResend().emails.send({
-      from: from,
+      from,
       to: actualTo,
       subject: actualSubject,
       html,

@@ -4,25 +4,24 @@
 // All admin emails are English only.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import {
-  emailWrapper,
-  emailHeader,
-  emailBanner,
-  emailFooter,
-  detailRow,
-  detailSection,
-  formatAmount,
-  ctaButton,
-  BRAND,
-} from "./emailLayout";
 import type {
   BookingSubmittedEmailInput,
   PaymentSuccessEmailInput,
-  SubscriptionActivatedEmailInput,
-  RenewalSuccessEmailInput,
-  SubscriptionCancelledEmailInput,
   RefundEmailInput,
+  RenewalSuccessEmailInput,
+  SubscriptionActivatedEmailInput,
+  SubscriptionCancelledEmailInput,
 } from "../types";
+import {
+  BRAND,
+  ctaButton,
+  detailRow,
+  detailSection,
+  emailBanner,
+  emailFooter,
+  emailWrapper,
+  formatAmount,
+} from "./emailLayout";
 
 // ── Shared admin header ───────────────────────────────────────────────────────
 function adminHeader(title: string, bookingId: string): string {

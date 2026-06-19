@@ -1,4 +1,3 @@
-// app/api/webhooks/stripe/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
@@ -128,7 +127,7 @@ async function sendCheckoutEmails(
   bookingId: string,
   session: Stripe.Checkout.Session,
 ): Promise<void> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("bookings")
     .select(
       `
@@ -142,8 +141,9 @@ async function sendCheckoutEmails(
     .single();
 
   if (!data) {
-    console.warn(
-      `[email] Could not fetch booking ${bookingId} for checkout email`,
+    console.error(
+      `[email] Could not fetch booking ${bookingId} for checkout email:`,
+      error?.message ?? "no row returned",
     );
     return;
   }
@@ -155,7 +155,7 @@ async function sendCheckoutEmails(
     session.amount_total ?? Math.round((data.final_price ?? 0) * 100);
 
   if (session.mode === "payment") {
-    sendPaymentSuccessEmails({
+    await sendPaymentSuccessEmails({
       locale,
       bookingId,
       customerEmail: customer?.email ?? "",
@@ -174,7 +174,7 @@ async function sendCheckoutEmails(
       console.error(`[email] Payment success email error [${bookingId}]:`, err),
     );
   } else if (session.mode === "subscription") {
-    sendSubscriptionActivatedEmails({
+    await sendSubscriptionActivatedEmails({
       locale,
       bookingId,
       customerEmail: customer?.email ?? "",
@@ -303,7 +303,7 @@ async function handleCheckoutCompleted(
   }
 
   // ── Send confirmation emails (non-blocking) ───────────────────────────────
-  sendCheckoutEmails(supabase, bookingId, session).catch((err) =>
+  await sendCheckoutEmails(supabase, bookingId, session).catch((err) =>
     console.error(`[webhook] Checkout email error [${bookingId}]:`, err),
   );
 
