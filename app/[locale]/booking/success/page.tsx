@@ -106,7 +106,7 @@ export default async function BookingSuccessPage({
 
   return (
     <main className="min-h-screen bg-[#f8faf9] flex items-start justify-center px-5 py-24">
-      <StoreCleaner storeKeys={["booking-store"]} />
+      <StoreCleaner storeKeys={["booking-store", "pricing-selections"]} />
       <div className="w-full max-w-lg space-y-6">
         {/* ── Status header ──────────────────────────────────────────────── */}
         {isConfirmed ? (

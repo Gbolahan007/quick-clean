@@ -74,7 +74,9 @@ export default async function OfficeBookingSuccessPage({
 
   return (
     <main className="min-h-screen bg-[#f8faf9] flex items-start justify-center px-5 py-16">
-      <StoreCleaner storeKeys={["office-booking-store"]} />
+      <StoreCleaner
+        storeKeys={["office-booking-store", "pricing-selections"]}
+      />
       <div className="w-full max-w-lg space-y-6">
         {/* ── Header ─────────────────────────────────────────────────────── */}
         {isConfirmed ? (
