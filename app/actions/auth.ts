@@ -1,11 +1,13 @@
 "use server";
-// app/actions/auth.ts
-// ─────────────────────────────────────────────────────────────────────────────
+
 // Server Actions for authentication.
 // All auth mutations go through here — never called directly from the client.
 //
 // SECURITY MODEL:
-//   sendMagicLink  — rate-limited per email (60 seconds between sends)
+//   sendMagicLink      — rate-limited per email (5 seconds between sends)
+//   verifyMagicLinkCode — mobile-safe fallback: verify the 6-digit code from
+//                         the same email instead of relying on the link
+//                         opening in the same browser that requested it
 //   loginWithPassword — standard credential check, never exposes reason for failure
 //   setPassword    — requires active session, updates auth.users only
 //   logout         — signs out and redirects
@@ -21,7 +23,7 @@ import {
 } from "@/app/lib/supabase/server";
 
 // ── Rate limit constant ───────────────────────────────────────────────────────
-const MAGIC_LINK_COOLDOWN_SECONDS = 5;
+const MAGIC_LINK_COOLDOWN_SECONDS = 60;
 
 // ── Result types ─────────────────────────────────────────────────────────────
 
@@ -96,6 +98,45 @@ export async function sendMagicLink(
       .from("customers")
       .update({ magic_link_sent_at: new Date().toISOString() })
       .eq("id", customer.id);
+  }
+
+  return { success: true };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// verifyMagicLinkCode
+// Mobile-safe fallback for magic link — user types the 6-digit code from the
+// same email instead of relying on the link opening in the same browser that
+// requested it (PKCE code_verifier is browser-bound, so cross-app/browser
+// link taps can fail the exchange even though the link itself is valid).
+// Called from: login page, after "Check your email" screen
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function verifyMagicLinkCode(
+  email: string,
+  token: string,
+): Promise<AuthResult> {
+  const normalised = email.toLowerCase().trim();
+  const cleanedToken = token.trim();
+
+  if (!normalised || !cleanedToken) {
+    return { success: false, error: "Please enter the code from your email." };
+  }
+
+  const supabase = await createServerClient();
+
+  const { error } = await supabase.auth.verifyOtp({
+    email: normalised,
+    token: cleanedToken,
+    type: "email",
+  });
+
+  if (error) {
+    console.error("[auth] verifyOtp error:", error.message);
+    return {
+      success: false,
+      error: "Invalid or expired code. Please request a new one.",
+    };
   }
 
   return { success: true };

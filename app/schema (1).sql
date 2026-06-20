@@ -40,7 +40,7 @@
 -- ============================================================================
 --
 -- CUSTOMER FLOW (the only flow that matters for 99% of users):
---
+
 --   1. Customer visits site — no account needed
 --   2. Customer books → customers row created (auth_user_id = NULL)
 --   3. Customer pays via Stripe Checkout

@@ -27,7 +27,7 @@ export async function fetchSlotsForDate(
   const { data: slotRows, error: slotError } = await supabase
     .from("availability_slots")
     .select("id, start_time, end_time, max_bookings, is_available")
-    .eq("day_of_week", dayOfWeek) // int 0–6, matches JS Date.getDay()
+    .eq("day_of_week", dayOfWeek)
     .eq("is_available", true)
     .order("start_time", { ascending: true });
 

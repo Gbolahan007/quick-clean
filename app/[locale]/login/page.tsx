@@ -3,7 +3,11 @@
 import { useState, useTransition } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { sendMagicLink, loginWithPassword } from "@/app/actions/auth";
+import {
+  sendMagicLink,
+  loginWithPassword,
+  verifyMagicLinkCode,
+} from "@/app/actions/auth";
 import { createClient } from "@/app/lib/supabase/client";
 import { useEffect } from "react";
 import type { User } from "@supabase/supabase-js";
@@ -22,6 +26,9 @@ export default function LoginPage() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const [otp, setOtp] = useState("");
+  const [otpError, setOtpError] = useState<string | null>(null);
 
   const callbackError = searchParams.get("error");
 
@@ -56,10 +63,22 @@ export default function LoginPage() {
     });
   }
 
+  function handleVerifyCode() {
+    setOtpError(null);
+    startTransition(async () => {
+      const result = await verifyMagicLinkCode(email, otp);
+      if (result.success) {
+        router.push(`/${locale}/dashboard`);
+      } else {
+        setOtpError(result.error);
+      }
+    });
+  }
+
   if (sent) {
     return (
-      <main className="min-h-screen bg-[#f8faf9] flex items-center justify-center px-5">
-        <div className="w-full max-w-md text-center space-y-5">
+      <main className="min-h-screen  bg-[#f8faf9] flex items-center justify-center px-5">
+        <div className="w-full max-w-md text-center space-y-5  py-24">
           <div className="w-16 h-16 rounded-full bg-[#f0f8f3] flex items-center justify-center mx-auto">
             <svg
               className="w-8 h-8 text-[#7c9885]"
@@ -83,11 +102,50 @@ export default function LoginPage() {
             <strong className="text-[#0a1628]">{email}</strong>. Click the link
             to sign in — no password needed.
           </p>
+
+          {/* ── Code entry fallback ─────────────────────────────────────── */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-3 text-left">
+            <label
+              htmlFor="otp"
+              className="text-[12px] font-semibold text-[#0a1628]"
+            >
+              Or enter the 8-digit code from the email
+            </label>
+            <input
+              id="otp"
+              type="text"
+              inputMode="numeric"
+              maxLength={8}
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+              placeholder="123456"
+              autoComplete="one-time-code"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-[16px] tracking-[0.3em] text-center text-[#0a1628] placeholder:tracking-normal placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7c9885]/30 focus:border-[#7c9885] transition-colors"
+            />
+            {otpError && <p className="text-[13px] text-red-600">{otpError}</p>}
+            <button
+              type="button"
+              onClick={handleVerifyCode}
+              disabled={isPending || otp.length !== 8}
+              className="w-full py-3 rounded-xl bg-[#7c9885] text-[14px] font-semibold text-white hover:bg-[#6f8c78] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isPending ? "Verifying…" : "Verify code"}
+            </button>
+            <p className="text-[11px] text-gray-400 text-center">
+              On mobile, the link can open in a different browser than expected.
+              If that happens, use this code instead.
+            </p>
+          </div>
+
           <p className="text-[12px] text-gray-400">
             Didn&apos;t receive it?{" "}
             <button
               type="button"
-              onClick={() => setSent(false)}
+              onClick={() => {
+                setSent(false);
+                setOtp("");
+                setOtpError(null);
+              }}
               className="text-[#7c9885] font-medium hover:underline"
             >
               Send again
