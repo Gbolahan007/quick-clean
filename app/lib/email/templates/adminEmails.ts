@@ -1,6 +1,6 @@
 // app/lib/email/templates/adminEmails.ts
 // ─────────────────────────────────────────────────────────────────────────────
-// Admin-facing email templates for QuickClean.
+// Admin-facing email templates for Frosh.
 // All admin emails are English only.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -31,7 +31,7 @@ function adminHeader(title: string, bookingId: string): string {
     <td style="background:${BRAND.dark};padding:20px 28px;border-bottom:3px solid ${BRAND.green}">
       <table width="100%" cellpadding="0" cellspacing="0"><tr>
         <td>
-          <p style="margin:0;font-size:12px;font-weight:800;color:${BRAND.green};text-transform:uppercase;letter-spacing:1px">QuickClean — Admin</p>
+          <p style="margin:0;font-size:12px;font-weight:800;color:${BRAND.green};text-transform:uppercase;letter-spacing:1px">Frosh — Admin</p>
           <p style="margin:4px 0 0;font-size:18px;font-weight:800;color:${BRAND.white}">${title}</p>
         </td>
         <td align="right">
@@ -48,7 +48,7 @@ function adminHeader(title: string, bookingId: string): string {
 function dashboardLink(bookingId: string): string {
   return `
   <tr><td style="padding:20px 28px 28px">
-    ${ctaButton("View in dashboard →", `https://quickclean.fi/admin/bookings/${bookingId}`)}
+    ${ctaButton("View in dashboard →", `https://frosh.fi/admin/bookings/${bookingId}`)}
   </td></tr>`;
 }
 

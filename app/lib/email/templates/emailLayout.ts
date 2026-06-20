@@ -35,7 +35,7 @@ export function emailHeader(subtitle?: string): string {
   return `
   <tr>
     <td style="background:${BRAND.dark};padding:28px 32px">
-      <p style="margin:0;font-size:20px;font-weight:800;color:${BRAND.white};letter-spacing:-0.5px">QuickClean</p>
+      <p style="margin:0;font-size:20px;font-weight:800;color:${BRAND.white};letter-spacing:-0.5px">Frosh</p>
       ${subtitle ? `<p style="margin:4px 0 0;font-size:12px;color:${BRAND.green};font-weight:600;text-transform:uppercase;letter-spacing:1px">${subtitle}</p>` : ""}
     </td>
   </tr>`;
@@ -114,7 +114,7 @@ export function emailFooter(extra?: string): string {
   <tr>
     <td style="background:#f8faf9;border-top:1px solid ${BRAND.border};padding:16px 32px">
       <p style="margin:0;font-size:11px;color:${BRAND.muted};line-height:1.6">
-        QuickClean · Tampere, Finland · <a href="mailto:hello@quickclean.fi" style="color:${BRAND.muted}">hello@quickclean.fi</a>
+        Frosh · Tampere, Finland · <a href="mailto:hello@frosh.fi" style="color:${BRAND.muted}">hello@frosh.fi</a>
         ${extra ? `<br/>${extra}` : ""}
       </p>
     </td>

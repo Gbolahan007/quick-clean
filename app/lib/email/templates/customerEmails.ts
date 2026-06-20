@@ -24,11 +24,11 @@ import {
 const T = {
   en: {
     bookingSubmitted: {
-      subject: "Booking Request Received — QuickClean",
+      subject: "Booking Request Received — Frosh",
       banner: "We've received your booking request",
       heading: (name: string) => `Hi ${name},`,
       intro:
-        "Thanks for choosing QuickClean. We've received your booking request and it's awaiting payment.",
+        "Thanks for choosing Frosh. We've received your booking request and it's awaiting payment.",
       detailsTitle: "Booking details",
       fields: {
         ref: "Booking ref",
@@ -42,7 +42,7 @@ const T = {
       paymentNote:
         "Your booking will be confirmed once payment is completed. You'll receive a separate confirmation email after payment.",
       cta: "Complete payment →",
-      sign: "See you soon — The QuickClean team",
+      sign: "See you soon — The Frosh team",
     },
     paymentSuccess: {
       subject: "Payment Received — Your Booking Is Confirmed",
@@ -59,14 +59,14 @@ const T = {
         status: "Status",
       },
       status: "Confirmed ✓",
-      sign: "Enjoy your clean home. — The QuickClean team",
+      sign: "Enjoy your clean home. — The Frosh team",
     },
     subscriptionActivated: {
       subject: "Your Cleaning Subscription Is Active",
       banner: "Subscription activated",
       heading: (name: string) => `Welcome, ${name}!`,
       intro:
-        "Your QuickClean subscription is now active. Here's a summary of your plan.",
+        "Your Frosh subscription is now active. Here's a summary of your plan.",
       fields: {
         ref: "Booking ref",
         plan: "Plan",
@@ -78,7 +78,7 @@ const T = {
       },
       status: "Active ✓",
       visitsLabel: (n: number) => `${n} visit${n !== 1 ? "s" : ""} per month`,
-      sign: "Looking forward to keeping your home spotless. — The QuickClean team",
+      sign: "Looking forward to keeping your home spotless. — The Frosh team",
     },
     renewal: {
       subject: "Subscription Renewal Successful",
@@ -93,14 +93,14 @@ const T = {
         period: "Billing period",
         visits: "Visits this period",
       },
-      sign: "See you soon — The QuickClean team",
+      sign: "See you soon — The Frosh team",
     },
     cancelled: {
-      subject: "Your QuickClean Subscription Has Ended",
+      subject: "Your Frosh Subscription Has Ended",
       banner: "Subscription ended",
       heading: (name: string) => `Hi ${name},`,
       intro:
-        "Your QuickClean cleaning subscription has ended. We hope you enjoyed the service.",
+        "Your Frosh cleaning subscription has ended. We hope you enjoyed the service.",
       fields: {
         ref: "Booking ref",
         plan: "Plan",
@@ -109,10 +109,10 @@ const T = {
       },
       outro:
         "You can restart your subscription or book a one-time clean any time at",
-      sign: "Thank you for choosing QuickClean. — The QuickClean team",
+      sign: "Thank you for choosing Frosh. — The Frosh team",
     },
     refund: {
-      subject: "Refund Processed — QuickClean",
+      subject: "Refund Processed — Frosh",
       banner: "Your refund has been processed",
       heading: (name: string) => `Hi ${name},`,
       intro: "We've processed a refund for your booking.",
@@ -125,16 +125,16 @@ const T = {
       fullRefund: "Full refund",
       partialRefund: "Partial refund",
       note: "Refunds typically appear in your account within 5–10 business days depending on your bank.",
-      sign: "If you have any questions, contact us at hello@quickclean.fi. — The QuickClean team",
+      sign: "If you have any questions, contact us at hello@frosh.fi. — The Frosh team",
     },
   },
   fi: {
     bookingSubmitted: {
-      subject: "Varaukset vastaanotettu — QuickClean",
+      subject: "Varaukset vastaanotettu — Frosh",
       banner: "Olemme vastaanottaneet varauksesi",
       heading: (name: string) => `Hei ${name},`,
       intro:
-        "Kiitos, että valitsit QuickCleanin. Olemme vastaanottaneet varauspyyntösi. Se odottaa maksua.",
+        "Kiitos, että valitsit Froshin. Olemme vastaanottaneet varauspyyntösi. Se odottaa maksua.",
       detailsTitle: "Varauksen tiedot",
       fields: {
         ref: "Varausnumero",
@@ -148,7 +148,7 @@ const T = {
       paymentNote:
         "Varauksesi vahvistetaan maksun jälkeen. Saat erillisen vahvistussähköpostin maksamisen jälkeen.",
       cta: "Siirry maksamaan →",
-      sign: "Nähdään pian — QuickClean-tiimi",
+      sign: "Nähdään pian — Frosh-tiimi",
     },
     paymentSuccess: {
       subject: "Maksu vastaanotettu — Varauksesi on vahvistettu",
@@ -165,14 +165,14 @@ const T = {
         status: "Tila",
       },
       status: "Vahvistettu ✓",
-      sign: "Nauti puhtaasta kodistasi. — QuickClean-tiimi",
+      sign: "Nauti puhtaasta kodistasi. — Frosh-tiimi",
     },
     subscriptionActivated: {
       subject: "Siivoustilauspalvelusi on aktiivinen",
       banner: "Tilaus aktivoitu",
       heading: (name: string) => `Tervetuloa, ${name}!`,
       intro:
-        "QuickClean-tilauksesi on nyt aktiivinen. Tässä yhteenveto paketistasi.",
+        "Frosh-tilauksesi on nyt aktiivinen. Tässä yhteenveto paketistasi.",
       fields: {
         ref: "Varausnumero",
         plan: "Paketti",
@@ -185,7 +185,7 @@ const T = {
       status: "Aktiivinen ✓",
       visitsLabel: (n: number) =>
         `${n} käynti${n !== 1 ? "ä" : ""} kuukaudessa`,
-      sign: "Pidämme kotisi siistinä. — QuickClean-tiimi",
+      sign: "Pidämme kotisi siistinä. — Frosh-tiimi",
     },
     renewal: {
       subject: "Tilausuusinta onnistui",
@@ -199,14 +199,14 @@ const T = {
         period: "Laskutuskausi",
         visits: "Käynnit tällä kaudella",
       },
-      sign: "Nähdään pian — QuickClean-tiimi",
+      sign: "Nähdään pian — Frosh-tiimi",
     },
     cancelled: {
-      subject: "QuickClean-tilauksesi on päättynyt",
+      subject: "Frosh-tilauksesi on päättynyt",
       banner: "Tilaus päättynyt",
       heading: (name: string) => `Hei ${name},`,
       intro:
-        "QuickClean-siivoustilauspalvelusi on päättynyt. Toivomme, että olet ollut tyytyväinen palveluumme.",
+        "Frosh-siivoustilauspalvelusi on päättynyt. Toivomme, että olet ollut tyytyväinen palveluumme.",
       fields: {
         ref: "Varausnumero",
         plan: "Paketti",
@@ -215,10 +215,10 @@ const T = {
       },
       outro:
         "Voit aloittaa tilauksen uudelleen tai varata kertaluonteisen siivouksen milloin tahansa osoitteessa",
-      sign: "Kiitos, että valitsit QuickCleanin. — QuickClean-tiimi",
+      sign: "Kiitos, että valitsit Froshin. — Frosh-tiimi",
     },
     refund: {
-      subject: "Hyvitys käsitelty — QuickClean",
+      subject: "Hyvitys käsitelty — Frosh",
       banner: "Hyvityksesi on käsitelty",
       heading: (name: string) => `Hei ${name},`,
       intro: "Olemme käsitelleet hyvityksen varauksestasi.",
@@ -231,7 +231,7 @@ const T = {
       fullRefund: "Täysi hyvitys",
       partialRefund: "Osahyvitys",
       note: "Hyvitykset näkyvät tilillä yleensä 5–10 pankkipäivän kuluessa.",
-      sign: "Jos sinulla on kysyttävää, ota yhteyttä osoitteessa hello@quickclean.fi. — QuickClean-tiimi",
+      sign: "Jos sinulla on kysyttävää, ota yhteyttä osoitteessa hello@frosh.fi. — Frosh-tiimi",
     },
   },
 } as const;
@@ -276,7 +276,7 @@ export function buildBookingSubmittedEmail(input: BookingSubmittedEmailInput): {
     <tr><td style="padding:20px 32px">
       <p style="margin:0 0 16px;font-size:14px;font-weight:600;color:${BRAND.dark}">${c.sign}</p>
     </td></tr>
-    ${emailFooter("This email was sent because a booking was submitted on quickclean.fi.")}
+    ${emailFooter("This email was sent because a booking was submitted on frosh.fi.")}
   `;
 
   return { subject: c.subject, html: emailWrapper(body) };
@@ -458,7 +458,7 @@ export function buildSubscriptionCancelledEmail(
       `,
       )}
       <p style="margin:16px 0 0;font-size:13px;color:${BRAND.text};line-height:1.7">
-        ${c.outro} <a href="https://quickclean.fi/pricing" style="color:${BRAND.green};font-weight:600">quickclean.fi/pricing</a>.
+        ${c.outro} <a href="https://frosh.fi/pricing" style="color:${BRAND.green};font-weight:600">frosh.fi/pricing</a>.
       </p>
     </td></tr>
     <tr><td style="padding:20px 32px">
