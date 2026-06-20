@@ -74,10 +74,10 @@ export default async function ProfilePage({ params }: PageProps) {
           <p className="text-[12px] text-gray-400">
             To update your personal details, contact us at{" "}
             <a
-              href="mailto:hello@quickclean.fi"
+              href="mailto:hello@frosh.fi"
               className="text-[#7c9885] font-medium hover:underline"
             >
-              hello@quickclean.fi
+              hello@frosh.fi
             </a>
           </p>
         </div>

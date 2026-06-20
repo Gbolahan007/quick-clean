@@ -319,7 +319,7 @@ function buildPaymentFailedHtml(input: {
 <html><head><meta charset="UTF-8"/></head>
 <body style="font-family:-apple-system,sans-serif;background:#f4f6f4;padding:32px 16px;margin:0">
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden">
-    <tr><td style="background:#0a1628;padding:24px 28px"><p style="margin:0;font-size:18px;font-weight:800;color:#fff">QuickClean</p></td></tr>
+    <tr><td style="background:#0a1628;padding:24px 28px"><p style="margin:0;font-size:18px;font-weight:800;color:#fff">Frosh</p></td></tr>
     <tr><td style="background:#fef2f2;border-bottom:2px solid #fecaca;padding:12px 28px">
       <p style="margin:0;font-size:13px;font-weight:700;color:#b91c1c">⚠ Payment could not be processed</p>
     </td></tr>
@@ -333,7 +333,7 @@ function buildPaymentFailedHtml(input: {
       <p style="margin:0;font-size:13px;color:#6b7280">Ref: <strong style="font-family:monospace">#${ref}</strong></p>
     </td></tr>
     <tr><td style="background:#f8faf9;border-top:1px solid #e9ede9;padding:14px 28px">
-      <p style="margin:0;font-size:11px;color:#9ca3af">QuickClean · Tampere · hello@quickclean.fi</p>
+      <p style="margin:0;font-size:11px;color:#9ca3af">Frosh · Tampere · hello@frosh.fi</p>
     </td></tr>
   </table>
 </body></html>`;

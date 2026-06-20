@@ -32,7 +32,7 @@ export default function ServiceHero() {
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-6">
             <span className="w-2 h-2 rounded-full bg-[#7c9885] animate-pulse" />
             <span className="text-white/90 text-sm font-medium tracking-wide uppercase">
-              QuickClean Services
+              Frosh Services
             </span>
           </div>
 

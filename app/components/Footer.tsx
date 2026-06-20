@@ -186,7 +186,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="mailto:hello@quickclean.fi"
+                  href="mailto:hello@frosh.fi"
                   className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-start group"
                 >
                   <Mail className="w-5 h-5 mr-3 mt-1 shrink-0 group-hover:text-[#7c9885]" />

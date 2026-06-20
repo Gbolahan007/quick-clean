@@ -42,7 +42,7 @@ export async function sendPaymentFailedEmail(input: {
 }) {
   const resend = getResend();
 
-  const subject = "Action required — your QuickClean payment failed";
+  const subject = "Action required — your Frosh payment failed";
 
   const html = `<!DOCTYPE html>
 <html>
@@ -51,7 +51,7 @@ export async function sendPaymentFailedEmail(input: {
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;margin:0 auto;background:#ffffff;border-radius:14px;overflow:hidden">
     <tr>
       <td style="background:#0a1628;padding:24px 28px">
-        <p style="margin:0;font-size:18px;font-weight:800;color:#ffffff">QuickClean</p>
+        <p style="margin:0;font-size:18px;font-weight:800;color:#ffffff">Frosh</p>
       </td>
     </tr>
     <tr>
@@ -74,7 +74,7 @@ export async function sendPaymentFailedEmail(input: {
         </p>
         <p style="margin:0 0 24px;font-size:14px;color:#4b5563;line-height:1.6">
           If you have questions, reply to this email or contact us at 
-          <a href="mailto:hello@quickclean.fi" style="color:#7c9885">hello@quickclean.fi</a>.
+          <a href="mailto:hello@frosh.fi" style="color:#7c9885">hello@frosh.fi</a>.
         </p>
         <p style="margin:0;font-size:13px;color:#6b7280">
           Booking ref: <span style="font-weight:600;font-family:monospace">${input.bookingId.slice(0, 8).toUpperCase()}</span>
@@ -83,7 +83,7 @@ export async function sendPaymentFailedEmail(input: {
     </tr>
     <tr>
       <td style="background:#f8faf9;border-top:1px solid #e9ede9;padding:14px 28px">
-        <p style="margin:0;font-size:11px;color:#9ca3af">QuickClean · Tampere, Finland · hello@quickclean.fi</p>
+        <p style="margin:0;font-size:11px;color:#9ca3af">Frosh · Tampere, Finland · hello@frosh.fi</p>
       </td>
     </tr>
   </table>
@@ -128,7 +128,7 @@ export async function sendSubscriptionEndedEmail(input: {
 }) {
   const resend = getResend();
 
-  const subject = "Your QuickClean subscription has ended";
+  const subject = "Your Frosh subscription has ended";
 
   const html = `<!DOCTYPE html>
 <html>
@@ -137,23 +137,23 @@ export async function sendSubscriptionEndedEmail(input: {
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;margin:0 auto;background:#ffffff;border-radius:14px;overflow:hidden">
     <tr>
       <td style="background:#0a1628;padding:24px 28px">
-        <p style="margin:0;font-size:18px;font-weight:800;color:#ffffff">QuickClean</p>
+        <p style="margin:0;font-size:18px;font-weight:800;color:#ffffff">Frosh</p>
       </td>
     </tr>
     <tr>
       <td style="padding:28px">
         <p style="margin:0 0 16px;font-size:15px;color:#0a1628">Hi ${input.customerName},</p>
         <p style="margin:0 0 16px;font-size:14px;color:#4b5563;line-height:1.6">
-          Your QuickClean cleaning subscription has now ended. We hope you enjoyed the service.
+          Your Frosh cleaning subscription has now ended. We hope you enjoyed the service.
         </p>
         <p style="margin:0 0 24px;font-size:14px;color:#4b5563;line-height:1.6">
           If you'd like to restart your subscription or try a different plan, 
           you can book again at any time at 
-          <a href="https://quickclean.fi/pricing" style="color:#7c9885">quickclean.fi/pricing</a>.
+          <a href="https://frosh.fi/pricing" style="color:#7c9885">frosh.fi/pricing</a>.
         </p>
         <p style="margin:0 0 24px;font-size:14px;color:#4b5563;line-height:1.6">
           Questions? Reach us at 
-          <a href="mailto:hello@quickclean.fi" style="color:#7c9885">hello@quickclean.fi</a>.
+          <a href="mailto:hello@frosh.fi" style="color:#7c9885">hello@frosh.fi</a>.
         </p>
         <p style="margin:0;font-size:13px;color:#6b7280">
           Booking ref: <span style="font-weight:600;font-family:monospace">${input.bookingId.slice(0, 8).toUpperCase()}</span>
@@ -162,7 +162,7 @@ export async function sendSubscriptionEndedEmail(input: {
     </tr>
     <tr>
       <td style="background:#f8faf9;border-top:1px solid #e9ede9;padding:14px 28px">
-        <p style="margin:0;font-size:11px;color:#9ca3af">QuickClean · Tampere, Finland · hello@quickclean.fi</p>
+        <p style="margin:0;font-size:11px;color:#9ca3af">Frosh · Tampere, Finland · hello@frosh.fi</p>
       </td>
     </tr>
   </table>

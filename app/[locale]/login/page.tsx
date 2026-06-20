@@ -107,7 +107,7 @@ export default function LoginPage() {
             href={`/${locale}`}
             className="text-[13px] text-[#7c9885] font-semibold hover:underline"
           >
-            ← QuickClean
+            ← Frosh
           </Link>
           <h1 className="text-[26px] font-extrabold text-[#0a1628] tracking-tight mt-3">
             Sign in to your account

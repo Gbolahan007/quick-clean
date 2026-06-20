@@ -282,10 +282,10 @@ export default async function BookingSuccessPage({
         <p className="text-center text-[12px] text-gray-400">
           Questions?{" "}
           <a
-            href="mailto:hello@quickclean.fi"
+            href="mailto:hello@frosh.fi"
             className="text-[#7c9885] font-medium hover:underline"
           >
-            hello@quickclean.fi
+            hello@frosh.fi
           </a>
         </p>
       </div>

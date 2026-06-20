@@ -1,6 +1,6 @@
 -- ============================================================================
 -- CLEANING SERVICE PLATFORM — COMPLETE SCHEMA
--- QuickClean | Tampere, Finland
+-- Frosh | Tampere, Finland
 -- ============================================================================
 --
 -- VERSION HISTORY

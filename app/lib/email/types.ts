@@ -1,6 +1,6 @@
 // app/lib/email/types.ts
 // ─────────────────────────────────────────────────────────────────────────────
-// Shared types for the QuickClean email system.
+// Shared types for the Frosh email system.
 // Every email function takes one of these typed input objects.
 // ─────────────────────────────────────────────────────────────────────────────
 
