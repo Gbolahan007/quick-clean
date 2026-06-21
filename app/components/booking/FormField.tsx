@@ -60,8 +60,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                   }
                 : undefined
             }
+            // Input — in FormField.tsx
             className={[
-              "w-full px-4 py-3 rounded-xl border text-sm text-[#0a1628] box-border min-w-0",
+              "w-full px-4 py-3 rounded-xl border text-[16px] sm:text-sm text-[#0a1628] box-border min-w-0",
               "placeholder:text-gray-300 transition-all duration-150",
               "focus:outline-none focus:ring-2 focus:ring-[#7c9885]/40 focus:border-[#7c9885]",
               "disabled:bg-gray-50 disabled:cursor-not-allowed",
@@ -104,7 +105,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const errId = error ? `${fieldId}-error` : undefined;
 
     return (
-      <div className="flex flex-col gap-1 ">
+      <div className="flex flex-col gap-1 min-w-0">
         <label
           htmlFor={fieldId}
           className="text-[13px]  font-semibold text-[#0a1628]"
@@ -131,8 +132,9 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           }
           aria-invalid={!!error}
           rows={4}
+          // Textarea — same swap
           className={[
-            "w-full px-4 py-3  rounded-xl border text-sm text-[#0a1628] resize-none",
+            "w-full px-4 py-3 rounded-xl border text-[16px] sm:text-sm text-[#0a1628] resize-none",
             "placeholder:text-gray-300 transition-all duration-150",
             "focus:outline-none focus:ring-2 focus:ring-[#7c9885]/40 focus:border-[#7c9885]",
             error
@@ -177,7 +179,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     const fieldId = id ?? label.toLowerCase().replace(/\s+/g, "-");
 
     return (
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 min-w-0">
         <label
           htmlFor={fieldId}
           className="text-[13px] font-semibold text-[#0a1628]"
