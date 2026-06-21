@@ -28,26 +28,62 @@ async function logWebhookEvent(
   supabase: TypedSupabase,
   event: Stripe.Event,
 ): Promise<{ alreadyProcessed: boolean }> {
-  const { error } = await supabase.from("stripe_webhook_events").insert({
-    stripe_event_id: event.id,
-    event_type: event.type,
-    payload: event as unknown as Record<string, unknown>,
-    processed: false,
-  });
+  const { data: existing, error: selectError } = await supabase
+    .from("stripe_webhook_events")
+    .select("stripe_event_id, processed")
+    .eq("stripe_event_id", event.id)
+    .maybeSingle();
 
-  if (error) {
-    if (error.code === "23505") {
+  if (selectError) {
+    console.error(
+      `[webhook] Failed to check existing event ${event.id}:`,
+      selectError.message,
+    );
+
+    return { alreadyProcessed: false };
+  }
+
+  if (existing) {
+    if (existing.processed) {
       console.log(
-        `[webhook] Duplicate event skipped: ${event.id} (${event.type})`,
+        `[webhook] Duplicate event skipped (already processed): ${event.id} (${event.type})`,
       );
       return { alreadyProcessed: true };
     }
-    console.error(`[webhook] Failed to log event ${event.id}:`, error.message);
+
+    console.warn(
+      `[webhook] Retrying previously incomplete event: ${event.id} (${event.type})`,
+    );
+    return { alreadyProcessed: false };
+  }
+
+  // First time seeing this event — record it and proceed.
+  const { error: insertError } = await supabase
+    .from("stripe_webhook_events")
+    .insert({
+      stripe_event_id: event.id,
+      event_type: event.type,
+      payload: event as unknown as Record<string, unknown>,
+      processed: false,
+    });
+
+  if (insertError) {
+    if (insertError.code === "23505") {
+      // Race: a concurrent request inserted between our select and insert
+      // (e.g. two near-simultaneous deliveries). That request owns this one.
+      console.log(
+        `[webhook] Duplicate event skipped (race): ${event.id} (${event.type})`,
+      );
+      return { alreadyProcessed: true };
+    }
+    console.error(
+      `[webhook] Failed to log event ${event.id}:`,
+      insertError.message,
+    );
   }
 
   return { alreadyProcessed: false };
 }
-
 async function markProcessed(
   supabase: TypedSupabase,
   stripeEventId: string,
@@ -91,32 +127,32 @@ async function findBookingBySubscription(
   } | null;
 }
 
-async function findBookingBySession(
-  supabase: TypedSupabase,
-  sessionId: string,
-) {
-  const { data, error } = await supabase
-    .from("bookings")
-    .select(
-      "id, customer_id, frequency, visits_per_month, stripe_subscription_id, status",
-    )
-    .eq("stripe_checkout_session_id", sessionId)
-    .single();
+// async function findBookingBySession(
+//   supabase: TypedSupabase,
+//   sessionId: string,
+// ) {
+//   const { data, error } = await supabase
+//     .from("bookings")
+//     .select(
+//       "id, customer_id, frequency, visits_per_month, stripe_subscription_id, status",
+//     )
+//     .eq("stripe_checkout_session_id", sessionId)
+//     .single();
 
-  if (error)
-    throw new Error(
-      `Booking lookup by session failed (${sessionId}): ${error.message}`,
-    );
+//   if (error)
+//     throw new Error(
+//       `Booking lookup by session failed (${sessionId}): ${error.message}`,
+//     );
 
-  return data as {
-    id: string;
-    customer_id: string;
-    frequency: string;
-    visits_per_month: number | null;
-    stripe_subscription_id: string | null;
-    status: string;
-  };
-}
+//   return data as {
+//     id: string;
+//     customer_id: string;
+//     frequency: string;
+//     visits_per_month: number | null;
+//     stripe_subscription_id: string | null;
+//     status: string;
+//   };
+// }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // EMAIL HELPERS (top-level — so they can be called from handlers)
@@ -291,15 +327,25 @@ async function handleCheckoutCompleted(
   // One-time payments: create payments row immediately
 
   if (isPayment && session.payment_intent && session.amount_total) {
-    await supabase.from("payments").insert({
-      booking_id: bookingId,
-      stripe_payment_intent_id: session.payment_intent as string,
-      amount_cents: session.amount_total,
-      currency: session.currency ?? "eur",
-      status: "succeeded",
-      is_first_payment: true,
-      paid_at: new Date().toISOString(),
-    });
+    const { error: paymentError } = await supabase.from("payments").upsert(
+      {
+        booking_id: bookingId,
+        stripe_payment_intent_id: session.payment_intent as string,
+        amount_cents: session.amount_total,
+        currency: session.currency ?? "eur",
+        status: "succeeded",
+        is_first_payment: true,
+        paid_at: new Date().toISOString(),
+      },
+      { onConflict: "stripe_payment_intent_id" },
+    );
+
+    if (paymentError) {
+      console.error(
+        `[webhook] Payment upsert failed for booking ${bookingId}:`,
+        paymentError.message,
+      );
+    }
   }
 
   // ── Send confirmation emails (non-blocking) ───────────────────────────────
@@ -346,8 +392,7 @@ async function handleInvoicePaid(
   let booking = await findBookingBySubscription(supabase, subscriptionId);
 
   // ── Fallback: booking_id from subscription metadata ───────────────────────
-  // Race condition: invoice.paid can fire before checkout.session.completed
-  // has written stripe_subscription_id to the booking row.
+
   if (!booking) {
     console.warn(
       `[webhook] invoice.paid: no booking for ${subscriptionId}, trying metadata fallback`,
@@ -443,19 +488,29 @@ async function handleInvoicePaid(
       `amount: €${(amountPaid / 100).toFixed(2)} | first: ${isFirstPayment}`,
   );
 
-  await supabase.from("payments").insert({
-    booking_id: booking.id,
-    stripe_payment_intent_id: paymentIntentId,
-    stripe_invoice_id: invoice.id,
-    amount_cents: amountPaid,
-    currency: invoiceCurrency,
-    status: "succeeded",
-    billing_period_start: periodStart,
-    billing_period_end: periodEnd,
-    visits_covered: booking.visits_per_month,
-    is_first_payment: isFirstPayment,
-    paid_at: new Date().toISOString(),
-  });
+  const { error: paymentError } = await supabase.from("payments").upsert(
+    {
+      booking_id: booking.id,
+      stripe_payment_intent_id: paymentIntentId,
+      stripe_invoice_id: invoice.id,
+      amount_cents: amountPaid,
+      currency: invoiceCurrency,
+      status: "succeeded",
+      billing_period_start: periodStart,
+      billing_period_end: periodEnd,
+      visits_covered: booking.visits_per_month,
+      is_first_payment: isFirstPayment,
+      paid_at: new Date().toISOString(),
+    },
+    { onConflict: "stripe_invoice_id" },
+  );
+
+  if (paymentError) {
+    console.error(
+      `[webhook] Payment upsert failed for booking ${booking.id}:`,
+      paymentError.message,
+    );
+  }
 
   await supabase
     .from("bookings")
