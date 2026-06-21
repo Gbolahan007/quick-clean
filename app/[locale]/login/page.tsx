@@ -236,7 +236,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               autoComplete="email"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-[14px] text-[#0a1628] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7c9885]/30 focus:border-[#7c9885] transition-colors"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-[16px] text-[#0a1628] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7c9885]/30 focus:border-[#7c9885] transition-colors"
             />
           </div>
 
@@ -255,7 +255,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 autoComplete="current-password"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-[14px] text-[#0a1628] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7c9885]/30 focus:border-[#7c9885] transition-colors"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-[16px] text-[#0a1628] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7c9885]/30 focus:border-[#7c9885] transition-colors"
               />
             </div>
           )}
