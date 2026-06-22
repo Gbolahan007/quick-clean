@@ -274,12 +274,12 @@ function HeaderContent() {
               >
                 {t("nav.about")}
               </Link>
-              <Link
+              {/* <Link
                 href="/our-story"
                 className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors"
               >
                 Our Story
-              </Link>
+              </Link> */}
             </Dropdown>
 
             <Dropdown
@@ -365,7 +365,7 @@ function HeaderContent() {
                 >
                   {t("nav.login")}
                 </Link>
-                <Link
+                {/* <Link
                   href="/signup"
                   className={`${isFinnish ? "px-4 py-2 text-sm" : "px-5 py-2.5"} text-[#7c9885] rounded-full
                     border border-[#7c9885]
@@ -374,7 +374,7 @@ function HeaderContent() {
                     font-semibold transition-all duration-200`}
                 >
                   {t("nav.signup")}
-                </Link>
+                </Link> */}
               </>
             )}
             <Link
@@ -428,13 +428,13 @@ function HeaderContent() {
                   >
                     {t("nav.about")}
                   </Link>
-                  <Link
+                  {/* <Link
                     href="/our-story"
                     className="block py-2 text-gray-600 hover:text-[#7c9885]"
                     onClick={handleMobileClick}
                   >
                     Our Story
-                  </Link>
+                  </Link> */}
                 </div>
               )}
             </div>
