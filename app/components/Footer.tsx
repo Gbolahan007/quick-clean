@@ -25,8 +25,7 @@ export default function Footer() {
           <div>
             <div className="mb-6">
               <h3 className="text-2xl font-bold mb-2">
-                <span className="text-black">Quick</span>
-                <span className="text-[#7c9885]">Clean</span>
+                <span className="text-black">Frosh</span>
               </h3>
             </div>
             <p className="text-gray-600 mb-6 leading-relaxed">
@@ -132,7 +131,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="/services#residential"
+                  href="/services/home-care"
                   className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-center group"
                 >
                   <span className="w-2 h-2 bg-[#7c9885] rounded-full mr-3 group-hover:bg-black transition-colors"></span>
@@ -141,7 +140,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/services#commercial"
+                  href="/services/office"
                   className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-center group"
                 >
                   <span className="w-2 h-2 bg-[#7c9885] rounded-full mr-3 group-hover:bg-black transition-colors"></span>
@@ -150,11 +149,11 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/services#specialized"
+                  href="/services/moveout"
                   className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-center group"
                 >
                   <span className="w-2 h-2 bg-[#7c9885] rounded-full mr-3 group-hover:bg-black transition-colors"></span>
-                  {t("landing.servicesOverview.services.special")}
+                  {t("landing.servicesOverview.services.moveOut")}
                 </Link>
               </li>
               <li>

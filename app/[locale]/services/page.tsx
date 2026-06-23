@@ -140,7 +140,7 @@ export default function ServicesPage() {
             <ServiceCard
               icon="📦"
               serviceKey="moveOut"
-              href="/services/move-out"
+              href="/services/moveout"
             />
             <ServiceCard
               icon="🔨"
