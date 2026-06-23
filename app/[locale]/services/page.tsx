@@ -125,7 +125,7 @@ export default function ServicesPage() {
             <ServiceCard
               icon="🏢"
               serviceKey="office"
-              href="/services/office"
+              href="/services/office-cleaning"
             />
             <ServiceCard
               icon="✨"

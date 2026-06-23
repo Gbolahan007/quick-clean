@@ -29,9 +29,9 @@ const TRUST_ITEMS: TrustItem[] = [
 ];
 
 const HIDDEN_ON_SEGMENTS = [
-  "pricing/home-cleaning",
+  "pricing/home-care",
   "pricing/office-cleaning",
-  "pricing/move-out-cleaning",
+  "pricing/moveout",
 ];
 
 function Dot() {

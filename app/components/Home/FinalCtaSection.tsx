@@ -44,7 +44,7 @@ export default function FinalCtaSection() {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
           <Link
-            href="/pricing/home-cleaning"
+            href="/pricing/home-care"
             className={`${isFinnish ? "px-6 py-3 text-base" : "px-8 py-4 text-lg"} bg-[#7c9885] text-white rounded-full font-semibold hover:bg-[#6a8573] transition-all shadow-lg hover:shadow-xl`}
           >
             {t("ctaPrimary")}

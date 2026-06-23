@@ -132,7 +132,6 @@ export default function ServiceDetail({
   exclusions,
   locale,
 }: Props) {
-  console.log(service.image);
   const isFinnish = locale === "fi";
   const description = isFinnish
     ? service.description_fi
@@ -213,7 +212,7 @@ export default function ServiceDetail({
 
           {/* CTA */}
           <Link
-            href="/pricing"
+            href={`/pricing/${service.slug}`}
             className="inline-flex items-center justify-center gap-2 bg-white text-[#7c9885] font-bold px-10 py-4 rounded-full hover:bg-white/90 transition-colors text-base shadow-md"
           >
             {isFinnish

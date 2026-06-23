@@ -321,7 +321,7 @@ function HeaderContent() {
               onClose={() => setPricingDropdownOpen(false)}
             >
               <Link
-                href="/pricing/home-cleaning"
+                href="/pricing/home-care"
                 className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors"
               >
                 {t("services.cards.homeCare.title")}
@@ -333,7 +333,7 @@ function HeaderContent() {
                 {t("services.cards.office.title")}
               </Link>
               <Link
-                href="/pricing/move-out-cleaning"
+                href="/pricing/moveout"
                 className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors"
               >
                 {t("services.cards.moveOut.title")}
@@ -498,7 +498,7 @@ function HeaderContent() {
               {pricingDropdownOpen && (
                 <div className="pl-4 space-y-2 mt-2">
                   <Link
-                    href="/pricing/home-cleaning"
+                    href="/pricing/home-care"
                     className="block py-2 text-gray-600 hover:text-[#7c9885]"
                     onClick={handleMobileClick}
                   >
@@ -512,7 +512,7 @@ function HeaderContent() {
                     {t("services.cards.office.title")}
                   </Link>
                   <Link
-                    href="/pricing/move-out-cleaning"
+                    href="/pricing/moveout"
                     className="block py-2 text-gray-600 hover:text-[#7c9885]"
                     onClick={handleMobileClick}
                   >

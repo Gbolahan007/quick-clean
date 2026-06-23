@@ -23,7 +23,7 @@ type ServiceKey = "homeCleaning" | "officeCleaning" | "moveOutCleaning";
 const SERVICES: { key: ServiceKey; href: string; accent: string }[] = [
   {
     key: "homeCleaning",
-    href: "pricing/home-cleaning",
+    href: "pricing/home-care",
     accent: "#7c9885",
   },
   {
@@ -33,7 +33,7 @@ const SERVICES: { key: ServiceKey; href: string; accent: string }[] = [
   },
   {
     key: "moveOutCleaning",
-    href: "pricing/move-out-cleaning",
+    href: "pricing/moveout",
     accent: "#2d6b5a",
   },
 ];
