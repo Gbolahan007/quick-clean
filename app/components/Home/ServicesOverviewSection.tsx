@@ -28,7 +28,7 @@ export default function ServicesShowcaseSection() {
       title: t("services.office"),
       image: "/cleaning8.JPG",
       description: t("serviceDescriptions.office"),
-      href: "/services/office",
+      href: "/services/office-cleaning",
     },
     {
       id: "moveOut",
