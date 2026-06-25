@@ -295,7 +295,7 @@ function HeaderContent() {
                 {t("services.maintenance.name")}
               </Link>
               <Link
-                href="/services/office"
+                href="/services/office-cleaning"
                 className="block px-4 py-2 text-gray-700 hover:bg-[#7c9885]/10 hover:text-[#7c9885] transition-colors"
               >
                 {t("services.deepClean.name")}
