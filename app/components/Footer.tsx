@@ -111,7 +111,7 @@ export default function Footer() {
                   {t("nav.pricing")}
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/contact"
                   className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-center group"
@@ -119,7 +119,7 @@ export default function Footer() {
                   <span className="w-2 h-2 bg-[#7c9885] rounded-full mr-3 group-hover:bg-black transition-colors"></span>
                   {t("footer.contact")}
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
 
