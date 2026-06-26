@@ -212,7 +212,7 @@ export default function ServiceDetail({
 
           {/* CTA */}
           <Link
-            href={`/pricing/${service.slug}`}
+            href={`/pricing`}
             className="inline-flex items-center justify-center gap-2 bg-white text-[#7c9885] font-bold px-10 py-4 rounded-full hover:bg-white/90 transition-colors text-base shadow-md"
           >
             {isFinnish
@@ -224,7 +224,7 @@ export default function ServiceDetail({
       </section>
 
       {/* Tasks Accordion */}
-      <section className="py-20 bg-white">
+      <section className="py-16 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2
             className={`${isFinnish ? "text-2xl sm:text-3xl" : "text-3xl sm:text-4xl"} font-bold text-[#7c9885] text-center mb-16`}
@@ -237,7 +237,7 @@ export default function ServiceDetail({
 
       {/* Addons */}
       {addons.length > 0 && (
-        <section className="py-20 bg-[#f9fafb]">
+        <section className="py-16 bg-[#f9fafb]">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <h2
               className={`${isFinnish ? "text-2xl sm:text-3xl" : "text-3xl sm:text-4xl"} font-bold text-[#7c9885] text-center mb-16`}
@@ -279,7 +279,7 @@ export default function ServiceDetail({
 
       {/* Exclusions */}
       {exclusions.length > 0 && (
-        <section className="py-16 bg-white">
+        <section className="py-16  bg-white">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <h2
               className={`${isFinnish ? "text-2xl sm:text-3xl" : "text-3xl sm:text-4xl"} font-bold text-gray-800 text-center mb-16`}
