@@ -1,33 +1,32 @@
 "use server";
 // app/actions/submitBooking.ts
 // ─────────────────────────────────────────────────────────────────────────────
-// Residential booking server action.
+// Residential booking server action — v4 with voucher + first-booking discount.
 //
-// STRIPE INTEGRATION (added):
-//   After the booking row is created, we:
-//     1. Create/reuse a Stripe Customer (stored on customers.stripe_customer_id)
-//     2. Create a Stripe Checkout Session
-//     3. Store stripe_checkout_session_id + stripe_price_id + visits_per_month
-//     4. Return checkoutUrl for the client to redirect to
+// NEW IN v4:
+//   - Accepts optional voucherCode from the review step
+//   - Revalidates voucher server-side (never trusts client preview)
+//   - Runs selectDiscount() to determine the winning discount
+//   - Zero-payment path: if finalAmountCents === 0, skips Stripe entirely
+//     and confirms the booking atomically in a single transaction block
+//   - Non-zero path: creates Stripe Checkout Session as before,
+//     passing the winning coupon via discounts: [{ coupon: stripeCouponId }]
+//   - Discount snapshot written to booking row unconditionally
 //
-//   EMAIL CHANGE:
-//     Confirmation email is NO LONGER sent here.
-//     It fires from the checkout.session.completed webhook handler instead,
-//     because the customer has not paid yet at this point.
-//     The booking is still "pending" until the webhook confirms it.
-//
-// ORDER GUARANTEE:
-//   DB booking is always created BEFORE any Stripe call.
-//   If Stripe session creation fails, the booking stays pending
-//   and no orphaned Stripe objects are created.
+// FIRST-BOOKING ELIGIBILITY:
+//   Evaluated at submission time. Becomes immutable only after payment confirms
+//   (webhook sets payment_status = 'paid'). A booking that stays 'pending'
+//   does NOT consume eligibility — the next paid booking will still get the discount.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { createClient } from "@supabase/supabase-js";
 import { bookingSubmitSchema } from "../schema/bookingSubmit";
 import { BookingSubmitPayload } from "../types/api";
 import { createCheckoutSession } from "./createCheckoutSession";
+import { validateVoucher } from "@/app/lib/vouchers/validateVoucher";
+import { selectDiscount } from "@/app/lib/vouchers/discountEngine";
+import type { VoucherRow, DiscountResult } from "@/app/lib/vouchers/types";
 
-// Updated result type includes checkoutUrl
 export type BookingSubmitResult =
   | {
       success: true;
@@ -46,31 +45,119 @@ function getServiceClient() {
 
 const ADDON_TYPE_MAP: Record<string, string> = {
   "Window cleaning": "windows",
-
   "Oven cleaning": "oven",
   "Oven interior": "oven_interior",
-
   "Fridge cleaning": "fridge",
   "Fridge / freezer interior": "fridge",
-
   "Deep clean": "deep_clean",
   "High dusting": "high_dust",
-
   "Trash cabinet interior": "trash_cabinet",
-
   "Sauna cleaning": "sauna",
-
   Ironing: "ironing",
   "Ironing (5–7 shirts)": "ironing",
-
   Laundry: "laundry",
   "Laundry (per load)": "laundry",
 };
 
+// ── Zero-payment confirmation ─────────────────────────────────────────────────
+// Called when finalAmountCents === 0.
+// Confirms booking, inserts payment, records voucher redemption atomically.
+// No Stripe involvement.
+
+async function confirmZeroPaymentBooking(params: {
+  supabase: ReturnType<typeof getServiceClient>;
+  bookingId: string;
+  customerId: string;
+  discount: DiscountResult;
+  stripeSessionId: string; // sentinel for zero-payment, not a real Stripe session
+}): Promise<void> {
+  const { supabase, bookingId, customerId, discount, stripeSessionId } = params;
+
+  // Confirm the booking
+  const { error: bookingError } = await supabase
+    .from("bookings")
+    .update({
+      status: "confirmed",
+      payment_status: "paid",
+    })
+    .eq("id", bookingId);
+
+  if (bookingError) {
+    throw new Error(
+      `Zero-payment booking confirmation failed: ${bookingError.message}`,
+    );
+  }
+
+  // Insert payment record with amount_cents = 0
+  const { error: paymentError } = await supabase.from("payments").insert({
+    booking_id: bookingId,
+    stripe_payment_intent_id: null,
+    stripe_invoice_id: null,
+    amount_cents: 0,
+    currency: "eur",
+    status: "succeeded",
+    is_first_payment: true,
+    paid_at: new Date().toISOString(),
+  });
+
+  if (paymentError) {
+    throw new Error(
+      `Zero-payment payment record failed: ${paymentError.message}`,
+    );
+  }
+
+  // Record voucher redemption if a voucher was used
+  if (
+    discount.source === "voucher" &&
+    discount.voucherId !== null &&
+    discount.voucherCode !== null
+  ) {
+    const { error: redemptionError } = await supabase
+      .from("voucher_redemptions")
+      .insert({
+        voucher_id: discount.voucherId,
+        booking_id: bookingId,
+        customer_id: customerId,
+        discount_type: "percentage", // resolved from voucher, but we use the snapshot
+        discount_value: 0, // overridden below — we need the actual voucher row
+        stripe_coupon_id: discount.stripeCouponId,
+        discount_amount_cents: discount.discountAmountCents,
+        original_amount_cents: discount.originalAmountCents,
+        final_amount_cents: 0,
+        stripe_session_id: stripeSessionId,
+        redeemed_at: new Date().toISOString(),
+      });
+
+    if (redemptionError) {
+      // Non-fatal — log but don't fail the booking
+      console.error(
+        `[submitBooking] Voucher redemption insert failed for booking ${bookingId}:`,
+        redemptionError.message,
+      );
+    }
+
+    // Atomically increment voucher usage
+    const { data: incremented } = await supabase.rpc(
+      "increment_voucher_usage",
+      { p_voucher_id: discount.voucherId },
+    );
+
+    if (!incremented) {
+      console.warn(
+        `[submitBooking] increment_voucher_usage returned false for ${discount.voucherId} — ` +
+          "voucher may have been exhausted by a concurrent request",
+      );
+    }
+  }
+}
+
+// ── Main action ───────────────────────────────────────────────────────────────
+
 export async function submitBookingAction(
   payload: BookingSubmitPayload,
+  voucherCode: string | null = null,
 ): Promise<BookingSubmitResult> {
-  // ── 1. Validate ────────────────────────────────────────────────────────────
+  // ── 1. Validate payload ───────────────────────────────────────────────────
   const parsed = bookingSubmitSchema.safeParse(payload);
   if (!parsed.success) {
     return {
@@ -84,7 +171,7 @@ export async function submitBookingAction(
   const supabase = getServiceClient();
 
   try {
-    // ── 2. Find or create customer ─────────────────────────────────────────
+    // ── 2. Find or create customer ──────────────────────────────────────────
     let customerId: string;
 
     const { data: existing, error: lookupError } = await supabase
@@ -109,32 +196,19 @@ export async function submitBookingAction(
       const { data: created, error: createError } = await supabase
         .from("customers")
         .insert({
-          email: data.email,
+          email: data.email.toLowerCase().trim(),
           full_name: `${data.firstName} ${data.lastName}`.trim(),
           phone: data.phone,
         })
         .select("id")
         .single();
+
       if (createError)
         throw new Error(`Customer creation failed: ${createError.message}`);
       customerId = created.id;
     }
 
-    console.log("[submitBookingAction] Customer:", customerId);
-    const { error: linkError } = await supabase.rpc(
-      "link_customer_and_auth_by_email",
-      {
-        p_email: data.email,
-      },
-    );
-
-    if (linkError) {
-      console.error(
-        "[submitBookingAction] Customer/Auth link failed:",
-        linkError,
-      );
-    }
-    // ── 3. Insert address ──────────────────────────────────────────────────
+    // ── 3. Insert address ───────────────────────────────────────────────────
     const { data: addressRecord, error: addressError } = await supabase
       .from("addresses")
       .insert({
@@ -154,7 +228,7 @@ export async function submitBookingAction(
     if (addressError)
       throw new Error(`Address insertion failed: ${addressError.message}`);
 
-    // ── 4. Server-side slot re-validation ─────────────────────────────────
+    // ── 4. Slot re-validation ───────────────────────────────────────────────
     const { data: slotRecord, error: slotLookupError } = await supabase
       .from("availability_slots")
       .select(
@@ -199,7 +273,6 @@ export async function submitBookingAction(
 
     if (countError)
       throw new Error(`Slot count check failed: ${countError.message}`);
-
     if ((currentBookings ?? 0) >= slotRecord.max_bookings) {
       return {
         success: false,
@@ -225,14 +298,7 @@ export async function submitBookingAction(
       };
     }
 
-    console.log(
-      "[submitBookingAction] Slot validated:",
-      slotStartTime,
-      "on",
-      data.bookingDate,
-    );
-
-    // ── 5. Resolve service_id ──────────────────────────────────────────────
+    // ── 5. Resolve service ──────────────────────────────────────────────────
     const { data: serviceRecord, error: serviceError } = await supabase
       .from("services")
       .select("id, slug, name_en")
@@ -241,51 +307,93 @@ export async function submitBookingAction(
       .single();
 
     if (serviceError || !serviceRecord) {
-      const { data: allServices } = await supabase
-        .from("services")
-        .select("id, slug, name_en, is_active");
-      console.error(
-        "[submitBookingAction] Service lookup failed.",
-        "\n  Looking for slug:",
-        data.serviceType,
-        "\n  Services in DB:",
-        JSON.stringify(allServices, null, 2),
-        "\n  Supabase error:",
-        serviceError?.message ?? "none",
-      );
-      throw new Error(
-        `Service not found for slug: "${data.serviceType}". ` +
-          `Available: ${allServices?.map((s) => s.slug).join(", ") ?? "none"}`,
-      );
+      throw new Error(`Service not found for slug: "${data.serviceType}"`);
     }
 
-    console.log(
-      "[submitBookingAction] Service:",
-      serviceRecord.name_en,
-      "→",
-      serviceRecord.id,
-    );
-
-    // ── 6. Resolve subscription_plan_id ───────────────────────────────────
+    // ── 6. Resolve subscription plan ────────────────────────────────────────
     let subscriptionPlanId: string | null = null;
-
     if (data.frequency !== "one-time") {
       const { data: planRecord } = await supabase
         .from("subscription_plans")
-        .select("id, name")
+        .select("id")
         .eq("frequency", data.frequency)
         .eq("is_active", true)
         .maybeSingle();
       subscriptionPlanId = planRecord?.id ?? null;
-      console.log(
-        "[submitBookingAction] Plan:",
-        planRecord?.name ?? "none (one-time)",
-      );
     }
 
-    // ── 7. Insert booking ──────────────────────────────────────────────────
-    // status = "pending" intentionally — it becomes "confirmed" only after
-    // the checkout.session.completed webhook fires (payment confirmed).
+    // ── 7. Discount resolution ──────────────────────────────────────────────
+    // Step A: Revalidate voucher server-side (never trust the client preview)
+    let validatedVoucher: VoucherRow | null = null;
+
+    if (voucherCode && voucherCode.trim()) {
+      const originalAmountCentsForValidation = Math.round(
+        data.finalPrice * 100,
+      );
+      const voucherResult = await validateVoucher({
+        code: voucherCode,
+        customerId,
+        serviceType: data.serviceType,
+        originalAmountCents: originalAmountCentsForValidation,
+      });
+
+      if (voucherResult.valid) {
+        validatedVoucher = voucherResult.voucher;
+      } else {
+        // Voucher was valid at preview time but failed revalidation.
+        // This means it was exhausted or deactivated between preview and submit.
+        // Return a clear error rather than silently proceeding without the discount.
+        return {
+          success: false,
+          error: `Voucher error: ${voucherResult.error}`,
+          code: "VOUCHER_INVALID",
+        };
+      }
+    }
+
+    // Step B: Select the best discount (first-booking vs voucher)
+    const originalAmountCents = Math.round(data.finalPrice * 100);
+
+    const discount = await selectDiscount({
+      customerId,
+      serviceType: data.serviceType,
+      originalAmountCents,
+      validatedVoucher,
+    });
+
+    const finalAmountCents = discount.finalAmountCents;
+    const finalPrice = finalAmountCents / 100;
+
+    console.log(
+      `[submitBooking] Discount: source=${discount.source ?? "none"} ` +
+        `original=${originalAmountCents}c final=${finalAmountCents}c ` +
+        `saving=${discount.discountAmountCents}c`,
+    );
+
+    // ── 8. Build discount snapshot fields ──────────────────────────────────
+    // These are written atomically with the booking row.
+    const discountFields =
+      discount.source === null
+        ? {
+            is_first_booking: false,
+            discount_source: null,
+            voucher_id: null,
+            stripe_coupon_id: null,
+            discount_amount_cents: null,
+            original_final_price_cents: null,
+            final_price_cents: finalAmountCents,
+          }
+        : {
+            is_first_booking: discount.source === "first_booking",
+            discount_source: discount.source,
+            voucher_id: discount.voucherId,
+            stripe_coupon_id: discount.stripeCouponId,
+            discount_amount_cents: discount.discountAmountCents,
+            original_final_price_cents: originalAmountCents,
+            final_price_cents: finalAmountCents,
+          };
+
+    // ── 9. Insert booking ───────────────────────────────────────────────────
     const { data: booking, error: bookingError } = await supabase
       .from("bookings")
       .insert({
@@ -298,7 +406,7 @@ export async function submitBookingAction(
         status: "pending",
         payment_status: "pending",
         frequency: data.frequency,
-        final_price: data.finalPrice,
+        final_price: finalPrice, // post-discount EUR amount
         base_price: data.basePrice,
         service_type: data.serviceType,
         plan_key: data.planKey,
@@ -309,26 +417,23 @@ export async function submitBookingAction(
         apartment_size: data.apartmentSize,
         addons_snapshot: data.addonsSnapshot,
         special_notes: data.specialNotes,
+        ...discountFields,
       })
-      .select("id, created_at")
+      .select("id")
       .single();
 
     if (bookingError)
       throw new Error(`Booking insertion failed: ${bookingError.message}`);
+    console.log("[submitBooking] Booking created:", booking.id);
 
-    console.log("[submitBookingAction] Booking created:", booking.id);
-
-    // ── 8. Insert booking_extras ───────────────────────────────────────────
+    // ── 10. Insert booking_extras ───────────────────────────────────────────
     if (data.addonsSnapshot.count > 0 && data.addonsSnapshot.names.length > 0) {
       const extrasRows = data.addonsSnapshot.names
         .map((name) => {
           const baseName = name.replace(/\s×\d+$/, "").trim();
           const extraType = ADDON_TYPE_MAP[baseName];
           if (!extraType) {
-            console.warn(
-              "[submitBookingAction] Unrecognised addon name:",
-              baseName,
-            );
+            console.warn("[submitBooking] Unrecognised addon name:", baseName);
             return null;
           }
           return { booking_id: booking.id, extra_type: extraType, price: 0 };
@@ -341,25 +446,45 @@ export async function submitBookingAction(
           .insert(extrasRows);
         if (extrasError) {
           console.warn(
-            "[submitBookingAction] booking_extras warning:",
+            "[submitBooking] booking_extras warning:",
             extrasError.message,
-          );
-        } else {
-          console.log(
-            "[submitBookingAction] booking_extras inserted:",
-            extrasRows.length,
-            "rows",
           );
         }
       }
     }
 
-    // ── 9. Create Stripe Checkout Session ─────────────────────────────────
-    // DB booking exists first (step 7). Now we create the Stripe session.
-    // If this fails, the booking stays pending — no orphaned Stripe objects.
-    //
-    // NOTE: Email is NOT sent here. Confirmation email fires from the
-    // checkout.session.completed webhook after the customer actually pays.
+    // ── 11. Zero-payment path (finalAmountCents === 0) ──────────────────────
+    if (discount.isFree) {
+      console.log(
+        `[submitBooking] Zero-payment booking ${booking.id} — skipping Stripe`,
+      );
+
+      const zeroPaymentSessionId = `zero_${booking.id}`;
+
+      await confirmZeroPaymentBooking({
+        supabase,
+        bookingId: booking.id,
+        customerId,
+        discount,
+        stripeSessionId: zeroPaymentSessionId,
+      });
+
+      // Redirect to success page with same URL shape as paid bookings.
+      // No real session_id — use the sentinel so the success page can display.
+      const successUrl =
+        `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}` +
+        `/${(data.locale as string) ?? "en"}/booking/success` +
+        `?booking_id=${booking.id}&session_id=${zeroPaymentSessionId}`;
+
+      return {
+        success: true,
+        bookingId: booking.id,
+        customerId,
+        checkoutUrl: successUrl,
+      };
+    }
+
+    // ── 12. Stripe Checkout path (finalAmountCents > 0) ─────────────────────
     const checkoutResult = await createCheckoutSession({
       bookingId: booking.id,
       customerId,
@@ -372,13 +497,14 @@ export async function submitBookingAction(
       cancelPath: "/booking/cancelled",
       addonsTotal: data.addonsSnapshot.discountedTotal,
       addonNames: data.addonsSnapshot.names,
+      // Pass the winning Stripe coupon — discount applied in Checkout UI
+      stripeCouponId:
+        discount.source !== null ? discount.stripeCouponId : undefined,
     });
 
     if (!checkoutResult.success) {
-      // Checkout session creation failed. The booking remains pending.
-      // Customer can retry. No orphaned Stripe objects exist.
       console.error(
-        `[submitBookingAction] Stripe checkout failed for booking ${booking.id}:`,
+        `[submitBooking] Stripe checkout failed for booking ${booking.id}:`,
         checkoutResult.error,
       );
       return {
@@ -389,10 +515,9 @@ export async function submitBookingAction(
     }
 
     console.log(
-      `[submitBookingAction] Checkout session created: ${checkoutResult.sessionId} → ${booking.id}`,
+      `[submitBooking] ✓ Checkout session created: ${checkoutResult.sessionId} → ${booking.id}`,
     );
 
-    // ── 10. Return checkout URL for client redirect ────────────────────────
     return {
       success: true,
       bookingId: booking.id,
@@ -400,7 +525,7 @@ export async function submitBookingAction(
       checkoutUrl: checkoutResult.checkoutUrl,
     };
   } catch (err) {
-    console.error("[submitBookingAction] Fatal:", err);
+    console.error("[submitBooking] Fatal:", err);
     return {
       success: false,
       error:

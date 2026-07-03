@@ -11,7 +11,6 @@ import {
   sendRefundEmails,
 } from "@/app/lib/email/emailService";
 
-// ── Typed Supabase client ─────────────────────────────────────────────────────
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TypedSupabase = SupabaseClient<any>;
 
@@ -39,7 +38,6 @@ async function logWebhookEvent(
       `[webhook] Failed to check existing event ${event.id}:`,
       selectError.message,
     );
-
     return { alreadyProcessed: false };
   }
 
@@ -50,14 +48,12 @@ async function logWebhookEvent(
       );
       return { alreadyProcessed: true };
     }
-
     console.warn(
       `[webhook] Retrying previously incomplete event: ${event.id} (${event.type})`,
     );
     return { alreadyProcessed: false };
   }
 
-  // First time seeing this event — record it and proceed.
   const { error: insertError } = await supabase
     .from("stripe_webhook_events")
     .insert({
@@ -69,8 +65,6 @@ async function logWebhookEvent(
 
   if (insertError) {
     if (insertError.code === "23505") {
-      // Race: a concurrent request inserted between our select and insert
-      // (e.g. two near-simultaneous deliveries). That request owns this one.
       console.log(
         `[webhook] Duplicate event skipped (race): ${event.id} (${event.type})`,
       );
@@ -84,6 +78,7 @@ async function logWebhookEvent(
 
   return { alreadyProcessed: false };
 }
+
 async function markProcessed(
   supabase: TypedSupabase,
   stripeEventId: string,
@@ -127,36 +122,7 @@ async function findBookingBySubscription(
   } | null;
 }
 
-// async function findBookingBySession(
-//   supabase: TypedSupabase,
-//   sessionId: string,
-// ) {
-//   const { data, error } = await supabase
-//     .from("bookings")
-//     .select(
-//       "id, customer_id, frequency, visits_per_month, stripe_subscription_id, status",
-//     )
-//     .eq("stripe_checkout_session_id", sessionId)
-//     .single();
-
-//   if (error)
-//     throw new Error(
-//       `Booking lookup by session failed (${sessionId}): ${error.message}`,
-//     );
-
-//   return data as {
-//     id: string;
-//     customer_id: string;
-//     frequency: string;
-//     visits_per_month: number | null;
-//     stripe_subscription_id: string | null;
-//     status: string;
-//   };
-// }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// EMAIL HELPERS (top-level — so they can be called from handlers)
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Email helpers ─────────────────────────────────────────────────────────────
 
 async function sendCheckoutEmails(
   supabase: TypedSupabase,
@@ -244,16 +210,13 @@ async function sendInvoicePaidEmail(
   invoiceId: string,
   billingReason: string | null | undefined,
 ): Promise<void> {
-  // Skip first payment — checkout.session.completed handles that email
   if (billingReason === "subscription_create") return;
 
-  // Fetch customer via booking
   const { data: bookingData } = await supabase
     .from("bookings")
     .select("customer_id")
     .eq("id", bookingId)
     .single();
-
   if (!bookingData) return;
 
   const { data: customerData } = await supabase
@@ -261,7 +224,6 @@ async function sendInvoicePaidEmail(
     .select("email, full_name")
     .eq("id", bookingData.customer_id)
     .single();
-
   if (!customerData) return;
 
   sendRenewalSuccessEmails({
@@ -282,7 +244,7 @@ async function sendInvoicePaidEmail(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HANDLER: checkout.session.completed
+// HANDLER: checkout.session.completed  (v4 — adds voucher redemption)
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function handleCheckoutCompleted(
@@ -299,6 +261,7 @@ async function handleCheckoutCompleted(
   const isSubscription = session.mode === "subscription";
   const isPayment = session.mode === "payment";
 
+  // ── Confirm the booking ───────────────────────────────────────────────────
   const updateFields: Record<string, unknown> = {
     status: "confirmed",
     payment_status: "paid",
@@ -312,20 +275,22 @@ async function handleCheckoutCompleted(
     updateFields.subscription_status = "active";
   }
 
-  const { error } = await supabase
+  const { error: confirmError } = await supabase
     .from("bookings")
     .update(updateFields)
     .eq("id", bookingId);
 
-  if (error)
-    throw new Error(`Failed to confirm booking ${bookingId}: ${error.message}`);
+  if (confirmError) {
+    throw new Error(
+      `Failed to confirm booking ${bookingId}: ${confirmError.message}`,
+    );
+  }
 
   console.log(
     `[webhook] Booking ${bookingId} confirmed (mode: ${session.mode})`,
   );
 
-  // One-time payments: create payments row immediately
-
+  // ── One-time payments: insert payment row ─────────────────────────────────
   if (isPayment && session.payment_intent && session.amount_total) {
     const { error: paymentError } = await supabase.from("payments").upsert(
       {
@@ -344,6 +309,101 @@ async function handleCheckoutCompleted(
       console.error(
         `[webhook] Payment upsert failed for booking ${bookingId}:`,
         paymentError.message,
+      );
+    }
+  }
+
+  // ── Voucher redemption (v4) ───────────────────────────────────────────────
+  // Explicit type cast required because the database is untyped (any schema).
+  // Without it TypeScript infers GenericStringError for every property access.
+  type BookingDiscountSnapshot = {
+    customer_id: string;
+    discount_source: string | null;
+    voucher_id: string | null;
+    voucher_code: string | null;
+    stripe_coupon_id: string | null;
+    discount_amount_cents: number | null;
+    original_final_price_cents: number | null;
+    final_price_cents: number | null;
+  };
+
+  const { data: rawSnapshot } = await supabase
+    .from("bookings")
+    .select(
+      "customer_id, discount_source, voucher_id, voucher_code, " +
+        "stripe_coupon_id, discount_amount_cents, " +
+        "original_final_price_cents, final_price_cents",
+    )
+    .eq("id", bookingId)
+    .maybeSingle();
+
+  const bookingSnapshot = rawSnapshot as BookingDiscountSnapshot | null;
+
+  if (
+    bookingSnapshot !== null &&
+    bookingSnapshot.discount_source === "voucher" &&
+    bookingSnapshot.voucher_id !== null
+  ) {
+    // Fetch discount_type and discount_value from the voucher row for the snapshot
+    const { data: voucherRow } = await supabase
+      .from("vouchers")
+      .select("discount_type, discount_value")
+      .eq("id", bookingSnapshot.voucher_id)
+      .single();
+
+    const { data: insertedRows, error: redemptionError } = await supabase
+      .from("voucher_redemptions")
+      .upsert(
+        {
+          voucher_id: bookingSnapshot.voucher_id,
+          booking_id: bookingId,
+          customer_id: bookingSnapshot.customer_id,
+          discount_type: voucherRow?.discount_type ?? "percentage",
+          discount_value: voucherRow?.discount_value ?? 0,
+          stripe_coupon_id: bookingSnapshot.stripe_coupon_id ?? "",
+          discount_amount_cents: bookingSnapshot.discount_amount_cents ?? 0,
+          original_amount_cents:
+            bookingSnapshot.original_final_price_cents ?? 0,
+          final_amount_cents: bookingSnapshot.final_price_cents ?? 0,
+          stripe_session_id: session.id,
+          redeemed_at: new Date().toISOString(),
+        },
+        { onConflict: "booking_id", ignoreDuplicates: true },
+      )
+      .select("id");
+
+    if (redemptionError) {
+      console.error(
+        `[webhook] Voucher redemption insert error for booking ${bookingId}:`,
+        redemptionError.message,
+      );
+    } else if (insertedRows && insertedRows.length > 0) {
+      // Row was newly inserted — safe to increment voucher usage
+      const { data: incremented } = await supabase.rpc(
+        "increment_voucher_usage",
+        { p_voucher_id: bookingSnapshot.voucher_id },
+      );
+
+      if (!incremented) {
+        // Race condition: voucher exhausted between validation and payment.
+        // Discount was already applied by Stripe — log for manual review.
+        console.warn(
+          `[webhook] ⚠️  OVER-REDEMPTION: increment_voucher_usage returned false ` +
+            `for voucher ${bookingSnapshot.voucher_id} on booking ${bookingId}. ` +
+            `Voucher has been redeemed beyond its max_uses limit. Manual review required.`,
+        );
+      } else {
+        console.log(
+          `[webhook] Voucher "${bookingSnapshot.voucher_code}" redeemed and ` +
+            `usage incremented for booking ${bookingId}`,
+        );
+      }
+    } else {
+      // Empty result — conflict on booking_id. This is a webhook retry.
+      // Redemption already recorded in a previous delivery. Skip increment.
+      console.log(
+        `[webhook] Voucher redemption already recorded for booking ${bookingId} — ` +
+          `skipping usage increment (idempotent retry)`,
       );
     }
   }
@@ -388,10 +448,7 @@ async function handleInvoicePaid(
     `[webhook] invoice.paid: subscriptionId resolved → ${subscriptionId}`,
   );
 
-  // ── Primary lookup ────────────────────────────────────────────────────────
   let booking = await findBookingBySubscription(supabase, subscriptionId);
-
-  // ── Fallback: booking_id from subscription metadata ───────────────────────
 
   if (!booking) {
     console.warn(
@@ -436,7 +493,6 @@ async function handleInvoicePaid(
     return;
   }
 
-  // ── Billing period (dahlia: lives on items.data[0]) ───────────────────────
   let periodStart: string | null = null;
   let periodEnd: string | null = null;
 
@@ -527,7 +583,6 @@ async function handleInvoicePaid(
     `[webhook] Booking ${booking.id} billing period updated: ${periodStart} → ${periodEnd}`,
   );
 
-  // ── Send renewal email (non-blocking, skips subscription_create) ──────────
   sendInvoicePaidEmail(
     supabase,
     booking.id,
@@ -542,8 +597,6 @@ async function handleInvoicePaid(
   ).catch((err) =>
     console.error(`[webhook] Invoice paid email error [${booking.id}]:`, err),
   );
-
-  // ── SCHEDULING HOOK ───────────────────────────────────────────────────────
 
   return booking.id;
 }
@@ -774,7 +827,6 @@ async function handleChargeRefunded(
     `[webhook] Charge refunded. Amount: ${refundedAmount} cents. Full: ${isFullRefund}`,
   );
 
-  // ── Send refund emails (non-blocking) ─────────────────────────────────────
   try {
     const { data: bookingData } = await supabase
       .from("bookings")

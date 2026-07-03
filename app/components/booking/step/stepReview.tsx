@@ -1,10 +1,21 @@
 "use client";
+// app/components/booking/step/StepReview.tsx
+// ─────────────────────────────────────────────────────────────────────────────
+// Final review step. Shows booking summary, voucher input, price breakdown.
+// Voucher code is stored in local state — passed to submitBooking at submit time.
+// The server revalidates the voucher independently — never trusts the preview.
+// ─────────────────────────────────────────────────────────────────────────────
 
 import { useTranslations } from "next-intl";
-import React from "react";
-
+import React, { useState } from "react";
 import { useBookingStore } from "@/app/store/useBookingStore";
 import { StepActions } from "../FormField";
+import { VoucherInput } from "@/app/components/booking/VoucherInput";
+import type { VoucherPreview } from "@/app/lib/vouchers/types";
+
+function formatCents(cents: number): string {
+  return `€${(cents / 100).toFixed(2)}`;
+}
 
 export function StepReview() {
   const t = useTranslations("booking.review");
@@ -21,7 +32,29 @@ export function StepReview() {
   const isSubmitting = useBookingStore((s) => s.isSubmitting);
   const submissionError = useBookingStore((s) => s.submissionError);
 
+  // ── Voucher state (local — not persisted in store) ────────────────────────
+  // The voucher code is the source of truth. The preview is display only.
+  const [appliedVoucher, setAppliedVoucher] = useState<VoucherPreview | null>(
+    null,
+  );
+
   if (!pricing) return null;
+
+  // Original amount in cents (plan + addons, no discount)
+  const originalAmountCents = Math.round(pricing.totalPrice * 100);
+
+  // Discounted amount for display
+  const discountAmountCents = appliedVoucher?.discountAmountCents ?? 0;
+  const finalAmountCents = appliedVoucher
+    ? appliedVoucher.finalAmountCents
+    : originalAmountCents;
+
+  const hasDiscount = discountAmountCents > 0;
+  const isFree = finalAmountCents === 0;
+
+  function handleSubmit() {
+    submitBooking(appliedVoucher?.code ?? null);
+  }
 
   return (
     <div className="space-y-6">
@@ -32,7 +65,7 @@ export function StepReview() {
         <p className="text-[13px] text-gray-400 mt-1">{t("subtitle")}</p>
       </div>
 
-      {/* ── Service summary ──────────────────────────────────────────────────── */}
+      {/* ── Service summary ──────────────────────────────────────────────── */}
       <ReviewSection
         title={t("sections.service")}
         onEdit={() => goToStep("contact")}
@@ -46,14 +79,9 @@ export function StepReview() {
           value={pricing.serviceType}
         />
         <ReviewRow label={t("fields.plan")} value={pricing.planLabel} />
-        <ReviewRow
-          label={t("fields.totalPrice")}
-          value={`€${pricing.totalPrice}`}
-          valueClass="font-bold text-[#0a1628]"
-        />
       </ReviewSection>
 
-      {/* ── Contact ──────────────────────────────────────────────────────────── */}
+      {/* ── Contact ──────────────────────────────────────────────────────── */}
       <ReviewSection
         title={t("sections.contact")}
         onEdit={() => goToStep("contact")}
@@ -66,7 +94,7 @@ export function StepReview() {
         <ReviewRow label={t("fields.phone")} value={contact.phone ?? "—"} />
       </ReviewSection>
 
-      {/* ── Address ──────────────────────────────────────────────────────────── */}
+      {/* ── Address ──────────────────────────────────────────────────────── */}
       <ReviewSection
         title={t("sections.address")}
         onEdit={() => goToStep("address")}
@@ -96,7 +124,7 @@ export function StepReview() {
         )}
       </ReviewSection>
 
-      {/* ── Schedule ─────────────────────────────────────────────────────────── */}
+      {/* ── Schedule ─────────────────────────────────────────────────────── */}
       <ReviewSection
         title={t("sections.schedule")}
         onEdit={() => goToStep("schedule")}
@@ -108,7 +136,7 @@ export function StepReview() {
         <ReviewRow label={t("fields.time")} value={schedule.timeSlot ?? "—"} />
       </ReviewSection>
 
-      {/* ── Notes ────────────────────────────────────────────────────────────── */}
+      {/* ── Notes ────────────────────────────────────────────────────────── */}
       <ReviewSection
         title={t("sections.notes")}
         onEdit={() => goToStep("notes")}
@@ -131,7 +159,73 @@ export function StepReview() {
         />
       </ReviewSection>
 
-      {/* ── Error ────────────────────────────────────────────────────────────── */}
+      {/* ── Price breakdown ───────────────────────────────────────────────── */}
+      <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100">
+          <p className="text-[12px] font-bold uppercase tracking-widest text-gray-400">
+            {t("sections.service")}
+          </p>
+        </div>
+        <div className="px-5 py-4 space-y-3">
+          {/* Subtotal */}
+          <div className="flex items-center justify-between">
+            <span className="text-[13px] text-gray-500">
+              {pricing.planLabel}
+              {pricing.apartment.size ? ` · ${pricing.apartment.size}` : ""}
+            </span>
+            <span className="text-[13px] font-semibold text-[#0a1628]">
+              {formatCents(originalAmountCents)}
+            </span>
+          </div>
+
+          {/* Voucher line */}
+          {hasDiscount && (
+            <div className="flex items-center justify-between text-[#3d6b47]">
+              <span className="text-[13px] font-medium">
+                Voucher ({appliedVoucher!.code})
+              </span>
+              <span className="text-[13px] font-semibold">
+                −{formatCents(discountAmountCents)}
+              </span>
+            </div>
+          )}
+
+          {/* Divider */}
+          <div className="border-t border-gray-100 pt-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[14px] font-bold text-[#0a1628]">
+                Total
+              </span>
+              <div className="text-right">
+                {hasDiscount && (
+                  <p className="text-[11px] text-gray-400 line-through">
+                    {formatCents(originalAmountCents)}
+                  </p>
+                )}
+                <p className="text-[18px] font-extrabold text-[#0a1628]">
+                  {isFree ? "Free" : formatCents(finalAmountCents)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* VAT note */}
+          <p className="text-[11px] text-gray-400">incl. VAT 25.5%</p>
+
+          {/* Voucher input */}
+          <div className="pt-1 border-t border-gray-100">
+            <VoucherInput
+              email={contact.email ?? ""}
+              serviceType={pricing.serviceType}
+              originalAmountCents={originalAmountCents}
+              appliedVoucher={appliedVoucher}
+              onApply={setAppliedVoucher}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Error ────────────────────────────────────────────────────────── */}
       {submissionError && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex gap-3">
           <span className="text-lg shrink-0">⚠️</span>
@@ -139,15 +233,15 @@ export function StepReview() {
         </div>
       )}
 
-      {/* ── Legal note ───────────────────────────────────────────────────────── */}
+      {/* ── Legal note ───────────────────────────────────────────────────── */}
       <p className="text-[11px] text-gray-400 leading-relaxed">
         {t("legalNote")}
       </p>
 
       <StepActions
-        onNext={submitBooking}
+        onNext={handleSubmit}
         onBack={prevStep}
-        nextLabel={t("confirm")}
+        nextLabel={isFree ? "Confirm booking" : t("confirm")}
         backLabel={tCommon("back")}
         isLoading={isSubmitting}
       />
@@ -175,11 +269,7 @@ function ReviewSection({
         <button
           type="button"
           onClick={onEdit}
-          className={[
-            "text-[12px] font-semibold text-[#7c9885]",
-            "hover:text-[#3d6b47] transition-colors",
-            "focus-visible:outline-none focus-visible:underline",
-          ].join(" ")}
+          className="text-[12px] font-semibold text-[#7c9885] hover:text-[#3d6b47] transition-colors focus-visible:outline-none focus-visible:underline"
         >
           Edit
         </button>

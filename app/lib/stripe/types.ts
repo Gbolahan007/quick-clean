@@ -12,6 +12,7 @@ export interface CreateCheckoutInput {
   cancelPath: string;
   addonsTotal?: number;
   addonNames?: string[];
+  stripeCouponId?: string;
 }
 
 export interface CheckoutResult {

@@ -26,7 +26,13 @@ const INITIAL_STATE: BookingState = {
   confirmedBookingId: null,
 };
 
-export const useBookingStore = create<BookingState & BookingActions>()(
+// ── Extended actions type — submitBooking now accepts voucherCode ──────────────
+
+interface ExtendedBookingActions extends Omit<BookingActions, "submitBooking"> {
+  submitBooking: (voucherCode: string | null) => Promise<void>;
+}
+
+export const useBookingStore = create<BookingState & ExtendedBookingActions>()(
   persist(
     (set, get) => ({
       ...INITIAL_STATE,
@@ -92,7 +98,7 @@ export const useBookingStore = create<BookingState & BookingActions>()(
         get().nextStep();
       },
 
-      submitBooking: async () => {
+      submitBooking: async (voucherCode: string | null) => {
         const { pricing, contact, address, schedule, notes } = get();
 
         if (!pricing) {
@@ -129,7 +135,7 @@ export const useBookingStore = create<BookingState & BookingActions>()(
             frequency: pricing.frequency,
             showDeducted: pricing.showDeducted,
             basePrice: pricing.basePrice,
-            finalPrice: pricing.totalPrice,
+            finalPrice: pricing.totalPrice, // original price — server applies discount
             apartmentKey: pricing.apartment.key,
             apartmentLabel: pricing.apartment.labelKey,
             apartmentSize: pricing.apartment.size,
@@ -147,19 +153,20 @@ export const useBookingStore = create<BookingState & BookingActions>()(
             }),
           };
 
-          const result = await submitBookingAction(payload);
+          // Pass voucherCode separately — server revalidates independently
+          const result = await submitBookingAction(payload, voucherCode);
 
           if (!result.success) {
             set({ submissionError: result.error, isSubmitting: false });
             return;
           }
 
-          // ── Redirect to Stripe Checkout ───────────────────────────────────
-
           console.log(
-            "[submitBooking] ✓ Redirecting to Stripe Checkout | bookingId:",
+            "[submitBooking] ✓ Redirecting | bookingId:",
             result.bookingId,
           );
+
+          // Works for both Stripe Checkout URLs and zero-payment success URLs
           window.location.href = result.checkoutUrl;
         } catch (err) {
           set({
