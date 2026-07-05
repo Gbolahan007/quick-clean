@@ -60,16 +60,13 @@ const ADDON_TYPE_MAP: Record<string, string> = {
 };
 
 // ── Zero-payment confirmation ─────────────────────────────────────────────────
-// Called when finalAmountCents === 0.
-// Confirms booking, inserts payment, records voucher redemption atomically.
-// No Stripe involvement.
 
 async function confirmZeroPaymentBooking(params: {
   supabase: ReturnType<typeof getServiceClient>;
   bookingId: string;
   customerId: string;
   discount: DiscountResult;
-  stripeSessionId: string; // sentinel for zero-payment, not a real Stripe session
+  stripeSessionId: string;
 }): Promise<void> {
   const { supabase, bookingId, customerId, discount, stripeSessionId } = params;
 
@@ -269,7 +266,7 @@ export async function submitBookingAction(
       .select("id", { count: "exact", head: true })
       .eq("booking_date", data.bookingDate)
       .eq("time_slot", slotStartTime)
-      .neq("status", "cancelled");
+      .eq("status", "confirmed");
 
     if (countError)
       throw new Error(`Slot count check failed: ${countError.message}`);
@@ -287,7 +284,7 @@ export async function submitBookingAction(
       .eq("customer_id", customerId)
       .eq("booking_date", data.bookingDate)
       .eq("time_slot", slotStartTime)
-      .neq("status", "cancelled")
+      .eq("status", "confirmed")
       .maybeSingle();
 
     if (duplicate) {
@@ -340,9 +337,6 @@ export async function submitBookingAction(
       if (voucherResult.valid) {
         validatedVoucher = voucherResult.voucher;
       } else {
-        // Voucher was valid at preview time but failed revalidation.
-        // This means it was exhausted or deactivated between preview and submit.
-        // Return a clear error rather than silently proceeding without the discount.
         return {
           success: false,
           error: `Voucher error: ${voucherResult.error}`,
@@ -406,7 +400,7 @@ export async function submitBookingAction(
         status: "pending",
         payment_status: "pending",
         frequency: data.frequency,
-        final_price: finalPrice, // post-discount EUR amount
+        final_price: finalPrice,
         base_price: data.basePrice,
         service_type: data.serviceType,
         plan_key: data.planKey,
@@ -501,7 +495,6 @@ export async function submitBookingAction(
       stripeCouponId:
         discount.source !== null ? discount.stripeCouponId : undefined,
     });
-
     if (!checkoutResult.success) {
       console.error(
         `[submitBooking] Stripe checkout failed for booking ${booking.id}:`,
@@ -509,7 +502,7 @@ export async function submitBookingAction(
       );
       return {
         success: false,
-        error: checkoutResult.error,
+        error: "Payment session could not be created. Please try again.",
         code: checkoutResult.code,
       };
     }

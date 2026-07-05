@@ -12,10 +12,6 @@ export const contactSchema = z.object({
 export type ContactSchema = z.infer<typeof contactSchema>;
 
 // ── Step 2: Address ───────────────────────────────────────────────────────────
-// squareMeters and numberOfRooms stay as z.number().
-// The conversion from string → number is handled in the component via
-// register("field", { valueAsNumber: true }) — React Hook Form does the
-// cast before Zod ever sees the value, so the types stay clean.
 
 export const addressSchema = z.object({
   streetAddress: z.string().min(1, "Street address is required"),

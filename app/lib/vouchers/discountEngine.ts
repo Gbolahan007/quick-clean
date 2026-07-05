@@ -44,7 +44,6 @@ export async function isFirstBookingEligible(
   customerId: string,
   serviceType: string,
 ): Promise<boolean> {
-  // Office bookings are excluded from the first-booking discount
   if (serviceType === "office") return false;
 
   const supabase = getServiceClient();
@@ -55,7 +54,7 @@ export async function isFirstBookingEligible(
     .eq("customer_id", customerId)
     .eq("status", "confirmed")
     .eq("payment_status", "paid")
-    .neq("service_type", "office"); // exclude office from eligibility count
+    .neq("service_type", "office");
 
   if (error) {
     console.error("[discountEngine] First-booking check error:", error.message);

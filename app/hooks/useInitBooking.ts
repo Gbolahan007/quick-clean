@@ -24,14 +24,7 @@ interface UseInitBookingParams {
   addonsSummary: AddonsSummary;
 }
 
-// ── Frequency resolution ──────────────────────────────────────────────────────
-// Maps the planKey (from your pricing data) to the BookingFrequency value
-// that createCheckoutSession uses to resolve the Stripe Price and mode.
-//
-// MAINTENANCE plans → Stripe mode=subscription, interval=month, interval_count=1
-// DEEP MONTHLY     → Stripe mode=subscription, interval=month, interval_count=1
-// DEEP QUARTERLY   → Stripe mode=subscription, interval=month, interval_count=3
-// MOVEOUT / ONE-TIME → Stripe mode=payment (no subscription)
+// ── Frequency resolution ────────────────────────────────────────────────────
 
 function resolveFrequency(
   planKey: string,

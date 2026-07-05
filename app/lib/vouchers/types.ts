@@ -1,10 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// Shared types for the voucher and discount system.
-// All monetary values are integer cents throughout.
-// ─────────────────────────────────────────────────────────────────────────────
-
-// ── Raw voucher row from the database ────────────────────────────────────────
-
 export interface VoucherRow {
   id: string;
   code: string;
@@ -43,9 +36,8 @@ export interface DiscountDecision {
   source: DiscountSource;
   discountAmountCents: number;
   originalAmountCents: number;
-  finalAmountCents: number; // may be 0 for 100% vouchers
+  finalAmountCents: number;
 
-  // Voucher fields — null when source = 'first_booking'
   voucherId: string | null;
   voucherCode: string | null;
   stripeCouponId: string; // always present — snapshot from voucher or first-booking env var

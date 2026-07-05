@@ -33,7 +33,7 @@ function getServiceClient() {
 export async function validateVoucher(params: {
   code: string;
   customerId: string;
-  serviceType: string; // 'maintenance' | 'deep' | 'moveout' | 'office'
+  serviceType: string;
   originalAmountCents: number;
 }): Promise<VoucherValidationResult> {
   const { code, customerId, serviceType, originalAmountCents } = params;

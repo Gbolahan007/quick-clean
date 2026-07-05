@@ -1,10 +1,4 @@
 "use client";
-// app/components/booking/step/StepReview.tsx
-// ─────────────────────────────────────────────────────────────────────────────
-// Final review step. Shows booking summary, voucher input, price breakdown.
-// Voucher code is stored in local state — passed to submitBooking at submit time.
-// The server revalidates the voucher independently — never trusts the preview.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import { useTranslations } from "next-intl";
 import React, { useState } from "react";
@@ -32,8 +26,6 @@ export function StepReview() {
   const isSubmitting = useBookingStore((s) => s.isSubmitting);
   const submissionError = useBookingStore((s) => s.submissionError);
 
-  // ── Voucher state (local — not persisted in store) ────────────────────────
-  // The voucher code is the source of truth. The preview is display only.
   const [appliedVoucher, setAppliedVoucher] = useState<VoucherPreview | null>(
     null,
   );

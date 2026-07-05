@@ -135,7 +135,7 @@ export const useBookingStore = create<BookingState & ExtendedBookingActions>()(
             frequency: pricing.frequency,
             showDeducted: pricing.showDeducted,
             basePrice: pricing.basePrice,
-            finalPrice: pricing.totalPrice, // original price — server applies discount
+            finalPrice: pricing.totalPrice,
             apartmentKey: pricing.apartment.key,
             apartmentLabel: pricing.apartment.labelKey,
             apartmentSize: pricing.apartment.size,

@@ -1,10 +1,5 @@
 "use client";
 // app/components/booking/VoucherInput.tsx
-// ─────────────────────────────────────────────────────────────────────────────
-// Collapsible voucher input shown in the booking review step.
-// Calls previewVoucherAction on Apply — displays discount breakdown.
-// The applied voucher code is passed up to the parent via onApply.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useTransition } from "react";
 import { ChevronDown, Tag, X } from "lucide-react";
@@ -38,7 +33,6 @@ export function VoucherInput({
   function handleApply() {
     if (!code.trim()) return;
     setError(null);
-
     startTransition(async () => {
       const result = await previewVoucherAction({
         code,
@@ -46,12 +40,10 @@ export function VoucherInput({
         serviceType,
         originalAmountCents,
       });
-
       if (!result.valid) {
         setError(result.error);
         return;
       }
-
       onApply(result);
       setOpen(false);
     });
@@ -68,10 +60,10 @@ export function VoucherInput({
     return (
       <div className="rounded-xl border border-[#d4e8d9] bg-[#f0f8f3] px-4 py-3">
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <Tag className="w-4 h-4 text-[#7c9885] shrink-0" />
-            <div>
-              <p className="text-[13px] font-bold text-[#3d6b47]">
+            <div className="min-w-0">
+              <p className="text-[13px] font-bold text-[#3d6b47] truncate">
                 {appliedVoucher.code}
                 {appliedVoucher.description && (
                   <span className="font-normal text-[#3d6b47]/70 ml-1.5">
@@ -117,8 +109,12 @@ export function VoucherInput({
   }
 
   // ── Expanded input ────────────────────────────────────────────────────────
+  // Stack vertically on mobile, row on sm+.
+  // Input never causes horizontal overflow because it's constrained to
+  // the parent width with min-w-0 and the buttons sit below on small screens.
   return (
     <div className="space-y-2">
+      {/* Row: input + Apply — full width, no overflow */}
       <div className="flex gap-2">
         <input
           type="text"
@@ -130,28 +126,37 @@ export function VoucherInput({
           onKeyDown={(e) => e.key === "Enter" && handleApply()}
           placeholder="VOUCHER CODE"
           autoFocus
-          className="flex-1 px-3 py-2 rounded-xl border border-gray-200 text-[13px] font-mono uppercase text-[#0a1628] placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#7c9885]/30 focus:border-[#7c9885] transition-colors"
+          className={[
+            "min-w-0 flex-1 px-3 py-2 rounded-xl border border-gray-200",
+            "text-[13px] font-mono uppercase text-[#0a1628]",
+            "placeholder:text-gray-300",
+            "focus:outline-none focus:ring-2 focus:ring-[#7c9885]/30 focus:border-[#7c9885]",
+            "transition-colors",
+          ].join(" ")}
         />
         <button
           type="button"
           onClick={handleApply}
           disabled={isPending || !code.trim()}
-          className="px-4 py-2 rounded-xl bg-[#7c9885] text-[13px] font-semibold text-white hover:bg-[#6f8c78] disabled:opacity-50 disabled:cursor-not-allowed transition-colors shrink-0"
+          className="shrink-0 px-4 py-2 rounded-xl bg-[#7c9885] text-[13px] font-semibold text-white hover:bg-[#6f8c78] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {isPending ? "Checking…" : "Apply"}
         </button>
-        <button
-          type="button"
-          onClick={() => {
-            setOpen(false);
-            setError(null);
-          }}
-          className="px-3 py-2 rounded-xl border border-gray-200 text-[13px] text-gray-400 hover:text-gray-600 transition-colors"
-        >
-          Cancel
-        </button>
       </div>
-      {error && <p className="text-[12px] text-red-600 px-0.5">{error}</p>}
+
+      {/* Cancel sits on its own line — never pushed off screen */}
+      <button
+        type="button"
+        onClick={() => {
+          setOpen(false);
+          setError(null);
+        }}
+        className="text-[12px] font-medium text-gray-400 hover:text-gray-600 transition-colors"
+      >
+        Cancel
+      </button>
+
+      {error && <p className="text-[12px] text-red-600">{error}</p>}
     </div>
   );
 }

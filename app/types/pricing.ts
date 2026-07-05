@@ -1,7 +1,3 @@
-// app/types/pricing.ts
-// Central home for shared pricing types.
-// Import from here in both plan.ts and PlanGrid.tsx to avoid circular deps.
-
 export interface Plan {
   key: string;
   labelKey: string;
