@@ -94,7 +94,7 @@ export function detailRow(
 export function detailSection(title: string, rows: string): string {
   return `
   <div style="margin-bottom:8px">
-    <p style="margin:0 0 10px;font-size:11px;font-weight:700;color:${BRAND.green};text-transform:uppercase;letter-spacing:1px">${title}</p>
+    ${title ? `<p style="margin:0 0 10px;font-size:11px;font-weight:700;color:${BRAND.green};text-transform:uppercase;letter-spacing:1px">${title}</p>` : ""}
     <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #f0f0f0">
       ${rows}
     </table>
@@ -131,4 +131,113 @@ export function ctaButton(
   const color = secondary ? "#374151" : BRAND.white;
   const border = secondary ? `border:1px solid #d1d5db;` : "";
   return `<a href="${href}" style="display:inline-block;background:${bg};${border}color:${color};font-size:13px;font-weight:700;padding:12px 22px;border-radius:10px;text-decoration:none">${label}</a>`;
+}
+
+// ── Discount block — customer emails ──────────────────────────────────────────
+// Renders a green callout when a first-booking or voucher discount was applied.
+// Returns empty string when no discount — safe to call unconditionally.
+
+export function discountBlock(params: {
+  discountSource?: "first_booking" | "voucher" | null;
+  discountAmountCents?: number | null;
+  originalAmountCents?: number | null;
+  locale?: "en" | "fi";
+}): string {
+  const {
+    discountSource,
+    discountAmountCents,
+    originalAmountCents,
+    locale = "en",
+  } = params;
+  if (!discountSource || !discountAmountCents || !originalAmountCents)
+    return "";
+
+  const saving = formatAmount(discountAmountCents);
+  const original = formatAmount(originalAmountCents);
+
+  if (discountSource === "first_booking") {
+    const heading =
+      locale === "fi"
+        ? "🎉 Ensimmäisen varauksen alennus — 25% off"
+        : "🎉 First booking discount — 25% off";
+    const body =
+      locale === "fi"
+        ? `Sait 25% alennuksen ensimmäisestä varauksestasi Froshilla. Säästit <strong>${saving}</strong> (alkuperäinen hinta ${original}).`
+        : `You received 25% off your first booking with us. You saved <strong>${saving}</strong> (original price ${original}).`;
+
+    return `
+    <tr><td style="padding:0 32px 20px">
+      <div style="background:#f0f8f3;border:2px solid #7c9885;border-radius:12px;padding:16px 20px">
+        <p style="margin:0 0 5px;font-size:14px;font-weight:800;color:#3d6b47">${heading}</p>
+        <p style="margin:0;font-size:13px;color:#3d6b47;line-height:1.6">${body}</p>
+      </div>
+    </td></tr>`;
+  }
+
+  // Voucher
+  const heading =
+    locale === "fi" ? "🏷 Alennuskoodi käytetty" : "🏷 Voucher applied";
+  const body =
+    locale === "fi"
+      ? `Alennuskoodisi on käytetty onnistuneesti. Säästit <strong>${saving}</strong> (alkuperäinen hinta ${original}).`
+      : `Your voucher code was applied successfully. You saved <strong>${saving}</strong> (original price ${original}).`;
+
+  return `
+  <tr><td style="padding:0 32px 20px">
+    <div style="background:#f0f8f3;border:1px solid #d4e8d9;border-radius:12px;padding:16px 20px">
+      <p style="margin:0 0 5px;font-size:14px;font-weight:700;color:#3d6b47">${heading}</p>
+      <p style="margin:0;font-size:13px;color:#3d6b47;line-height:1.6">${body}</p>
+    </div>
+  </td></tr>`;
+}
+
+// ── Admin discount block ──────────────────────────────────────────────────────
+// Compact version for admin emails — English only, shows full price breakdown.
+
+export function adminDiscountBlock(params: {
+  isFirstBooking?: boolean;
+  discountSource?: "first_booking" | "voucher" | null;
+  discountAmountCents?: number | null;
+  originalAmountCents?: number | null;
+  chargedCents: number;
+}): string {
+  const {
+    isFirstBooking,
+    discountSource,
+    discountAmountCents,
+    originalAmountCents,
+    chargedCents,
+  } = params;
+  if (!discountSource || !discountAmountCents || !originalAmountCents)
+    return "";
+
+  const saving = formatAmount(discountAmountCents);
+  const original = formatAmount(originalAmountCents);
+  const charged = formatAmount(chargedCents);
+
+  if (isFirstBooking || discountSource === "first_booking") {
+    return `
+    <tr><td style="padding:0 28px 16px">
+      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:12px 16px">
+        <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#c2410c">🎉 First booking — 25% discount applied</p>
+        <p style="margin:0;font-size:12px;color:#c2410c;line-height:1.6">
+          Original: <strong>${original}</strong> &nbsp;·&nbsp;
+          Saving: <strong>${saving}</strong> &nbsp;·&nbsp;
+          Charged: <strong>${charged}</strong>
+        </p>
+      </div>
+    </td></tr>`;
+  }
+
+  return `
+  <tr><td style="padding:0 28px 16px">
+    <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:12px 16px">
+      <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#0369a1">🏷 Voucher discount applied</p>
+      <p style="margin:0;font-size:12px;color:#0369a1;line-height:1.6">
+        Original: <strong>${original}</strong> &nbsp;·&nbsp;
+        Saving: <strong>${saving}</strong> &nbsp;·&nbsp;
+        Charged: <strong>${charged}</strong>
+      </p>
+    </div>
+  </td></tr>`;
 }

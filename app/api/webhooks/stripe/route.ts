@@ -124,25 +124,49 @@ async function findBookingBySubscription(
 
 // ── Email helpers ─────────────────────────────────────────────────────────────
 
+type BookingEmailSnapshot = {
+  id: string;
+  frequency: string | null;
+  plan_label: string | null;
+  visits_per_month: number | null;
+  booking_date: string | null;
+  time_slot: string | null;
+  final_price: number | null;
+  apartment_size: string | null;
+  stripe_subscription_id: string | null;
+  current_period_end: string | null;
+  is_first_booking: boolean;
+  discount_source: "first_booking" | "voucher" | null;
+  discount_amount_cents: number | null;
+  original_final_price_cents: number | null;
+  customers: {
+    full_name: string | null;
+    email: string | null;
+    phone: string | null;
+  } | null;
+};
+
 async function sendCheckoutEmails(
   supabase: TypedSupabase,
   bookingId: string,
   session: Stripe.Checkout.Session,
 ): Promise<void> {
-  const { data, error } = await supabase
+  const { data: raw, error } = await supabase
     .from("bookings")
     .select(
       `
       id, frequency, plan_label, visits_per_month,
       booking_date, time_slot, final_price, apartment_size,
       stripe_subscription_id, current_period_end,
+      is_first_booking, discount_source,
+      discount_amount_cents, original_final_price_cents,
       customers ( full_name, email, phone )
     `,
     )
     .eq("id", bookingId)
     .single();
 
-  if (!data) {
+  if (!raw) {
     console.error(
       `[email] Could not fetch booking ${bookingId} for checkout email:`,
       error?.message ?? "no row returned",
@@ -150,11 +174,19 @@ async function sendCheckoutEmails(
     return;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const customer = data.customers as any;
+  // Single cast at the boundary — fully typed from here on
+  const data = raw as unknown as BookingEmailSnapshot;
+  const customer = data.customers;
   const locale = (session.metadata?.locale as "en" | "fi") ?? "en";
   const amountCents =
     session.amount_total ?? Math.round((data.final_price ?? 0) * 100);
+
+  const discountInfo = {
+    isFirstBooking: data.is_first_booking,
+    discountSource: data.discount_source,
+    discountAmountCents: data.discount_amount_cents,
+    originalAmountCents: data.original_final_price_cents,
+  };
 
   if (session.mode === "payment") {
     await sendPaymentSuccessEmails({
@@ -172,6 +204,7 @@ async function sendCheckoutEmails(
       bookingDate: data.booking_date ?? "",
       timeSlot: data.time_slot ?? "",
       apartmentSize: data.apartment_size ?? "",
+      ...discountInfo,
     }).catch((err) =>
       console.error(`[email] Payment success email error [${bookingId}]:`, err),
     );
@@ -189,6 +222,7 @@ async function sendCheckoutEmails(
       stripeSubscriptionId: data.stripe_subscription_id ?? "",
       amountCents,
       currency: session.currency ?? "eur",
+      ...discountInfo,
     }).catch((err) =>
       console.error(
         `[email] Subscription activated email error [${bookingId}]:`,
@@ -314,8 +348,7 @@ async function handleCheckoutCompleted(
   }
 
   // ── Voucher redemption (v4) ───────────────────────────────────────────────
-  // Explicit type cast required because the database is untyped (any schema).
-  // Without it TypeScript infers GenericStringError for every property access.
+
   type BookingDiscountSnapshot = {
     customer_id: string;
     discount_source: string | null;

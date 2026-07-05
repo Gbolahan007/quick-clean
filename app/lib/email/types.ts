@@ -48,6 +48,10 @@ export interface PaymentSuccessEmailInput {
   bookingDate: string;
   timeSlot: string;
   apartmentSize: string;
+  discountSource?: "first_booking" | "voucher" | null;
+  discountAmountCents?: number | null;
+  originalAmountCents?: number | null;
+  isFirstBooking?: boolean;
 }
 
 // ── 3. Subscription activated ────────────────────────────────────────────────
@@ -63,6 +67,11 @@ export interface SubscriptionActivatedEmailInput {
   stripeSubscriptionId: string;
   amountCents: number;
   currency: string;
+
+  isFirstBooking?: boolean;
+  discountSource?: "first_booking" | "voucher" | null;
+  discountAmountCents?: number | null;
+  originalAmountCents?: number | null;
 }
 
 // ── 4. Monthly renewal successful ────────────────────────────────────────────

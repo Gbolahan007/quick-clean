@@ -144,7 +144,6 @@ export function VoucherInput({
         </button>
       </div>
 
-      {/* Cancel sits on its own line — never pushed off screen */}
       <button
         type="button"
         onClick={() => {

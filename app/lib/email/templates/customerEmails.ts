@@ -11,6 +11,7 @@ import {
   BRAND,
   detailRow,
   detailSection,
+  discountBlock,
   emailBanner,
   emailFooter,
   emailHeader,
@@ -317,6 +318,12 @@ export function buildPaymentSuccessEmail(input: PaymentSuccessEmailInput): {
       `,
       )}
     </td></tr>
+    ${discountBlock({
+      discountSource: input.discountSource,
+      discountAmountCents: input.discountAmountCents,
+      originalAmountCents: input.originalAmountCents,
+      locale: input.locale,
+    })}
     <tr><td style="padding:20px 32px">
       <p style="margin:0;font-size:14px;font-weight:600;color:${BRAND.dark}">${c.sign}</p>
     </td></tr>
@@ -368,6 +375,12 @@ export function buildSubscriptionActivatedEmail(
       `,
       )}
     </td></tr>
+    ${discountBlock({
+      discountSource: input.discountSource,
+      discountAmountCents: input.discountAmountCents,
+      originalAmountCents: input.originalAmountCents,
+      locale: input.locale,
+    })}
     <tr><td style="padding:20px 32px">
       <p style="margin:0;font-size:14px;font-weight:600;color:${BRAND.dark}">${c.sign}</p>
     </td></tr>
@@ -425,7 +438,7 @@ export function buildRenewalSuccessEmail(input: RenewalSuccessEmailInput): {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 5. SUBSCRIPTION CANCELLED (extended — replaces sendSubscriptionEndedEmail)
+// 5. SUBSCRIPTION CANCELLED
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function buildSubscriptionCancelledEmail(

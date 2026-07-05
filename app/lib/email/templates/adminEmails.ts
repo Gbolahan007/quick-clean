@@ -1,9 +1,4 @@
 // app/lib/email/templates/adminEmails.ts
-// ─────────────────────────────────────────────────────────────────────────────
-// Admin-facing email templates for Frosh.
-// All admin emails are English only.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import type {
   BookingSubmittedEmailInput,
   PaymentSuccessEmailInput,
@@ -14,6 +9,7 @@ import type {
 } from "../types";
 import {
   BRAND,
+  adminDiscountBlock,
   ctaButton,
   detailRow,
   detailSection,
@@ -44,7 +40,6 @@ function adminHeader(title: string, bookingId: string): string {
   </tr>`;
 }
 
-// ── Dashboard link ────────────────────────────────────────────────────────────
 function dashboardLink(bookingId: string): string {
   return `
   <tr><td style="padding:20px 28px 28px">
@@ -131,7 +126,7 @@ export function buildAdminPaymentReceivedEmail(
         "Payment",
         `
         ${detailRow("Booking ID", input.bookingId, true)}
-        ${detailRow("Amount", formatAmount(input.amountCents, input.currency), true)}
+        ${detailRow("Amount charged", formatAmount(input.amountCents, input.currency), true)}
         ${detailRow("Paid on", paidDate)}
         ${detailRow("Payment Intent", input.stripePaymentIntentId)}
         ${detailRow("Service", input.serviceType)}
@@ -147,6 +142,13 @@ export function buildAdminPaymentReceivedEmail(
       `,
       )}
     </td></tr>
+    ${adminDiscountBlock({
+      isFirstBooking: input.isFirstBooking,
+      discountSource: input.discountSource,
+      discountAmountCents: input.discountAmountCents,
+      originalAmountCents: input.originalAmountCents,
+      chargedCents: input.amountCents,
+    })}
     ${dashboardLink(input.bookingId)}
     ${emailFooter()}
   `;
@@ -191,6 +193,13 @@ export function buildAdminSubscriptionActivatedEmail(
       `,
       )}
     </td></tr>
+    ${adminDiscountBlock({
+      isFirstBooking: input.isFirstBooking,
+      discountSource: input.discountSource,
+      discountAmountCents: input.discountAmountCents,
+      originalAmountCents: input.originalAmountCents,
+      chargedCents: input.amountCents,
+    })}
     ${dashboardLink(input.bookingId)}
     ${emailFooter()}
   `;
@@ -199,7 +208,7 @@ export function buildAdminSubscriptionActivatedEmail(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 4. RENEWAL SUCCESSFUL (admin copy — brief)
+// 4. RENEWAL SUCCESSFUL (admin copy)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function buildAdminRenewalEmail(

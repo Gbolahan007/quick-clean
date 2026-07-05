@@ -1,7 +1,7 @@
 import { MagicLinkCTA } from "@/app/components/MagicLinkCTA";
 import { StoreCleaner } from "@/app/components/StoreCleaner";
 import { createClient } from "@supabase/supabase-js";
-import { ArrowRight, Calendar, CheckCircle, Clock } from "lucide-react";
+import { ArrowRight, Calendar, CheckCircle, Clock, Tag } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -9,8 +9,6 @@ interface PageProps {
   params: Promise<{ locale: string }>;
   searchParams: Promise<{ session_id?: string; booking_id?: string }>;
 }
-
-// ── Server-side booking fetch ─────────────────────────────────────────────────
 
 async function getBookingDetails(bookingId: string) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -23,18 +21,12 @@ async function getBookingDetails(bookingId: string) {
     .from("bookings")
     .select(
       `
-      id,
-      status,
-      payment_status,
-      service_type,
-      plan_label,
-      frequency,
-      booking_date,
-      time_slot,
-      final_price,
-      show_deducted,
-      apartment_size,
-      visits_per_month,
+      id, status, payment_status,
+      service_type, plan_label, frequency,
+      booking_date, time_slot,
+      final_price, apartment_size, visits_per_month,
+      is_first_booking, discount_source,
+      discount_amount_cents, original_final_price_cents,
       customers ( full_name, email )
     `,
     )
@@ -44,8 +36,6 @@ async function getBookingDetails(bookingId: string) {
   if (error || !data) return null;
   return data;
 }
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function formatDate(dateStr: string): string {
   try {
@@ -76,8 +66,6 @@ function frequencyLabel(frequency: string): string {
   return map[frequency] ?? frequency;
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
-
 export default async function BookingSuccessPage({
   params,
   searchParams,
@@ -85,30 +73,38 @@ export default async function BookingSuccessPage({
   const { locale } = await params;
   const { booking_id, session_id } = await searchParams;
 
-  // Guard: both params must be present
-  if (!booking_id || !session_id) {
-    redirect(`/${locale}/pricing`);
-  }
+  if (!booking_id || !session_id) redirect(`/${locale}/pricing`);
 
   const booking = await getBookingDetails(booking_id);
+  if (!booking) redirect(`/${locale}/pricing`);
 
   const isConfirmed =
-    booking?.status === "confirmed" && booking?.payment_status === "paid";
-  const isPending = booking?.status === "pending";
-
-  if (!booking) {
-    redirect(`/${locale}/pricing`);
-  }
+    booking.status === "confirmed" && booking.payment_status === "paid";
+  const isPending = booking.status === "pending";
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const customer = booking.customers as any;
+  const customer = (booking as any).customers as {
+    full_name: string;
+    email: string;
+  } | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const b = booking as any;
+  const isFirstBooking = b.is_first_booking as boolean;
+  const discountSource = b.discount_source as
+    | "first_booking"
+    | "voucher"
+    | null;
+  const discountAmountCents = b.discount_amount_cents as number | null;
+  const originalAmountCents = b.original_final_price_cents as number | null;
+  const hasDiscount = !!discountSource && !!discountAmountCents;
+
   const ref = booking_id.slice(0, 8).toUpperCase();
 
   return (
     <main className="min-h-screen bg-[#f8faf9] flex items-start justify-center px-5 py-24">
       <StoreCleaner storeKeys={["booking-store", "pricing-selections"]} />
       <div className="w-full max-w-lg space-y-6">
-        {/* ── Status header ──────────────────────────────────────────────── */}
+        {/* ── Status header ─────────────────────────────────────────────── */}
         {isConfirmed ? (
           <div className="text-center space-y-3">
             <div className="flex justify-center">
@@ -146,7 +142,49 @@ export default async function BookingSuccessPage({
           </div>
         )}
 
-        {/* ── Booking reference ───────────────────────────────────────────── */}
+        {/* ── First-booking / voucher discount callout ───────────────────── */}
+        {hasDiscount && (
+          <div
+            className={[
+              "rounded-2xl px-5 py-4 border-2",
+              isFirstBooking
+                ? "bg-[#f0f8f3] border-[#7c9885]"
+                : "bg-[#f0f8f3] border-[#d4e8d9]",
+            ].join(" ")}
+          >
+            <div className="flex items-start gap-3">
+              {isFirstBooking ? (
+                <span className="text-2xl shrink-0">🎉</span>
+              ) : (
+                <Tag className="w-5 h-5 text-[#7c9885] shrink-0 mt-0.5" />
+              )}
+              <div>
+                <p className="text-[14px] font-extrabold text-[#3d6b47]">
+                  {isFirstBooking
+                    ? "First booking discount — 25% off"
+                    : "Voucher applied"}
+                </p>
+                <p className="text-[13px] text-[#3d6b47]/80 mt-0.5 leading-relaxed">
+                  {isFirstBooking
+                    ? `Welcome! As a first-time customer you received 25% off. `
+                    : `Your discount code was applied. `}
+                  You saved{" "}
+                  <span className="font-bold">
+                    €{((discountAmountCents ?? 0) / 100).toFixed(2)}
+                  </span>
+                  {originalAmountCents && (
+                    <span className="text-[#3d6b47]/60">
+                      {" "}
+                      (original price €{(originalAmountCents / 100).toFixed(2)})
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Booking reference ──────────────────────────────────────────── */}
         <div className="rounded-2xl border border-[#d4e8d9] bg-[#f0f8f3] px-5 py-4 flex items-center justify-between">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-widest text-[#7c9885]">
@@ -168,14 +206,13 @@ export default async function BookingSuccessPage({
           )}
         </div>
 
-        {/* ── Booking details ─────────────────────────────────────────────── */}
+        {/* ── Booking details ────────────────────────────────────────────── */}
         <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100">
             <p className="text-[12px] font-bold uppercase tracking-widest text-gray-400">
               Booking details
             </p>
           </div>
-
           <div className="divide-y divide-gray-100">
             {/* Service */}
             <div className="px-5 py-3.5 flex items-start gap-3">
@@ -226,18 +263,25 @@ export default async function BookingSuccessPage({
                     ? "Total"
                     : "Monthly charge"}
                 </p>
-                <p className="text-[14px] font-semibold text-[#0a1628]">
-                  €{Number(booking.final_price).toFixed(2)}
-                  <span className="text-[12px] font-normal text-gray-400 ml-1">
-                    incl. VAT 25.5%
-                  </span>
-                </p>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-[14px] font-semibold text-[#0a1628]">
+                    €{Number(booking.final_price).toFixed(2)}
+                    <span className="text-[12px] font-normal text-gray-400 ml-1">
+                      incl. VAT 25.5%
+                    </span>
+                  </p>
+                  {hasDiscount && originalAmountCents && (
+                    <p className="text-[12px] text-gray-400 line-through">
+                      €{(originalAmountCents / 100).toFixed(2)}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* ── What happens next ───────────────────────────────────────────── */}
+        {/* ── What happens next ──────────────────────────────────────────── */}
         <div className="rounded-2xl border border-gray-200 bg-white px-5 py-5 space-y-3">
           <p className="text-[12px] font-bold uppercase tracking-widest text-gray-400">
             What happens next
@@ -258,7 +302,7 @@ export default async function BookingSuccessPage({
           ))}
         </div>
 
-        {/* ── Actions ─────────────────────────────────────────────────────── */}
+        {/* ── Actions ───────────────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row gap-3">
           <Link
             href={`/${locale}`}
@@ -275,10 +319,10 @@ export default async function BookingSuccessPage({
           </Link>
         </div>
 
-        {/* ── Create account CTA ──────────────────────────────────────────── */}
+        {/* ── Create account CTA ────────────────────────────────────────── */}
         <MagicLinkCTA bookingEmail={customer?.email} locale={locale} />
 
-        {/* ── Support line ────────────────────────────────────────────────── */}
+        {/* ── Support ───────────────────────────────────────────────────── */}
         <p className="text-center text-[12px] text-gray-400">
           Questions?{" "}
           <a
