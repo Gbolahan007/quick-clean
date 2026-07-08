@@ -1,4 +1,3 @@
-// app/admin/(protected)/bookings/page.tsx
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
@@ -59,7 +58,6 @@ async function fetchBookings(params: SearchParams) {
   const offset = (page - 1) * PAGE_SIZE;
   const search = params.q?.trim() ?? "";
 
-  // Base query
   let query = supabase
     .from("bookings")
     .select(
