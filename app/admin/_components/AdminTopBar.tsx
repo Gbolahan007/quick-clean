@@ -1,9 +1,3 @@
-// app/admin/_components/AdminTopBar.tsx
-// ─────────────────────────────────────────────────────────────────────────────
-// Admin top bar — server component (no interactivity needed).
-// Shows current admin name, role, and sign-out button.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { logout } from "@/app/actions/auth";
 import type { AdminProfile } from "@/app/lib/supabase/admin";
 

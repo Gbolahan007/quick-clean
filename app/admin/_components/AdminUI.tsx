@@ -1,6 +1,4 @@
 "use client";
-// app/admin/_components/AdminUI.tsx
-// Shared primitives: StatusBadge, SearchInput, Pagination, EmptyState
 
 import { useState, useTransition } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";

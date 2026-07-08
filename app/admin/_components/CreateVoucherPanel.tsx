@@ -1,12 +1,4 @@
 "use client";
-// app/admin/_components/CreateVoucherPanel.tsx
-// ─────────────────────────────────────────────────────────────────────────────
-// Inline create voucher form.
-// On submit: calls createVoucher server action which:
-//   1. Creates Stripe coupon automatically
-//   2. Inserts voucher row
-//   3. Writes audit log
-// ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";

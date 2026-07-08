@@ -1,10 +1,4 @@
 "use client";
-// app/admin/_components/BookingActions.tsx
-// ─────────────────────────────────────────────────────────────────────────────
-// Client component for booking detail action panel.
-// Renders cancel, reschedule, confirm, and note forms.
-// Calls server actions — all auth + audit logging happens server-side.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useTransition } from "react";
 import {

@@ -1,9 +1,3 @@
-// app/admin/_components/Charts.tsx
-// ─────────────────────────────────────────────────────────────────────────────
-// Pure SVG charts — no external dependencies.
-// BarChart: vertical bars with labels and value tooltips.
-// ─────────────────────────────────────────────────────────────────────────────
-
 interface BarChartProps {
   data: { label: string; value: number }[];
   height?: number;

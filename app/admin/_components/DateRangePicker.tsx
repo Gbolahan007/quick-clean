@@ -1,5 +1,4 @@
 "use client";
-// app/admin/_components/DateRangePicker.tsx
 
 import { useState, useTransition } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -49,10 +48,6 @@ export function DateRangePicker({ from, to }: Props) {
     });
   }
 
-  // applyPreset runs inside an event handler (onClick) — not during render.
-  // Date arithmetic here is fine: event handlers are not subject to the
-  // "components must be pure" rule. The error was Date.now() being called
-  // at module scope or during render — this is safe.
   function applyPreset(days: number) {
     const toStr = TODAY;
     const fromStr = subtractDays(toStr, days);

@@ -1,6 +1,4 @@
 "use client";
-// app/admin/_components/SubscriptionActions.tsx
-// Inline cancel/reactivate controls for the subscriptions table.
 
 import { useState, useTransition } from "react";
 import {
@@ -28,7 +26,7 @@ export function SubscriptionActions({
 
   if (showConfirm) {
     return (
-      <div className="flex flex-col gap-1.5 min-w-[180px]">
+      <div className="flex flex-col gap-1.5 min-w-45">
         {!cancelling && (
           <label className="flex items-center gap-1.5 text-[11px] text-gray-600">
             <input

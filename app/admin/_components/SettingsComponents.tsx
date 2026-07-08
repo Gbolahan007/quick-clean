@@ -1,6 +1,4 @@
 "use client";
-// app/admin/_components/SettingsComponents.tsx
-// PlatformSettingsForm + AvailabilityEditor
 
 import { useState, useTransition } from "react";
 import {

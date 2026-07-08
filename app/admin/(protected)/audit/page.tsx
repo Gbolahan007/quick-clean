@@ -1,4 +1,3 @@
-// app/admin/(protected)/audit/page.tsx
 import { redirect } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import { requireAdmin } from "@/app/lib/supabase/admin";

@@ -1,9 +1,4 @@
 "use client";
-// app/admin/_components/RefundModal.tsx
-// ─────────────────────────────────────────────────────────────────────────────
-// Inline refund panel — expands in place on the payments table row.
-// Supports full and partial refunds.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useTransition } from "react";
 import { issueRefund } from "@/app/admin/actions/financialActions";
