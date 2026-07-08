@@ -115,8 +115,8 @@ async function confirmZeroPaymentBooking(params: {
         voucher_id: discount.voucherId,
         booking_id: bookingId,
         customer_id: customerId,
-        discount_type: "percentage", // resolved from voucher, but we use the snapshot
-        discount_value: 0, // overridden below — we need the actual voucher row
+        discount_type: "percentage",
+        discount_value: 0,
         stripe_coupon_id: discount.stripeCouponId,
         discount_amount_cents: discount.discountAmountCents,
         original_amount_cents: discount.originalAmountCents,
@@ -447,35 +447,46 @@ export async function submitBookingAction(
       }
     }
 
-    // ── 11. Zero-payment path (finalAmountCents === 0) ──────────────────────
+    // ── 11. Zero-payment path ──────────────────────────────────────────────────
     if (discount.isFree) {
-      console.log(
-        `[submitBooking] Zero-payment booking ${booking.id} — skipping Stripe`,
+      const isSubscription = !["one-time", "deepOnetime"].includes(
+        data.frequency,
       );
 
-      const zeroPaymentSessionId = `zero_${booking.id}`;
+      if (isSubscription) {
+        // Subscriptions MUST go through Stripe even at $0
+        // so Stripe manages the billing cycle for month 2+.
+        // The coupon makes the first invoice $0 — no card needed.
+        // Fall through to Stripe Checkout below (do NOT return here).
+        console.log(
+          `[submitBooking] Zero-payment subscription ${booking.id} — routing through Stripe with coupon`,
+        );
+      } else {
+        // One-time bookings: truly free — skip Stripe entirely
+        console.log(
+          `[submitBooking] Zero-payment one-time booking ${booking.id} — skipping Stripe`,
+        );
 
-      await confirmZeroPaymentBooking({
-        supabase,
-        bookingId: booking.id,
-        customerId,
-        discount,
-        stripeSessionId: zeroPaymentSessionId,
-      });
+        await confirmZeroPaymentBooking({
+          supabase,
+          bookingId: booking.id,
+          customerId,
+          discount,
+          stripeSessionId: `zero_${booking.id}`,
+        });
 
-      // Redirect to success page with same URL shape as paid bookings.
-      // No real session_id — use the sentinel so the success page can display.
-      const successUrl =
-        `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}` +
-        `/${(data.locale as string) ?? "en"}/booking/success` +
-        `?booking_id=${booking.id}&session_id=${zeroPaymentSessionId}`;
+        const successUrl =
+          `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}` +
+          `/${(data.locale as string) ?? "en"}/booking/success` +
+          `?booking_id=${booking.id}&session_id=zero_${booking.id}`;
 
-      return {
-        success: true,
-        bookingId: booking.id,
-        customerId,
-        checkoutUrl: successUrl,
-      };
+        return {
+          success: true,
+          bookingId: booking.id,
+          customerId,
+          checkoutUrl: successUrl,
+        };
+      }
     }
 
     // ── 12. Stripe Checkout path (finalAmountCents > 0) ─────────────────────

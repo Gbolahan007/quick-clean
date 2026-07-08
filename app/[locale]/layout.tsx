@@ -102,18 +102,12 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body
-        className={`${geistSans.className} ${geistMono.className} antialiased`}
-      >
-        <NextIntlClientProvider messages={messages}>
-          <div className={`${monserrat.className} `}>
-            <Header />
-            {children}
-            <GlobalFooterWrapper />
-          </div>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider messages={messages}>
+      <div className={`${monserrat.className} `}>
+        <Header />
+        {children}
+        <GlobalFooterWrapper />
+      </div>
+    </NextIntlClientProvider>
   );
 }

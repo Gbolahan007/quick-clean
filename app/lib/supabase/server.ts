@@ -29,9 +29,6 @@ export async function createServerClient() {
 }
 
 // ── Service role client — bypasses RLS ────────────────────────────────────────
-// Use ONLY in webhook handlers and server actions that need to write
-// across customer boundaries (e.g. confirming a booking from a Stripe webhook).
-// NEVER expose to client or use in Server Components that render user data.
 
 import { createClient } from "@supabase/supabase-js";
 
