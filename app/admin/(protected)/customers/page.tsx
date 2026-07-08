@@ -1,4 +1,3 @@
-// app/admin/(protected)/customers/page.tsx
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";

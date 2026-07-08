@@ -20,6 +20,10 @@ export const AUDIT_ACTIONS = {
   VOUCHER_CREATED: "voucher.created",
   VOUCHER_DEACTIVATED: "voucher.deactivated",
   VOUCHER_UPDATED: "voucher.updated",
+
+  ADMIN_CREATED: "admin.created",
+  ADMIN_DEACTIVATED: "admin.deactivated",
+  ADMIN_ROLE_CHANGED: "admin.role_changed",
 } as const;
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[keyof typeof AUDIT_ACTIONS];

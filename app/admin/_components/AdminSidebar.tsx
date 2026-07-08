@@ -12,6 +12,7 @@ import {
   BarChart3,
   Settings,
   ScrollText,
+  User,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -24,6 +25,7 @@ const NAV_ITEMS = [
   { label: "Reports", href: "/admin/reports", icon: BarChart3 },
   { label: "Audit Log", href: "/admin/audit", icon: ScrollText },
   { label: "Settings", href: "/admin/settings", icon: Settings },
+  { label: "Staff", href: "/admin/staff", icon: User },
 ];
 
 export function AdminSidebar() {
