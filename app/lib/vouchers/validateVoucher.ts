@@ -19,25 +19,13 @@
 
 import { createClient } from "@supabase/supabase-js";
 import type { VoucherRow, VoucherValidationResult } from "./types";
+import { calculateDiscountCents } from "./discountUtils";
 
 function getServiceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) throw new Error("Missing Supabase env vars");
   return createClient(url, key, { auth: { persistSession: false } });
-}
-
-// ── Discount calculation ──────────────────────────────────────────────────────
-
-export function calculateDiscountCents(
-  voucher: VoucherRow,
-  originalAmountCents: number,
-): number {
-  if (voucher.discount_type === "percentage") {
-    return Math.round((originalAmountCents * voucher.discount_value) / 100);
-  }
-  // fixed_amount: cap at original amount (cannot discount more than the price)
-  return Math.min(voucher.discount_value, originalAmountCents);
 }
 
 // ── Main validator ────────────────────────────────────────────────────────────
