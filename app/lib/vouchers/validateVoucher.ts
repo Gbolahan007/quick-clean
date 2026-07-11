@@ -19,7 +19,6 @@
 
 import { createClient } from "@supabase/supabase-js";
 import type { VoucherRow, VoucherValidationResult } from "./types";
-import { calculateDiscountCents } from "./discountUtils";
 
 function getServiceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -28,12 +27,25 @@ function getServiceClient() {
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
+// ── Discount calculation ──────────────────────────────────────────────────────
+
+export function calculateDiscountCents(
+  voucher: VoucherRow,
+  originalAmountCents: number,
+): number {
+  if (voucher.discount_type === "percentage") {
+    return Math.round((originalAmountCents * voucher.discount_value) / 100);
+  }
+  // fixed_amount: cap at original amount (cannot discount more than the price)
+  return Math.min(voucher.discount_value, originalAmountCents);
+}
+
 // ── Main validator ────────────────────────────────────────────────────────────
 
 export async function validateVoucher(params: {
   code: string;
   customerId: string;
-  serviceType: string;
+  serviceType: string; // 'maintenance' | 'deep' | 'moveout' | 'office'
   originalAmountCents: number;
 }): Promise<VoucherValidationResult> {
   const { code, customerId, serviceType, originalAmountCents } = params;
@@ -82,11 +94,11 @@ export async function validateVoucher(params: {
   }
 
   // ── Global max uses check ─────────────────────────────────────────────────
-  if (voucher.max_uses !== null && voucher.times_used >= voucher.max_uses) {
-    return {
-      valid: false,
-      error: "This voucher has reached its maximum uses.",
-    };
+  // Vouchers are single-use globally by default. max_uses defaults to 1 if not set.
+  // Once times_used reaches the limit, the voucher is exhausted for everyone.
+  const effectiveMaxUses = voucher.max_uses ?? 1;
+  if (voucher.times_used >= effectiveMaxUses) {
+    return { valid: false, error: "This voucher has already been used." };
   }
 
   // ── Applicable services check ─────────────────────────────────────────────
@@ -103,6 +115,8 @@ export async function validateVoucher(params: {
   }
 
   // ── Per-customer limit check ──────────────────────────────────────────────
+  // Redundant safety net — if the global check passes but this customer
+  // somehow has a redemption (race condition), block them too.
   const { count: timesUsedByCustomer, error: redemptionError } = await supabase
     .from("voucher_redemptions")
     .select("id", { count: "exact", head: true })
@@ -120,13 +134,10 @@ export async function validateVoucher(params: {
     };
   }
 
-  if ((timesUsedByCustomer ?? 0) >= voucher.max_uses_per_customer) {
+  if ((timesUsedByCustomer ?? 0) >= 1) {
     return {
       valid: false,
-      error:
-        voucher.max_uses_per_customer === 1
-          ? "You have already used this voucher."
-          : `You have reached the maximum uses for this voucher.`,
+      error: "You have already used this voucher.",
     };
   }
 

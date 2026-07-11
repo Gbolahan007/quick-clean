@@ -38,8 +38,11 @@ async function handleAdminMiddleware(
 ): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
   const isLoginPage = pathname === ADMIN_LOGIN_PATH;
+  const isResetPage = pathname === "/admin/reset-password";
 
   let response = NextResponse.next({ request });
+
+  if (isLoginPage || isResetPage) return response;
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -68,7 +71,6 @@ async function handleAdminMiddleware(
   } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    if (isLoginPage) return response;
     return redirectToAdminLogin(request, pathname);
   }
 
@@ -78,21 +80,17 @@ async function handleAdminMiddleware(
     .eq("id", user.id)
     .single();
 
-  console.log("user.id:", user.id);
-  console.log("profile:", profile);
-  console.log("profileError:", profileError);
-
   const isAdmin =
     !profileError &&
     profile !== null &&
     ADMIN_ROLES.includes(profile.role as (typeof ADMIN_ROLES)[number]);
 
   if (!isAdmin) {
-    if (isLoginPage) return response;
     return redirectToAdminLogin(request, pathname);
   }
 
-  if (isLoginPage) {
+  // Authenticated admin visiting /admin root — send to dashboard
+  if (pathname === ADMIN_ROOT_PATH) {
     return NextResponse.redirect(new URL("/admin/dashboard", request.url));
   }
 

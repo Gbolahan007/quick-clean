@@ -1,4 +1,3 @@
-// app/lib/email/templates/adminEmails.ts
 import type {
   BookingSubmittedEmailInput,
   PaymentSuccessEmailInput,

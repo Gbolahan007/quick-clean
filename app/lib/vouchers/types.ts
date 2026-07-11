@@ -3,9 +3,9 @@ export interface VoucherRow {
   code: string;
   description: string | null;
   discount_type: "percentage" | "fixed_amount";
-  discount_value: number; // percentage: 1–100 | fixed_amount: cents
+  discount_value: number;
   stripe_coupon_id: string;
-  applicable_services: string[] | null; // null = all services
+  applicable_services: string[] | null;
   is_active: boolean;
   max_uses: number | null;
   times_used: number;
@@ -14,21 +14,19 @@ export interface VoucherRow {
 }
 
 // ── Result of server-side voucher validation ──────────────────────────────────
-// Returned by validateVoucher(). No DB mutations happen during validation.
 
 export type VoucherValidationResult =
   | {
       valid: true;
       voucher: VoucherRow;
-      discountAmountCents: number; // concrete saving in cents for this booking
+      discountAmountCents: number;
     }
   | {
       valid: false;
-      error: string; // user-facing message
+      error: string;
     };
 
 // ── Discount decision produced by the discount engine ────────────────────────
-// Represents the single winning discount to apply to a booking.
 
 export type DiscountSource = "first_booking" | "voucher";
 
@@ -40,7 +38,7 @@ export interface DiscountDecision {
 
   voucherId: string | null;
   voucherCode: string | null;
-  stripeCouponId: string; // always present — snapshot from voucher or first-booking env var
+  stripeCouponId: string;
 
   // Convenience flags
   isFree: boolean; // finalAmountCents === 0
@@ -60,7 +58,6 @@ export interface NoDiscount {
 export type DiscountResult = DiscountDecision | NoDiscount;
 
 // ── Voucher preview returned to the client ────────────────────────────────────
-// Safe subset — never expose full VoucherRow to the client.
 
 export interface VoucherPreview {
   valid: true;

@@ -1,27 +1,4 @@
 "use server";
-// app/lib/vouchers/discountEngine.ts
-// ─────────────────────────────────────────────────────────────────────────────
-// Discount selection engine.
-//
-// RESPONSIBILITIES:
-//   1. Determine if a customer qualifies for the first-booking discount
-//   2. Given an optional validated voucher, select the best discount
-//   3. Return a single DiscountResult — never two discounts
-//
-// RULES:
-//   - Only one discount is ever applied
-//   - If both discounts exist, choose the one with the larger saving
-//   - On a tie, prefer the voucher (analytics + determinism)
-//   - First-booking eligibility is based on confirmed+paid bookings only
-//   - Cancelled / failed / pending bookings do NOT count
-//   - Office bookings are excluded from the first-booking discount
-//   - Eligibility is evaluated at submission time — not locked in on booking creation
-//     It becomes immutable only after successful payment (webhook confirms)
-//
-// FIRST-BOOKING STRIPE COUPON:
-//   Stored in env var STRIPE_COUPON_FIRST_BOOKING
-//   Must be a pre-created Stripe Coupon with 25% off, duration=once
-// ─────────────────────────────────────────────────────────────────────────────
 
 import { createClient } from "@supabase/supabase-js";
 import type { DiscountResult, VoucherRow } from "./types";
@@ -37,8 +14,6 @@ function getServiceClient() {
 const FIRST_BOOKING_DISCOUNT_PERCENT = 25;
 
 // ── First-booking eligibility check ──────────────────────────────────────────
-// Counts confirmed+paid bookings for this customer, excluding office bookings.
-// Pending, cancelled, and failed bookings do not count.
 
 export async function isFirstBookingEligible(
   customerId: string,
@@ -58,7 +33,7 @@ export async function isFirstBookingEligible(
 
   if (error) {
     console.error("[discountEngine] First-booking check error:", error.message);
-    // Fail safe — do not grant discount if we cannot confirm eligibility
+
     return false;
   }
 
@@ -149,8 +124,7 @@ export async function selectDiscount(params: {
     };
   }
 
-  // First-booking eligible but STRIPE_COUPON_FIRST_BOOKING env var not set —
-  // log and fall through to no discount rather than crashing.
+  // First-booking eligible but
   if (firstBookingEligible && !firstBookingCouponId) {
     console.error(
       "[discountEngine] STRIPE_COUPON_FIRST_BOOKING is not set. " +

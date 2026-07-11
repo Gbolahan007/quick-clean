@@ -1,9 +1,3 @@
-// app/lib/email/types.ts
-// ─────────────────────────────────────────────────────────────────────────────
-// Shared types for the Frosh email system.
-// Every email function takes one of these typed input objects.
-// ─────────────────────────────────────────────────────────────────────────────
-
 export type EmailLocale = "en" | "fi";
 
 export interface EmailResult {

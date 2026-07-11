@@ -1,17 +1,3 @@
-// app/lib/stripe/stripeClient.ts
-// ─────────────────────────────────────────────────────────────────────────────
-// Stripe SDK singleton + Stripe Customer lifecycle management.
-//
-// SECURITY: The Stripe secret key is NEVER exposed to the client.
-//   It only lives in server-side environment variables.
-//   All Stripe API calls are made server-side only.
-//
-// WHY A SINGLETON:
-//   Avoids creating a new Stripe instance on every request.
-//   In serverless (Vercel), module-level singletons persist within
-//   a warm function invocation — this is the correct pattern.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
@@ -46,20 +32,9 @@ function getSupabase() {
 }
 
 // ── Stripe Customer lifecycle ─────────────────────────────────────────────────
-//
-// RULES:
-//   1. Never create duplicate Stripe Customers for the same email.
-//   2. If customers.stripe_customer_id is set → use it directly.
-//   3. If not set → search Stripe by email → reuse if found → else create.
-//   4. Always persist the stripe_customer_id back to our customers table.
-//
-// WHY WE SEARCH BY EMAIL BEFORE CREATING:
-//   A customer may have been manually created in the Stripe dashboard, or
-//   our DB row may have been wiped in a migration without clearing Stripe.
-//   This prevents orphaned or duplicate Stripe Customers.
 
 export interface GetOrCreateStripeCustomerInput {
-  platformCustomerId: string; // our customers.id UUID
+  platformCustomerId: string;
   email: string;
   fullName: string;
   phone?: string;
@@ -67,7 +42,7 @@ export interface GetOrCreateStripeCustomerInput {
 
 export interface GetOrCreateStripeCustomerResult {
   stripeCustomerId: string;
-  created: boolean; // true = new Stripe Customer was created
+  created: boolean;
 }
 
 export async function getOrCreateStripeCustomer(

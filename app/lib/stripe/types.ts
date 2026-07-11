@@ -48,8 +48,8 @@ export interface CancelSubscriptionInput {
 
 export interface CancelSubscriptionResult {
   success: boolean;
-  canceledAt?: string; // ISO timestamp
-  accessUntil?: string; // ISO timestamp (current_period_end for graceful cancel)
+  canceledAt?: string;
+  accessUntil?: string;
   error?: string;
 }
 
