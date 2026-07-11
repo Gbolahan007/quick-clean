@@ -353,7 +353,7 @@ async function handleCheckoutCompleted(
     customer_id: string;
     discount_source: string | null;
     voucher_id: string | null;
-    voucher_code: string | null;
+    // voucher_code: string | null;
     stripe_coupon_id: string | null;
     discount_amount_cents: number | null;
     original_final_price_cents: number | null;
@@ -363,7 +363,7 @@ async function handleCheckoutCompleted(
   const { data: rawSnapshot } = await supabase
     .from("bookings")
     .select(
-      "customer_id, discount_source, voucher_id, voucher_code, " +
+      "customer_id, discount_source, voucher_id, " +
         "stripe_coupon_id, discount_amount_cents, " +
         "original_final_price_cents, final_price_cents",
     )
@@ -427,7 +427,7 @@ async function handleCheckoutCompleted(
         );
       } else {
         console.log(
-          `[webhook] Voucher "${bookingSnapshot.voucher_code}" redeemed and ` +
+          `[webhook] Voucher "${bookingSnapshot.voucher_id}" redeemed and ` +
             `usage incremented for booking ${bookingId}`,
         );
       }
