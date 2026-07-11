@@ -32,10 +32,7 @@ export function StepReview() {
 
   if (!pricing) return null;
 
-  // Original amount in cents (plan + addons, no discount)
   const originalAmountCents = Math.round(pricing.totalPrice * 100);
-
-  // Discounted amount for display
   const discountAmountCents = appliedVoucher?.discountAmountCents ?? 0;
   const finalAmountCents = appliedVoucher
     ? appliedVoucher.finalAmountCents
@@ -151,6 +148,41 @@ export function StepReview() {
         />
       </ReviewSection>
 
+      {/* ── Voucher card ─────────────────────────────────────────────────── */}
+      <div
+        className={`rounded-2xl border-2 overflow-hidden transition-colors ${
+          hasDiscount
+            ? "border-[#3d6b47] bg-[#f0f7f2]"
+            : "border-dashed border-[#b5cebe] bg-white"
+        }`}
+      >
+        {/* Header */}
+        <div className="px-5 py-4 flex items-center gap-3">
+          <span className="text-2xl leading-none">🏷️</span>
+          <div>
+            <p className="text-[14px] font-extrabold text-[#0a1628] tracking-tight leading-tight">
+              Have a voucher or promo code?
+            </p>
+            <p className="text-[12px] text-gray-400 mt-0.5">
+              {hasDiscount
+                ? `Saving ${formatCents(discountAmountCents)} on this booking`
+                : "Enter your code below to apply a discount"}
+            </p>
+          </div>
+        </div>
+
+        {/* Input */}
+        <div className="px-5 pb-5">
+          <VoucherInput
+            email={contact.email ?? ""}
+            serviceType={pricing.serviceType}
+            originalAmountCents={originalAmountCents}
+            appliedVoucher={appliedVoucher}
+            onApply={setAppliedVoucher}
+          />
+        </div>
+      </div>
+
       {/* ── Price breakdown ───────────────────────────────────────────────── */}
       <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100">
@@ -170,11 +202,11 @@ export function StepReview() {
             </span>
           </div>
 
-          {/* Voucher line */}
+          {/* Voucher discount line */}
           {hasDiscount && (
             <div className="flex items-center justify-between text-[#3d6b47]">
               <span className="text-[13px] font-medium">
-                Voucher ({appliedVoucher!.code})
+                🏷️ Voucher ({appliedVoucher!.code})
               </span>
               <span className="text-[13px] font-semibold">
                 −{formatCents(discountAmountCents)}
@@ -182,7 +214,7 @@ export function StepReview() {
             </div>
           )}
 
-          {/* Divider */}
+          {/* Total */}
           <div className="border-t border-gray-100 pt-2">
             <div className="flex items-center justify-between">
               <span className="text-[14px] font-bold text-[#0a1628]">
@@ -203,17 +235,6 @@ export function StepReview() {
 
           {/* VAT note */}
           <p className="text-[11px] text-gray-400">incl. VAT 25.5%</p>
-
-          {/* Voucher input */}
-          <div className="pt-1 border-t border-gray-100">
-            <VoucherInput
-              email={contact.email ?? ""}
-              serviceType={pricing.serviceType}
-              originalAmountCents={originalAmountCents}
-              appliedVoucher={appliedVoucher}
-              onApply={setAppliedVoucher}
-            />
-          </div>
         </div>
       </div>
 

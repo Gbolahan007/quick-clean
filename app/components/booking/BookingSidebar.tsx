@@ -1,4 +1,3 @@
-// components/BookingSidebar.tsx
 "use client";
 
 import { useBookingStore } from "@/app/store/useBookingStore";
