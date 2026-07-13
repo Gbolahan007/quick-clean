@@ -1,4 +1,28 @@
 "use server";
+// app/lib/vouchers/discountEngine.ts
+// ─────────────────────────────────────────────────────────────────────────────
+// Discount selection engine.
+//
+// RESPONSIBILITIES:
+//   1. Determine if a customer qualifies for the first-booking discount
+//   2. Given an optional validated voucher, select the best discount
+//   3. Return a single DiscountResult — never two discounts
+//
+// RULES:
+//   - Only one discount is ever applied
+//   - If both discounts exist, choose the one with the larger saving
+//   - On a tie, prefer the voucher (analytics + determinism)
+//   - First-booking eligibility is based on confirmed+paid bookings only
+//   - Cancelled / failed / pending bookings do NOT count
+//   - Only "maintenance" and "deep" service types are eligible for discounts
+//   - Move-out and office bookings are excluded from all discounts
+//   - Eligibility is evaluated at submission time — not locked in on booking creation
+//     It becomes immutable only after successful payment (webhook confirms)
+//
+// FIRST-BOOKING STRIPE COUPON:
+//   Stored in env var STRIPE_COUPON_FIRST_BOOKING
+//   Must be a pre-created Stripe Coupon with 25% off, duration=once
+// ─────────────────────────────────────────────────────────────────────────────
 
 import { createClient } from "@supabase/supabase-js";
 import type { DiscountResult, VoucherRow } from "./types";
@@ -14,12 +38,17 @@ function getServiceClient() {
 const FIRST_BOOKING_DISCOUNT_PERCENT = 25;
 
 // ── First-booking eligibility check ──────────────────────────────────────────
+// Counts confirmed+paid bookings for this customer, excluding office bookings.
+// Pending, cancelled, and failed bookings do not count.
 
 export async function isFirstBookingEligible(
   customerId: string,
   serviceType: string,
 ): Promise<boolean> {
-  if (serviceType === "office") return false;
+  // Only home cleaning services (maintenance + deep) are eligible
+  // Move-out and office bookings are excluded from the first-booking discount
+  const ELIGIBLE_SERVICES = ["maintenance", "deep"];
+  if (!ELIGIBLE_SERVICES.includes(serviceType)) return false;
 
   const supabase = getServiceClient();
 
@@ -29,11 +58,11 @@ export async function isFirstBookingEligible(
     .eq("customer_id", customerId)
     .eq("status", "confirmed")
     .eq("payment_status", "paid")
-    .neq("service_type", "office");
+    .in("service_type", ["maintenance", "deep"]); // only count home cleaning bookings
 
   if (error) {
     console.error("[discountEngine] First-booking check error:", error.message);
-
+    // Fail safe — do not grant discount if we cannot confirm eligibility
     return false;
   }
 
@@ -42,12 +71,13 @@ export async function isFirstBookingEligible(
 
 // ── Discount engine ───────────────────────────────────────────────────────────
 // Selects the single best discount to apply.
+// Called from submitBookingAction after all validation is complete.
 
 export async function selectDiscount(params: {
   customerId: string;
   serviceType: string;
   originalAmountCents: number;
-  validatedVoucher: VoucherRow | null;
+  validatedVoucher: VoucherRow | null; // null if no voucher entered or validation failed
 }): Promise<DiscountResult> {
   const { customerId, serviceType, originalAmountCents, validatedVoucher } =
     params;
@@ -124,7 +154,8 @@ export async function selectDiscount(params: {
     };
   }
 
-  // First-booking eligible but
+  // First-booking eligible but STRIPE_COUPON_FIRST_BOOKING env var not set —
+  // log and fall through to no discount rather than crashing.
   if (firstBookingEligible && !firstBookingCouponId) {
     console.error(
       "[discountEngine] STRIPE_COUPON_FIRST_BOOKING is not set. " +

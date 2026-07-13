@@ -1,5 +1,4 @@
 "use server";
-// app/lib/vouchers/validateVoucher.ts
 // ─────────────────────────────────────────────────────────────────────────────
 // Server-side voucher validation. Pure function — no DB mutations.
 // Returns a preview with the concrete discount amount for this booking.
@@ -33,16 +32,18 @@ function getServiceClient() {
 export async function validateVoucher(params: {
   code: string;
   customerId: string;
-  serviceType: string; // 'maintenance' | 'deep' | 'moveout' | 'office'
+  serviceType: string;
   originalAmountCents: number;
 }): Promise<VoucherValidationResult> {
   const { code, customerId, serviceType, originalAmountCents } = params;
 
-  // ── Office bookings are excluded from all voucher discounts ──────────────
-  if (serviceType === "office") {
+  // ── Only home maintenance and deep clean are eligible for vouchers ────────
+  // Move-out and office bookings are excluded from all discounts.
+  const VOUCHER_ELIGIBLE_SERVICES = ["maintenance", "deep"];
+  if (!VOUCHER_ELIGIBLE_SERVICES.includes(serviceType)) {
     return {
       valid: false,
-      error: "Vouchers are not applicable to office cleaning bookings.",
+      error: "Vouchers are only valid for home cleaning services.",
     };
   }
 
