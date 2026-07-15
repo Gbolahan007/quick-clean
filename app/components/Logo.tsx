@@ -3,6 +3,7 @@
 import { Link } from "@/navigation";
 import { Home } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 
 export default function Logo() {
   const t = useTranslations();
@@ -12,11 +13,15 @@ export default function Logo() {
     : [appName, ""];
 
   return (
-    <Link href="/" className="flex items-center space-x-2 group">
-      <div className="bg-[#7c9885] p-2 rounded-lg group-hover:bg-[#5f7465] transition-colors">
-        <Home className="h-6 w-6 text-white" />
-      </div>
-      <span className="text-2xl font-bold text-gray-900">{firstPart}</span>
+    <Link href="/">
+      <Image
+        src="/logo.jpeg"
+        alt="Frosh"
+        width={120}
+        height={40}
+        priority
+        className="h-10 w-auto"
+      />
     </Link>
   );
 }
