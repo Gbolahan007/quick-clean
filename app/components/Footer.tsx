@@ -27,32 +27,45 @@ export default function Footer() {
             <div className="mb-6">
               <Logo />
             </div>
-            <p className="text-gray-600 mb-6 leading-relaxed">
+            <p className="text-gray-600 mb-4 leading-relaxed">
               {t("footer.tagline")}
             </p>
+
+            {/* Company legal info */}
+            <div className="mb-6 space-y-1">
+              <p className="text-[13px] font-semibold text-gray-700">
+                Frosh Enterprises
+              </p>
+              <p className="text-[12px] text-gray-400">
+                Business ID: 3599859-5
+              </p>
+            </div>
 
             {/* Social Media Icons */}
             <div className="flex space-x-4">
               <a
-                href="https://linkedin.com"
+                href="https://linkedin.com/company/frosh"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Frosh on LinkedIn (@Frosh)"
                 className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-[#7c9885] hover:bg-[#7c9885] hover:text-white transition-all"
               >
                 <Linkedin className="w-5 h-5" />
               </a>
               <a
-                href="https://facebook.com"
+                href="https://facebook.com/frosh"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Frosh on Facebook (@Frosh)"
                 className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-[#7c9885] hover:bg-[#7c9885] hover:text-white transition-all"
               >
                 <Facebook className="w-5 h-5" />
               </a>
               <a
-                href="https://instagram.com"
+                href="https://instagram.com/frosh"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Frosh on Instagram (@Frosh)"
                 className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-[#7c9885] hover:bg-[#7c9885] hover:text-white transition-all"
               >
                 <Instagram className="w-5 h-5" />
@@ -61,6 +74,7 @@ export default function Footer() {
                 href="https://wa.me/358503484537"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Chat with Frosh on WhatsApp"
                 className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-[#7c9885] hover:bg-[#7c9885] hover:text-white transition-all"
               >
                 <MessageCircle className="w-5 h-5" />
@@ -110,15 +124,6 @@ export default function Footer() {
                   {t("nav.pricing")}
                 </Link>
               </li>
-              {/* <li>
-                <Link
-                  href="/contact"
-                  className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-center group"
-                >
-                  <span className="w-2 h-2 bg-[#7c9885] rounded-full mr-3 group-hover:bg-black transition-colors"></span>
-                  {t("footer.contact")}
-                </Link>
-              </li> */}
             </ul>
           </div>
 
@@ -192,8 +197,8 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <div className="text-gray-600 flex items-start group">
-                  <MapPin className="w-5 h-5 mr-3 mt-1 shrink-0 group-hover:text-[#7c9885]" />
+                <div className="text-gray-600 flex items-start">
+                  <MapPin className="w-5 h-5 mr-3 mt-1 shrink-0" />
                   <span>Tampere, Finland</span>
                 </div>
               </li>
@@ -205,10 +210,25 @@ export default function Footer() {
       {/* Bottom Bar */}
       <div className="border-t border-gray-200 bg-gray-50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
-            <p className="mb-4 md:mb-0">
-              © {new Date().getFullYear()} Frosh. {t("footer.rights")}
-            </p>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+            {/* Left — copyright + legal identity */}
+            <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 text-center md:text-left">
+              <p>
+                © {new Date().getFullYear()} Frosh Enterprises.{" "}
+                {t("footer.rights")}
+              </p>
+              <span className="hidden md:inline text-gray-300">|</span>
+              <p>Business ID: 3599859-5</p>
+              <span className="hidden md:inline text-gray-300">|</span>
+              <a
+                href="mailto:hello@frosh.fi"
+                className="hover:text-[#7c9885] transition-colors"
+              >
+                hello@frosh.fi
+              </a>
+            </div>
+
+            {/* Right — legal links */}
             <div className="flex space-x-6">
               <Link
                 href="/privacy"
