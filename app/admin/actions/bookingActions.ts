@@ -1,9 +1,4 @@
 "use server";
-// app/admin/actions/bookingActions.ts
-// ─────────────────────────────────────────────────────────────────────────────
-// Admin server actions for booking management.
-// Every mutation: 1) verifies admin, 2) performs action, 3) writes audit log.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import { createClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";

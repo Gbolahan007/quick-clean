@@ -45,7 +45,9 @@ export const issueRefund = withAdmin(
     if (payment.status === "refunded")
       throw new Error("Payment has already been fully refunded");
     if (!payment.stripe_payment_intent_id) {
-      throw new Error("No Stripe Payment Intent linked to this payment");
+      throw new Error(
+        "This payment cannot be refunded. Please contact support.",
+      );
     }
 
     const refundAmount = amountCents ?? payment.amount_cents;

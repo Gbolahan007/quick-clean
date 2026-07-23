@@ -218,7 +218,7 @@ export default async function AdminPaymentsPage({
   return (
     <div className="space-y-5 max-w-7xl">
       {/* ── Header ──────────────────────────────────────────────────── */}
-      <h1 className="text-[22px] font-extrabold text-[#0a1628] tracking-tight">
+      <h1 className="text-[22px] font-extrabold text-[#0a1628] tracking-tight ">
         Payments
       </h1>
 
