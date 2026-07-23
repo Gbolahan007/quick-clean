@@ -543,13 +543,13 @@ function HeaderContent() {
                   >
                     {t("nav.login")}
                   </Link>
-                  <Link
+                  {/* <Link
                     href="/signup"
                     className="block w-full px-4 py-3 text-center bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-all"
                     onClick={handleMobileClick}
                   >
                     {t("nav.signup")}
-                  </Link>
+                  </Link> */}
                 </>
               )}
               <Link
