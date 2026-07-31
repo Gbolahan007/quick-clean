@@ -203,7 +203,7 @@ export default function LoginPage() {
           >
             Magic link
           </button>
-          <button
+          {/* <button
             type="button"
             onClick={() => {
               setMode("password");
@@ -217,7 +217,7 @@ export default function LoginPage() {
             ].join(" ")}
           >
             Password
-          </button>
+          </button> */}
         </div>
 
         {/* ── Form ───────────────────────────────────────────────────────── */}

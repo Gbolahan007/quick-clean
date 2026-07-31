@@ -59,13 +59,13 @@ function ServiceCard({
     >
       {/* Accent line */}
       <div
-        className="absolute  top-0 left-7 right-7 h-0.5 rounded-b-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        className="absolute  top-0 left-7 right-7 h-0.5 rounded-b-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 "
         style={{ background: accent }}
         aria-hidden
       />
 
       {/* Header */}
-      <div className="mb-5">
+      <div className="mb-5 ">
         <h2 className="text-[17px] font-extrabold text-[#0a1628] tracking-tight mb-1.5">
           {t("title")}
         </h2>
@@ -124,8 +124,8 @@ export default function PricingIndexPage({}: {
   const t = useTranslations("pricing.index");
 
   return (
-    <div className="min-h-screen bg-[#f8faf9]">
-      <div className="mx-auto max-w-5xl px-5 pt-16 pb-4">
+    <div className="min-h-screen  bg-[#f8faf9]">
+      <div className="mx-auto max-w-5xl px-5 pt-24 pb-4">
         {/* Hero */}
         <div className="text-center mb-14">
           <span className="inline-block text-[11px] font-bold uppercase tracking-[0.15em] text-[#7c9885] mb-4">
