@@ -1,16 +1,4 @@
-// app/[locale]/terms/termsData.ts
-// ─────────────────────────────────────────────────────────────────────────────
-// Terms of Service content, structured for rendering + auto-generated TOC.
-//
-// CONTENT IS VERBATIM from the approved draft. Do not reword clause text.
-//
-// BEFORE PUBLISHING:
-//   1. Set SHOW_DRAFT_NOTICE = false in TermsContent.tsx
-//   2. Replace every `placeholder: true` block with confirmed values
-//   3. Update LAST_UPDATED
-// ─────────────────────────────────────────────────────────────────────────────
-
-export const LAST_UPDATED = "[Insert effective date]";
+export const LAST_UPDATED = "August 2026";
 
 export type Block =
   | { type: "text"; content: string }
@@ -42,7 +30,7 @@ export const TERMS_SECTIONS: TermsSection[] = [
         type: "clause",
         number: "1.1",
         content:
-          'These Terms of Service ("Terms") govern the provision of cleaning and related services by Frosh Enterprises, Business ID 3599859-5, registered address K19 Näyttelijänkatu, Tampere ("Frosh," "we," "us," "our"), operating under the trade name Frosh at frosh.fi, to any customer who books, subscribes to, or otherwise uses our services ("Customer," "you").',
+          'These Terms of Service ("Terms") govern the provision of cleaning and related services by Frosh Enterprises, Business ID 3599859-5, registered address 19 K53 Näyttelijänkatu, 33720 Tampere ("Frosh," "we," "us," "our"), operating under the trade name Frosh at frosh.fi, to any customer who books, subscribes to, or otherwise uses our services ("Customer," "you").',
       },
       {
         type: "clause",
@@ -159,7 +147,7 @@ export const TERMS_SECTIONS: TermsSection[] = [
         type: "clause",
         number: "4.4",
         content:
-          "Rescheduling & late cancellation of a single visit. Individual visits may be rescheduled or cancelled free of charge up to [24/48] hours before the scheduled time. Cancellations after this window, or a missed visit due to lack of access, may incur a fee of [insert amount or %].",
+          "Rescheduling & late cancellation of a single visit. Individual visits may be rescheduled or cancelled free of charge up to 24 hours before the scheduled time. Cancellations after this window, or a missed visit due to lack of access, may incur a fee of 30% of the service charge.",
       },
     ],
   },
@@ -184,13 +172,13 @@ export const TERMS_SECTIONS: TermsSection[] = [
         type: "clause",
         number: "5.3",
         content:
-          "Payment. Payment is due [insert terms — e.g. by card on file at time of booking, or by invoice within X days]. For Subscriptions, charges are billed [insert cadence — e.g. per visit / monthly in advance].",
+          "Payment. Payment is due at the time of booking, or by invoice within 14 days. For Subscriptions, charges are billed monthly in advance.",
       },
       {
         type: "clause",
         number: "5.4",
         content:
-          "Price changes. Frosh may change its prices. For active Subscriptions, any increase will be notified at least [insert notice period, e.g. 30 days] in advance, and the Customer may cancel before the new price takes effect without penalty.",
+          "Price changes. Frosh may change its prices. For active Subscriptions, any increase will be notified at least 60 days in advance, and the Customer may cancel before the new price takes effect without penalty.",
       },
     ],
   },
@@ -222,7 +210,7 @@ export const TERMS_SECTIONS: TermsSection[] = [
         type: "clause",
         number: "6.3",
         content:
-          "How to withdraw. You may withdraw by giving Frosh a clear statement of your decision (e.g. by email to hello@frosh.fi) before the withdrawal period expires. Refunds due are processed without undue delay and no later than 14 days after we are informed of your decision.",
+          'How to withdraw. You may withdraw by giving Frosh a clear statement of your decision — either by sending an email to hello@frosh.fi or by using the "click to cancel" function in your user dashboard on frosh.fi — before the withdrawal period expires. Refunds due are processed without undue delay and no later than 14 days after we are informed of your decision.',
       },
     ],
   },
@@ -241,13 +229,13 @@ export const TERMS_SECTIONS: TermsSection[] = [
         type: "clause",
         number: "7.2",
         content:
-          "Cancellation notice. To avoid being charged for the next scheduled visit, cancellation of an ongoing Subscription must be made at least [insert notice period — e.g. 5 days] before the next scheduled Booking.",
+          "Cancellation notice. To avoid being charged for the next scheduled visit, cancellation of an ongoing Subscription must be made at least 24 hours before the next scheduled Booking.",
       },
       {
         type: "clause",
         number: "7.3",
         content:
-          "Easy cancellation. In line with the Finnish law in force from 19 June 2026 requiring that an online subscription be cancellable at least as easily as it was started, Frosh provides a direct cancellation function via your account area on frosh.fi. Frosh will confirm receipt of a cancellation request and its effective date.",
+          "Easy cancellation. In line with the Finnish law in force from 19 June 2026 requiring that an online subscription be cancellable at least as easily as it was started, Frosh provides a direct cancellation function via your user dashboard on frosh.fi. Frosh will confirm receipt of a cancellation request and its effective date.",
       },
       {
         type: "clause",
@@ -304,7 +292,7 @@ export const TERMS_SECTIONS: TermsSection[] = [
         type: "clause",
         number: "9.2",
         content:
-          "Damage claims. Any claim for loss or damage allegedly caused during a Booking must be reported to Frosh within [insert period — e.g. 48 hours] of the visit, with reasonable supporting detail (e.g. photos), to allow investigation and, where applicable, an insurance claim.",
+          "Damage claims. Any claim for loss or damage allegedly caused during a Booking must be reported to Frosh within 48 hours of the visit, with reasonable supporting detail (e.g. photos), to allow investigation and, where applicable, an insurance claim.",
       },
       {
         type: "clause",
@@ -360,7 +348,7 @@ export const TERMS_SECTIONS: TermsSection[] = [
         type: "clause",
         number: "11.2",
         content:
-          "Consumer Disputes Board. If a complaint cannot be resolved directly, consumer Customers may refer the matter to the Finnish Consumer Disputes Board (Kuluttajariitalautakunta, kuluttajariita.fi) or seek advice from the Finnish Competition and Consumer Authority (KKV).",
+          "Consumer Disputes Board. If a complaint cannot be resolved directly, consumer Customers may refer the matter to the Finnish Consumer Disputes Board (Kuluttajariitalautakunta, kuluttajariita.fi) or seek advice from the Finnish Competition and Consumer Authority (KKV). Note that the EU's online dispute resolution platform was discontinued in July 2025 and should not be referenced as an active option.",
       },
       {
         type: "clause",
@@ -379,7 +367,7 @@ export const TERMS_SECTIONS: TermsSection[] = [
         type: "clause",
         number: "12.1",
         content:
-          "Frosh may update these Terms from time to time, for example to reflect changes in law or in its services. For active Subscriptions, material changes will be notified at least [insert notice period] in advance by email; continued use of the Service after that date constitutes acceptance. Consumers may cancel before the changes take effect, as described in Section 7.",
+          "Frosh may update these Terms from time to time, for example to reflect changes in law or in its services. For active Subscriptions, material changes will be notified at least 30 days in advance by email; continued use of the Service after that date constitutes acceptance. Consumers may cancel before the changes take effect, as described in Section 7.",
       },
     ],
   },
@@ -395,7 +383,7 @@ export const TERMS_SECTIONS: TermsSection[] = [
           { label: "Business ID (Y-tunnus)", value: "3599859-5" },
           {
             label: "Registered address",
-            value: "K19 Näyttelijänkatu, Tampere, Finland",
+            value: "19 K53 Näyttelijänkatu, 33720 Tampere, Finland",
           },
           { label: "Email", value: "hello@frosh.fi" },
           { label: "Website", value: "frosh.fi" },

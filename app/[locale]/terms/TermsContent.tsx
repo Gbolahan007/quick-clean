@@ -1,11 +1,4 @@
 "use client";
-// app/[locale]/terms/TermsContent.tsx
-// ─────────────────────────────────────────────────────────────────────────────
-// Renders the Terms of Service with a sticky table of contents, scroll-spy
-// active highlighting, smooth scrolling, and a back-to-top control.
-//
-// ⚠️  BEFORE PUBLISHING: set SHOW_DRAFT_NOTICE to false.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -19,7 +12,7 @@ import {
 import { TERMS_SECTIONS, LAST_UPDATED, type Block } from "./termsData";
 
 /** Set to false once the document has been reviewed by a Finnish-qualified lawyer. */
-const SHOW_DRAFT_NOTICE = true;
+const SHOW_DRAFT_NOTICE = false;
 
 /** Highlights [bracketed] placeholders so unfilled values are impossible to miss. */
 function renderWithPlaceholders(text: string): React.ReactNode[] {
