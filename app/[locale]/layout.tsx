@@ -4,14 +4,11 @@ import { locales } from "@/i18n";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
-import { Geist, Geist_Mono, Montserrat } from "next/font/google";
+import { Montserrat } from "next/font/google";
 import { notFound } from "next/navigation";
 import { GlobalFooterWrapper } from "../components/GlobalFooterWrapper";
 import Header from "../components/Header";
 import "./globals.css";
-
-const geistSans = Geist({ subsets: ["latin"] });
-const geistMono = Geist_Mono({ subsets: ["latin"] });
 
 const monserrat = Montserrat({
   subsets: ["latin"],
@@ -23,7 +20,7 @@ export const metadata: Metadata = {
 
   title: {
     default: "Frosh | Professional Home & Office Cleaning Services",
-    template: "%s | Frosh",
+    template: "%s ",
   },
 
   description:

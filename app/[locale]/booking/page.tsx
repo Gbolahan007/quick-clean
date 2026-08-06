@@ -34,22 +34,12 @@ export default function BookingPage({ params }: BookingPageProps) {
   const currentStep = useBookingStore((s) => s.currentStep);
   const isSubmitting = useBookingStore((s) => s.isSubmitting);
 
-  // Redirect to home if there is no pricing data AND we are not currently
-  // submitting. When isSubmitting=true the store is in the process of calling
-  // the server action and then setting window.location.href to Stripe.
-  // Without this guard the useEffect would fire during that window and send
-  // the user to "/" before the browser finishes navigating to Stripe checkout.
   useEffect(() => {
     if (!pricing && !isSubmitting) {
       router.replace(`/${locale}`);
     }
   }, [pricing, isSubmitting, router, locale]);
 
-  // Show spinner while:
-  //   a) pricing is being rehydrated from localStorage on first render, OR
-  //   b) isSubmitting=true and window.location.href is in progress
-  // Never redirect here — the useEffect above handles that once we are certain
-  // we are not mid-submission.
   if (!pricing) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f7faf8]">
@@ -64,7 +54,7 @@ export default function BookingPage({ params }: BookingPageProps) {
   const ActiveStep = STEP_COMPONENTS[currentStep];
 
   return (
-    <div className="min-h-screen bg-[#f7faf8] pt-24">
+    <div className="min-h-screen  bg-[#f7faf8] pt-24">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
           <button

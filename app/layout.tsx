@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
   title: {
     default: "Frosh | Professional Home & Office Cleaning Services",
-    template: "%s | Frosh",
+    template: "%s",
   },
 
   description:

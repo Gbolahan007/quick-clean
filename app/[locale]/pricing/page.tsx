@@ -3,6 +3,14 @@ import type { Metadata } from "next";
 import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { JsonLd } from "@/app/components/seo/JsonLd";
+import {
+  buildGraph,
+  breadcrumbSchema,
+  offerCatalogPageSchema,
+} from "@/app/lib/seo/schema";
+import { buildMetadata } from "@/app/lib/seo/metadata";
+import type { Locale } from "@/app/lib/seo/config";
 
 // ── Metadata ──────────────────────────────────────────────────────────────────
 
@@ -12,33 +20,49 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "pricing.index.hero" });
-  return { title: t("title").replace("\n", " ") };
+
+  const tHero = await getTranslations({
+    locale,
+    namespace: "pricing.index.hero",
+  });
+
+  const title = tHero("title").replace("\n", " ");
+  const description =
+    locale === "fi"
+      ? "Selkeä hinnoittelu kotisiivouspalveluille Tampereella. Ylläpitosiivous, syväsiivous ja muuttosiivous — kaikki kotitalousvähennyskelpoiset."
+      : "Transparent pricing for cleaning services in Tampere. Home maintenance, deep cleaning, and move-out cleaning — all eligible for the Finnish household tax deduction.";
+
+  return buildMetadata({
+    locale: locale as Locale,
+    path: "/pricing",
+    title,
+    description,
+    keywords:
+      locale === "fi"
+        ? [
+            "siivouspalvelu hinta Tampere",
+            "kotisiivous hinnasto",
+            "kotitalousvähennys siivous hinta",
+          ]
+        : [
+            "cleaning service prices Tampere",
+            "home cleaning cost Finland",
+            "office cleaning quote Tampere",
+          ],
+  });
 }
 
 // ── Service card data ─────────────────────────────────────────────────────────
 
 type ServiceKey = "homeCleaning" | "officeCleaning" | "moveOutCleaning";
 
-const SERVICES: { key: ServiceKey; href: string; accent: string }[] = [
-  {
-    key: "homeCleaning",
-    href: "pricing/home-care",
-    accent: "#7c9885",
-  },
-  {
-    key: "officeCleaning",
-    href: "pricing/office-cleaning",
-    accent: "#4a7c6b",
-  },
-  {
-    key: "moveOutCleaning",
-    href: "pricing/moveout",
-    accent: "#2d6b5a",
-  },
+const SERVICE_CARDS: { key: ServiceKey; href: string; accent: string }[] = [
+  { key: "homeCleaning", href: "pricing/home-care", accent: "#7c9885" },
+  { key: "officeCleaning", href: "pricing/office-cleaning", accent: "#4a7c6b" },
+  { key: "moveOutCleaning", href: "pricing/moveout", accent: "#2d6b5a" },
 ];
 
-// ── Service card ──────────────────────────────────────────────────────────────
+// ── Service card — synchronous component (useTranslations is valid here) ───────
 
 function ServiceCard({
   serviceKey,
@@ -59,13 +83,13 @@ function ServiceCard({
     >
       {/* Accent line */}
       <div
-        className="absolute  top-0 left-7 right-7 h-0.5 rounded-b-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 "
+        className="absolute top-0 left-7 right-7 h-0.5 rounded-b-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{ background: accent }}
         aria-hidden
       />
 
       {/* Header */}
-      <div className="mb-5 ">
+      <div className="mb-5">
         <h2 className="text-[17px] font-extrabold text-[#0a1628] tracking-tight mb-1.5">
           {t("title")}
         </h2>
@@ -116,18 +140,35 @@ function ServiceCard({
   );
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
-
-export default function PricingIndexPage({}: {
+export default async function PricingIndexPage({
+  params,
+}: {
   params: Promise<{ locale: string }>;
 }) {
-  const t = useTranslations("pricing.index");
+  const { locale } = await params;
+
+  // Async server component → must use getTranslations, not the useTranslations hook.
+  const t = await getTranslations({ locale, namespace: "pricing.index" });
+
+  const graph = buildGraph([
+    breadcrumbSchema(
+      [
+        { name: locale === "fi" ? "Etusivu" : "Home", path: "" },
+        { name: locale === "fi" ? "Hinnoittelu" : "Pricing", path: "/pricing" },
+      ],
+      locale as Locale,
+    ),
+    // Now actually used — this is what was triggering the unused-import warning.
+    offerCatalogPageSchema(locale as Locale),
+  ]);
 
   return (
-    <div className="min-h-screen  bg-[#f8faf9]">
+    <div className="min-h-screen bg-[#f8faf9]">
+      <JsonLd graph={graph} id="pricing-schema" />
+
       <div className="mx-auto max-w-5xl px-5 pt-24 pb-4">
         {/* Hero */}
-        <div className="text-center mb-14">
+        <header className="text-center mb-14">
           <span className="inline-block text-[11px] font-bold uppercase tracking-[0.15em] text-[#7c9885] mb-4">
             {t("hero.eyebrow")}
           </span>
@@ -139,11 +180,10 @@ export default function PricingIndexPage({}: {
           <p className="text-[15px] text-[#0a1628]/50 leading-relaxed max-w-xl mx-auto">
             {t("hero.subtitle")}
           </p>
-        </div>
+        </header>
 
-        {/* Service cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-6">
-          {SERVICES.map(({ key, href, accent }) => (
+          {SERVICE_CARDS.map(({ key, href, accent }) => (
             <ServiceCard
               key={key}
               serviceKey={key}

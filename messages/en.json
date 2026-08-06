@@ -1159,5 +1159,11 @@
       "verified": "Verified professionals",
       "flexible": "Flexible scheduling"
     }
+  },
+  "home": {
+    "meta": {
+      "title": "Cleaning Service Tampere — Frosh",
+      "description": "Professional home cleaning, office cleaning..."
+    }
   }
 }

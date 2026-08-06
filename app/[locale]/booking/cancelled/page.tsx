@@ -1,9 +1,27 @@
 import Link from "next/link";
 import { XCircle, ArrowLeft, RefreshCw } from "lucide-react";
+import type { Metadata } from "next";
+import { buildMetadata } from "@/app/lib/seo/metadata";
+import type { Locale } from "@/app/lib/seo/config";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
   searchParams: Promise<{ booking_id?: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return buildMetadata({
+    locale: locale as Locale,
+    path: "/booking/cancelled",
+    title: "Payment Cancelled",
+    description: "Your payment was cancelled. No charge was made.",
+    noindex: true,
+  });
 }
 
 export default async function BookingCancelledPage({

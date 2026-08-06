@@ -4,10 +4,32 @@ import { createClient } from "@supabase/supabase-js";
 import { ArrowRight, Calendar, CheckCircle, Clock, Tag } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { buildMetadata } from "@/app/lib/seo/metadata";
+import type { Locale } from "@/app/lib/seo/config";
+import { Metadata } from "next";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
   searchParams: Promise<{ session_id?: string; booking_id?: string }>;
+}
+
+// ── Metadata ──────────────────────────────────────────────────────────────────
+// noindex is critical — every completed booking produces a unique URL with
+// session_id and booking_id query params. Without this they enter the index.
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return buildMetadata({
+    locale: locale as Locale,
+    path: "/booking/success",
+    title: "Booking Confirmed",
+    description: "Your cleaning booking is confirmed.",
+    noindex: true,
+  });
 }
 
 async function getBookingDetails(bookingId: string) {
