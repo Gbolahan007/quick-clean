@@ -11,10 +11,8 @@ import {
 } from "lucide-react";
 import { TERMS_SECTIONS, LAST_UPDATED, type Block } from "./termsData";
 
-/** Set to false once the document has been reviewed by a Finnish-qualified lawyer. */
 const SHOW_DRAFT_NOTICE = false;
 
-/** Highlights [bracketed] placeholders so unfilled values are impossible to miss. */
 function renderWithPlaceholders(text: string): React.ReactNode[] {
   const parts = text.split(/(\[[^\]]+\])/g);
   return parts.map((part, i) => {
@@ -102,7 +100,7 @@ export function TermsContent() {
       {/* ── Hero ───────────────────────────────────────────────────────── */}
       <header className="bg-[#f8f9fa] border-b border-gray-200">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-          <div className="max-w-3xl">
+          <div className="max-w-3xl py-8 sm:py-5">
             <p className="text-[12px] font-bold uppercase tracking-widest text-[#7c9885] mb-4">
               Legal
             </p>
