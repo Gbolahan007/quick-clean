@@ -3,18 +3,19 @@
 "use client";
 
 import { Link } from "@/navigation";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, type LucideProps } from "lucide-react";
 import { useTranslations, useLocale, useMessages } from "next-intl";
+import type { ComponentType } from "react";
 
 interface ServiceCardProps {
-  icon: string;
+  icon: ComponentType<LucideProps>;
   serviceKey: string;
   href: string;
   popular?: boolean;
 }
 
 export default function ServiceCard({
-  icon,
+  icon: Icon,
   serviceKey,
   href,
   popular = false,
@@ -42,7 +43,10 @@ export default function ServiceCard({
         </div>
       )}
 
-      <div className="text-5xl mb-4">{icon}</div>
+      {/* Lucide icon replacing the emoji string */}
+      <div className="w-12 h-12 rounded-xl bg-[#f0f4f1] flex items-center justify-center mb-4 text-[#7c9885] transition-colors duration-200 group-hover:bg-[#7c9885] group-hover:text-white">
+        <Icon className="w-6 h-6" aria-hidden="true" />
+      </div>
 
       <h3
         className={`${isFinnish ? "text-xl" : "text-2xl"} font-bold text-gray-900 mb-3 group-hover:text-[#7c9885] transition-colors`}

@@ -1,8 +1,18 @@
 "use client";
+// app/[locale]/services/ServicesPage.tsx
 
 import { Link } from "@/navigation";
 import { useTranslations, useLocale } from "next-intl";
-import { ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  Home,
+  Building2,
+  Sparkles,
+  KeyRound,
+  PackageOpen,
+  HardHat,
+  Anchor,
+} from "lucide-react";
 import ServiceHero from "../../components/services/ServiceHero";
 import ServiceCard from "../../components/services/ServicesCard";
 import ServiceChecklist from "../../components/services/ChecklistSection";
@@ -114,45 +124,44 @@ export default function ServicesPage() {
             </p>
           </div>
 
-          {/* Grid */}
+          {/* Grid — Lucide icons replace emoji strings */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             <ServiceCard
-              icon="🏠"
+              icon={Home}
               serviceKey="homeCare"
               href="/services/home-care"
               popular={true}
             />
             <ServiceCard
-              icon="🏢"
+              icon={Building2}
               serviceKey="office"
               href="/services/office-cleaning"
             />
             <ServiceCard
-              icon="✨"
+              icon={Sparkles}
               serviceKey="deepClean"
               href="/services/deep-clean"
             />
             <ServiceCard
-              icon="🔑"
+              icon={KeyRound}
               serviceKey="airbnb"
               href="/services/airbnb"
             />
             <ServiceCard
-              icon="📦"
+              icon={PackageOpen}
               serviceKey="moveOut"
               href="/services/moveout"
             />
             <ServiceCard
-              icon="🔨"
+              icon={HardHat}
               serviceKey="renovation"
               href="/services/renovation"
             />
-            <ServiceCard icon="⚓" serviceKey="yacht" href="/services/yacht" />
-            {/* <ServiceCard
-              icon="💎"
-              serviceKey="luxury"
-              href="/services/luxury"
-            /> */}
+            <ServiceCard
+              icon={Anchor}
+              serviceKey="yacht"
+              href="/services/yacht"
+            />
           </div>
         </div>
       </section>
@@ -207,11 +216,7 @@ export default function ServicesPage() {
                       ✓
                     </div>
                     <div>
-                      <h3
-                        className={`font-semibold text-gray-800 mb-0.5 ${
-                          isFinnish ? "text-sm" : "text-sm"
-                        }`}
-                      >
+                      <h3 className="font-semibold text-gray-800 mb-0.5 text-sm">
                         {tOffice(`${key}.title`)}
                       </h3>
                       <p className="text-xs text-gray-400 leading-relaxed">
@@ -267,20 +272,16 @@ export default function ServicesPage() {
 
       {/* ── Final CTA ── */}
       <section className="py-14 relative overflow-hidden">
-        {/* Background Image */}
         <Image
           src="/services2.jpg"
           alt="Clean professional space"
           fill
           className="object-cover"
         />
-
-        {/* Dark + sage overlay */}
         <div className="absolute inset-0 bg-linear-to-r from-gray-900/80 via-gray-900/65 to-gray-900/50" />
         <div className="absolute inset-0 bg-linear-to-t from-[#7c9885]/40 via-transparent to-transparent" />
 
         <div className="relative max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Eyebrow */}
           <span
             className="inline-block text-xs font-semibold tracking-widest uppercase mb-8 px-5 py-2 rounded-full"
             style={{ background: "rgba(255,255,255,0.15)", color: "white" }}
@@ -297,9 +298,7 @@ export default function ServicesPage() {
           </h2>
 
           <p
-            className={`${
-              isFinnish ? "text-base" : "text-lg"
-            } mb-2 leading-relaxed`}
+            className={`${isFinnish ? "text-base" : "text-lg"} mb-2 leading-relaxed`}
             style={{ color: "rgba(255,255,255,0.75)" }}
           >
             {t("finalCta.subtitle")}
