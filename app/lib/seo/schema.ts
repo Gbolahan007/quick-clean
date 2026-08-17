@@ -1,20 +1,3 @@
-// app/lib/seo/schema.ts
-// ─────────────────────────────────────────────────────────────────────────────
-// Schema.org JSON-LD builders.
-//
-// WHY THIS MATTERS MOST FOR YOU: LocalBusiness schema is how Google connects
-// your website to your Google Business Profile and understands that you are a
-// physical service business operating in a specific place. For a local
-// cleaning company this is the single highest-leverage structured data type —
-// it feeds the map pack, the knowledge panel, and "cleaning services near me".
-//
-// HONESTY RULE — read before adding ratings:
-// AggregateRating and Review markup must reflect real, verifiable, first-party
-// reviews that are ALSO visible on the page. Fabricated or invisible ratings
-// are a documented cause of manual action penalties. The builder below exists
-// but deliberately returns null unless you pass genuine data.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import {
   BASE_URL,
   BUSINESS,
@@ -25,7 +8,6 @@ import {
   type ServiceDefinition,
 } from "./config";
 
-// Loose typing — JSON-LD is structurally open and over-typing it fights the spec.
 type JsonLdValue =
   | string
   | number
@@ -69,11 +51,6 @@ function openingHoursSpecification(): JsonLdObject[] {
   }));
 }
 
-/**
- * areaServed as a radius around the business, plus explicit named cities.
- * The radius helps Google understand coverage; the named cities help you
- * surface for "{service} {city}" queries without dedicated pages existing yet.
- */
 function areaServed(): JsonLdValue[] {
   return [
     {
@@ -121,11 +98,7 @@ export function organizationSchema(): JsonLdObject {
 
 export interface LocalBusinessOptions {
   locale: Locale;
-  /**
-   * Real, first-party review data ONLY. Must also be rendered visibly on the
-   * page. Omit entirely until you have genuine reviews — omission costs you
-   * nothing, fabrication risks a manual penalty.
-   */
+
   aggregateRating?: {
     ratingValue: number;
     reviewCount: number;
@@ -276,14 +249,9 @@ export function serviceSchema(
 
 export interface BreadcrumbItem {
   name: string;
-  /** Path without locale prefix. */
   path: string;
 }
 
-/**
- * Breadcrumbs replace the raw URL in Google results with a readable trail,
- * which measurably improves click-through rate on deep pages.
- */
 export function breadcrumbSchema(
   items: BreadcrumbItem[],
   locale: Locale,
@@ -303,16 +271,9 @@ export function breadcrumbSchema(
 
 export interface FaqItem {
   question: string;
-  /** Plain text. Must match what is visibly rendered on the page. */
   answer: string;
 }
 
-/**
- * FAQPage markup can win expanded SERP real estate. Google requires the
- * questions and answers to be visible on the page — markup-only FAQs are a
- * guideline violation. Returns null for an empty list so callers can spread
- * safely.
- */
 export function faqSchema(items: FaqItem[]): JsonLdObject | null {
   if (items.length === 0) return null;
 
@@ -344,12 +305,6 @@ export function websiteSchema(locale: Locale): JsonLdObject {
 
 // ── Offer catalog page ────────────────────────────────────────────────────────
 
-/**
- * Standalone ItemList schema for the /pricing index page.
- * Different from the offerCatalog embedded inside localBusinessSchema —
- * that one describes the business's catalogue; this one describes the page
- * itself as a list, which is what Google expects on a pricing/listing route.
- */
 export function offerCatalogPageSchema(locale: Locale): JsonLdObject {
   return {
     "@type": "ItemList",
@@ -393,12 +348,6 @@ export function offerCatalogPageSchema(locale: Locale): JsonLdObject {
 
 // ── Graph assembly ────────────────────────────────────────────────────────────
 
-/**
- * Wraps schema nodes in a single @graph. One script tag per page beats several
- * disconnected ones — it lets nodes cross-reference by @id, which is how Google
- * understands that the Organization, the LocalBusiness, and the Service are all
- * the same entity rather than three unrelated things.
- */
 export function buildGraph(
   nodes: (JsonLdObject | null | undefined)[],
 ): JsonLdObject {
