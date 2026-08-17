@@ -319,12 +319,12 @@ export default function ServicesPage() {
               {t("finalCta.primaryCta")}
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link
+            {/* <Link
               href="/contact"
               className="cta-btn-secondary inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-semibold text-sm"
             >
               {t("finalCta.secondaryCta")}
-            </Link>
+            </Link> */}
           </div>
         </div>
       </section>
