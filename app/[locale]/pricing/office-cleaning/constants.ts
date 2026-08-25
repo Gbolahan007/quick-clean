@@ -1,7 +1,7 @@
 export const TIER_CONFIG = [
   {
     key: "tier1" as const,
-    rate: 49,
+    rate: 59,
     exVat: 39.04,
     color: "#7c9885",
     bg: "#f0f8f3",
@@ -9,7 +9,7 @@ export const TIER_CONFIG = [
   },
   {
     key: "tier2" as const,
-    rate: 44,
+    rate: 53,
     exVat: 35.06,
     color: "#4a7c6b",
     bg: "#e8f4ef",
@@ -17,7 +17,7 @@ export const TIER_CONFIG = [
   },
   {
     key: "tier3" as const,
-    rate: 40,
+    rate: 48,
     exVat: 31.87,
     color: "#2d6b5a",
     bg: "#dceee8",
@@ -51,7 +51,3 @@ export const SCHEDULE_PRESETS = [
 ] as const;
 
 export type ScheduleKey = (typeof SCHEDULE_PRESETS)[number]["distribKey"];
-
-// INCLUDED_SCOPE, CONTRACT_NOTES, and TRUST_BADGES have been removed.
-// Use t.raw("pricing.office.scopeIncluded"), t.raw("pricing.office.contractNotes"),
-// and t.raw("pricing.office.trust") in components instead.

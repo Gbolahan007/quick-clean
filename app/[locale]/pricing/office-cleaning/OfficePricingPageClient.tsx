@@ -47,7 +47,7 @@ function OfficePricingPageInner({ localeProp }: Props) {
         onVatChange={() => {}}
       />
 
-      <div className="mx-auto max-w-5xl px-5 pb-40 pt-8">
+      <div className="mx-auto max-w-5xl px-5 pb-40 pt-8 ">
         {/* Page header */}
         <div className="mb-8">
           <div className="inline-flex items-center gap-2 mb-3 px-3 py-1.5 rounded-full border border-blue-100 bg-blue-50">
@@ -59,7 +59,7 @@ function OfficePricingPageInner({ localeProp }: Props) {
             </span>
           </div>
 
-          <h1 className="text-[30px] sm:text-[38px] font-extrabold text-[#0a1628] tracking-tight leading-tight">
+          <h1 className="text-[30px] sm:text-[38px] font-extrabold text-[#0a1628] tracking-tight leading-tight ">
             {t("calculatorTitle")}{" "}
             <span className="text-[#7c9885]">
               {t("calculatorTitleHighlight")}
