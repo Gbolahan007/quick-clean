@@ -71,7 +71,7 @@ export default function Footer() {
                 <Instagram className="w-5 h-5" />
               </a>
               <a
-                href="https://wa.me/358503484537"
+                href="https://wa.me/358413254295"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Chat with Frosh on WhatsApp"
@@ -180,11 +180,11 @@ export default function Footer() {
             <ul className="space-y-4">
               <li>
                 <a
-                  href="tel:+358503484537"
+                  href="tel:+358413254295"
                   className="text-gray-600 hover:text-[#7c9885] transition-colors flex items-start group"
                 >
                   <Phone className="w-5 h-5 mr-3 mt-1 shrink-0 group-hover:text-[#7c9885]" />
-                  <span>+358 50 348 4537</span>
+                  <span>+358 41 325 4295</span>
                 </a>
               </li>
               <li>
