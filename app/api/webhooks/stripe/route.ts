@@ -260,7 +260,7 @@ async function sendInvoicePaidEmail(
     .single();
   if (!customerData) return;
 
-  sendRenewalSuccessEmails({
+  await sendRenewalSuccessEmails({
     locale: "en",
     bookingId,
     customerEmail: customerData.email,
@@ -616,7 +616,7 @@ async function handleInvoicePaid(
     `[webhook] Booking ${booking.id} billing period updated: ${periodStart} → ${periodEnd}`,
   );
 
-  sendInvoicePaidEmail(
+  await sendInvoicePaidEmail(
     supabase,
     booking.id,
     booking.plan_label ?? "",
@@ -698,7 +698,7 @@ async function handleInvoicePaymentFailed(
     .single();
 
   if (customerData) {
-    sendPaymentFailedEmails({
+    await sendPaymentFailedEmails({
       locale: "en",
       bookingId: booking.id,
       customerEmail: customerData.email,
@@ -788,7 +788,7 @@ async function handleSubscriptionDeleted(
     .single();
 
   if (customerData) {
-    sendSubscriptionCancelledEmails({
+    await sendSubscriptionCancelledEmails({
       locale: "en",
       bookingId: booking.id,
       customerEmail: customerData.email,
@@ -877,7 +877,7 @@ async function handleChargeRefunded(
 
       if (customerData) {
         const cd = customerData as Record<string, unknown>;
-        sendRefundEmails({
+        await sendRefundEmails({
           locale: "en",
           bookingId,
           customerEmail: cd["email"] as string,
