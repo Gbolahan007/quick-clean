@@ -11,6 +11,8 @@ import {
   RefreshCw,
   Package,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { cancelSubscription } from "@/app/actions/subscription";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -126,6 +128,25 @@ function BookingModal({
   const isOffice = booking.service_type === "office";
   const isRecurring = booking.frequency !== "one-time";
   const ref = booking.id.slice(0, 8).toUpperCase();
+  const router = useRouter();
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [cancelState, setCancelState] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
+  const [cancelError, setCancelError] = useState<string | null>(null);
+
+  async function handleCancelSubscription() {
+    setCancelState("loading");
+    setCancelError(null);
+    const result = await cancelSubscription(booking.id);
+    if (result.success) {
+      setCancelState("success");
+      router.refresh();
+    } else {
+      setCancelState("error");
+      setCancelError(result.error);
+    }
+  }
 
   return (
     <div
@@ -137,11 +158,11 @@ function BookingModal({
 
       {/* Sheet */}
       <div
-        className="relative w-full sm:max-w-lg bg-white rounded-t-3xl sm:rounded-2xl overflow-hidden shadow-2xl max-h-[92dvh] flex flex-col"
+        className="relative   w-full sm:max-w-lg bg-white rounded-t-3xl sm:rounded-2xl overflow-hidden shadow-2xl max-h-[92dvh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-start justify-between px-5 pt-5 pb-4 border-b border-gray-100 shrink-0">
+        <div className="flex items-start  justify-between px-5 pt-5 pb-4 border-b border-gray-100 shrink-0">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400">
               Booking #{ref}
@@ -323,6 +344,65 @@ function BookingModal({
               </div>
             )}
 
+          {isRecurring &&
+            booking.stripe_subscription_id &&
+            booking.subscription_status === "active" &&
+            !booking.cancel_at_period_end && (
+              <div className="rounded-2xl border border-gray-200 bg-white px-4 py-3 space-y-2">
+                <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wider">
+                  Subscription
+                </p>
+
+                {cancelState === "success" ? (
+                  <p className="text-[13px] text-[#3d6b47] font-medium">
+                    Your subscription will cancel at the end of the current
+                    billing period.
+                  </p>
+                ) : showCancelConfirm ? (
+                  <div className="space-y-2">
+                    <p className="text-[13px] text-[#0a1628]">
+                      Cancel your subscription? You&apos;ll keep access until{" "}
+                      {booking.current_period_end
+                        ? formatDate(booking.current_period_end)
+                        : "the end of your current period"}
+                      .
+                    </p>
+                    {cancelState === "error" && (
+                      <p className="text-[12px] text-red-600">{cancelError}</p>
+                    )}
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={handleCancelSubscription}
+                        disabled={cancelState === "loading"}
+                        className="text-[12px] font-semibold px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors disabled:opacity-50"
+                      >
+                        {cancelState === "loading"
+                          ? "Cancelling…"
+                          : "Yes, cancel"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowCancelConfirm(false)}
+                        disabled={cancelState === "loading"}
+                        className="text-[12px] font-semibold px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                      >
+                        Keep subscription
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowCancelConfirm(true)}
+                    className="text-[13px] font-semibold cursor-pointer text-red-600 hover:underline"
+                  >
+                    Cancel subscription
+                  </button>
+                )}
+              </div>
+            )}
+
           {/* Special instructions */}
           {(notes.instructions || notes.hasPets) && (
             <div className="rounded-2xl border border-gray-200 bg-white px-4 py-3 space-y-2">
@@ -446,7 +526,7 @@ export function BookingList({
   return (
     <>
       {/* Upcoming */}
-      <section className="space-y-3">
+      <section className="space-y-3 ">
         <h2 className="text-[13px] font-bold uppercase tracking-widest text-gray-400">
           Upcoming
         </h2>

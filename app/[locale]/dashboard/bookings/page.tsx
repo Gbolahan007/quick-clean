@@ -51,7 +51,7 @@ export default async function BookingsPage({ params }: PageProps) {
         <h1 className="text-[22px] font-extrabold text-[#0a1628] tracking-tight">
           Bookings
         </h1>
-        <p className="text-[14px] text-[#0a1628]/50 mt-1">
+        <p className="text-[14px] text-[#0a1628]/50 mt-1 ">
           Your upcoming and past cleaning visits.
         </p>
       </div>
