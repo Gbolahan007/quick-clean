@@ -1,13 +1,4 @@
 "use server";
-// app/actions/createCheckoutSession.ts
-// ─────────────────────────────────────────────────────────────────────────────
-// v4 change: accepts optional stripeCouponId.
-// When present, passed to Stripe as discounts: [{ coupon: stripeCouponId }].
-// Stripe applies the discount to line items and shows the breakdown in the UI.
-// The coupon is never constructed here — it is always a pre-created Stripe
-// Coupon object whose ID was snapshotted from the vouchers table or the
-// STRIPE_COUPON_FIRST_BOOKING env var.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import { createClient } from "@supabase/supabase-js";
 import {

@@ -230,10 +230,7 @@ export default function Footer() {
 
             {/* Right — legal links */}
             <div className="flex space-x-6">
-              <Link
-                href="/privacy"
-                className="hover:text-[#7c9885] transition-colors"
-              >
+              <Link href="#" className="hover:text-[#7c9885] transition-colors">
                 {t("footer.privacy")}
               </Link>
               <Link
