@@ -6,8 +6,8 @@
 // RULES ENFORCED:
 //   1. Voucher exists and is active
 //   2. Not expired
-//   3. Global max_uses not exceeded
-//   4. Per-customer limit not exceeded (checks voucher_redemptions)
+//   3. Global max_uses not exceeded  (NULL = unlimited)
+//   4. Per-customer limit not exceeded  (NULL = unlimited)
 //   5. Applicable to the booking's service type
 //   6. Office bookings are always rejected
 //
@@ -83,10 +83,9 @@ export async function validateVoucher(params: {
   }
 
   // ── Global max uses check ─────────────────────────────────────────────────
-  // Vouchers are single-use globally by default. max_uses defaults to 1 if not set.
-  // Once times_used reaches the limit, the voucher is exhausted for everyone.
-  const effectiveMaxUses = voucher.max_uses ?? 1;
-  if (voucher.times_used >= effectiveMaxUses) {
+  // NULL max_uses means unlimited — do not apply any cap.
+  // A positive integer max_uses is a hard global cap.
+  if (voucher.max_uses !== null && voucher.times_used >= voucher.max_uses) {
     return { valid: false, error: "This voucher has already been used." };
   }
 
@@ -104,31 +103,40 @@ export async function validateVoucher(params: {
   }
 
   // ── Per-customer limit check ──────────────────────────────────────────────
-  // Redundant safety net — if the global check passes but this customer
-  // somehow has a redemption (race condition), block them too.
-  const { count: timesUsedByCustomer, error: redemptionError } = await supabase
-    .from("voucher_redemptions")
-    .select("id", { count: "exact", head: true })
-    .eq("voucher_id", voucher.id)
-    .eq("customer_id", customerId);
+  // NULL max_uses_per_customer means unlimited reuse per customer.
+  // A positive integer is the per-customer cap.
+  // The DB schema enforces max_uses_per_customer >= 1 when NOT NULL, so
+  // existing single-use vouchers (value = 1) continue to work unchanged.
+  const perCustomerLimit = voucher.max_uses_per_customer ?? null;
 
-  if (redemptionError) {
-    console.error(
-      "[validateVoucher] Redemption count error:",
-      redemptionError.message,
-    );
-    return {
-      valid: false,
-      error: "Unable to validate voucher. Please try again.",
-    };
-  }
+  if (perCustomerLimit !== null) {
+    const { count: timesUsedByCustomer, error: redemptionError } =
+      await supabase
+        .from("voucher_redemptions")
+        .select("id", { count: "exact", head: true })
+        .eq("voucher_id", voucher.id)
+        .eq("customer_id", customerId);
 
-  if ((timesUsedByCustomer ?? 0) >= 1) {
-    return {
-      valid: false,
-      error: "You have already used this voucher.",
-    };
+    if (redemptionError) {
+      console.error(
+        "[validateVoucher] Redemption count error:",
+        redemptionError.message,
+      );
+      return {
+        valid: false,
+        error: "Unable to validate voucher. Please try again.",
+      };
+    }
+
+    if ((timesUsedByCustomer ?? 0) >= perCustomerLimit) {
+      return {
+        valid: false,
+        error: "You have already used this voucher.",
+      };
+    }
   }
+  // If perCustomerLimit is null, skip the per-customer check entirely —
+  // this customer may redeem the voucher as many times as they like.
 
   // ── Calculate discount ────────────────────────────────────────────────────
   const discountAmountCents = calculateDiscountCents(
