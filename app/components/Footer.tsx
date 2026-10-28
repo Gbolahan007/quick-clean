@@ -11,6 +11,7 @@ import {
   Instagram,
   MessageCircle,
 } from "lucide-react";
+import { SiTiktok } from "react-icons/si";
 import Logo from "./Logo";
 
 export default function Footer() {
@@ -44,16 +45,17 @@ export default function Footer() {
             {/* Social Media Icons */}
             <div className="flex space-x-4">
               <a
-                href="https://linkedin.com/company/frosh"
+                href="https://www.tiktok.com/@froshtampere?lang=ru-RU"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Frosh on LinkedIn (@Frosh)"
+                aria-label="Frosh on TikTok (@froshtampere)"
                 className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-[#7c9885] hover:bg-[#7c9885] hover:text-white transition-all"
               >
-                <Linkedin className="w-5 h-5" />
+                <SiTiktok className="w-5 h-5" />
               </a>
+
               <a
-                href="https://facebook.com/frosh"
+                href="https://www.facebook.com/profile.php?id=61590896576294"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Frosh on Facebook (@Frosh)"
@@ -62,7 +64,7 @@ export default function Footer() {
                 <Facebook className="w-5 h-5" />
               </a>
               <a
-                href="https://instagram.com/frosh"
+                href="https://www.instagram.com/froshtamp"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Frosh on Instagram (@Frosh)"
