@@ -12,6 +12,8 @@
 //   - Only one discount is ever applied
 //   - If both discounts exist, choose the one with the larger saving
 //   - On a tie, prefer the voucher (analytics + determinism)
+//   - EXCEPTION: priority partner vouchers always win regardless of size
+//     (see PRIORITY_VOUCHER_CODES below)
 //   - First-booking eligibility is based on confirmed+paid bookings only
 //   - Cancelled / failed / pending bookings do NOT count
 //   - Only "maintenance" and "deep" service types are eligible for discounts
@@ -36,6 +38,34 @@ function getServiceClient() {
 }
 
 const FIRST_BOOKING_DISCOUNT_PERCENT = 25;
+
+// ── Priority partner vouchers ────────────────────────────────────────────────
+// Codes listed here ALWAYS apply at their own rate and are never replaced by a
+// larger competing promotion (currently only the 25% first-booking discount).
+//
+// WHY: partner codes exist to be tracked. When a competing promotion wins, the
+// DiscountResult carries voucherId: null and voucherCode: null, so no
+// voucher_redemptions row is written and times_used never increments — the
+// partnership becomes invisible in reporting. Pinning the partner rate keeps
+// attribution intact and makes the review-screen preview match the amount
+// actually charged at Stripe.
+//
+// TRADE-OFF: a first-time customer using a priority code receives the partner
+// rate rather than the larger first-booking discount, so they save less than
+// if they had entered no code at all.
+//
+// SCOPE: this changes behaviour ONLY for the codes in this set. Every other
+// voucher keeps the existing largest-discount-wins selection untouched.
+//
+// Compared case-insensitively. If this list grows beyond a handful, move it to
+// a boolean `is_priority` column on the vouchers table so partner codes can be
+// managed without a deploy.
+const PRIORITY_VOUCHER_CODES = new Set<string>(["AZUCAR10"]);
+
+function isPriorityVoucher(voucher: VoucherRow | null): boolean {
+  if (!voucher) return false;
+  return PRIORITY_VOUCHER_CODES.has(voucher.code.trim().toUpperCase());
+}
 
 // ── First-booking eligibility check ──────────────────────────────────────────
 // Counts confirmed+paid bookings for this customer, excluding office bookings.
@@ -95,6 +125,8 @@ export async function selectDiscount(params: {
     : 0;
 
   // ── Voucher discount ──────────────────────────────────────────────────────
+  // Unchanged: the voucher's own rate, computed by the shared helper so
+  // percentage/fixed handling and rounding stay consistent across the app.
   const voucherDiscountCents = validatedVoucher
     ? calculateDiscountCents(validatedVoucher, originalAmountCents)
     : 0;
@@ -114,10 +146,14 @@ export async function selectDiscount(params: {
   }
 
   // ── Winner selection ──────────────────────────────────────────────────────
-  // Prefer voucher on tie (analytics + determinism per spec).
+  // Priority partner vouchers win outright. Everything else keeps the original
+  // rule: the voucher wins when its saving is at least as large as the
+  // first-booking discount (voucher preferred on tie).
+  const priority = isPriorityVoucher(validatedVoucher);
+
   const useVoucher =
     validatedVoucher !== null &&
-    voucherDiscountCents >= firstBookingDiscountCents;
+    (priority || voucherDiscountCents >= firstBookingDiscountCents);
 
   if (useVoucher && validatedVoucher) {
     const finalAmountCents = Math.max(
